@@ -106,11 +106,13 @@ background-color: #080808;
 .hero-bg {
 position: absolute;
 inset: 0;
-background-image: url(‘hero-bg.png’);
+background-image: url(‘hero-bg.PNG’);
 background-size: cover;
 background-position: center 30%;
 opacity: 0.25;
 z-index: 0;
+font-size: 0;
+line-height: 0;
 }
 
 .hero-overlay {
@@ -729,7 +731,7 @@ footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
     <li><a href="#about">About</a></li>
     <li><a href="#events">Events</a></li>
   </ul>
-  <a href="#cta" class="nav-cta">Book a Session</a>
+  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="nav-cta">Book a Session</a>
 </nav>
 
 <!-- HERO -->
@@ -745,7 +747,7 @@ footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
     <p class="hero-sub">You are running patterns you didn't consciously choose.</p>
     <p class="hero-support">Hypnosis · Biofeedback · Structured Self-Observation</p>
     <div class="btn-group">
-      <a href="#cta" class="btn-primary">Book a Session</a>
+      <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary">Book a Session</a>
       <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror</a>
     </div>
   </div>
@@ -948,7 +950,7 @@ footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
       </div>
       <p class="email-note">Study Yourself updates · Session availability · Framework releases</p>
       <div class="btn-group">
-        <a href="#" class="btn-primary">Book Your Session</a>
+        <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary">Book Your Session</a>
         <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror First</a>
       </div>
     </div>
@@ -998,7 +1000,6 @@ footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
     }).catch(() => {
       window.location.href = '/thank-you.html';
     });
-  }
   }
 </script>
 
