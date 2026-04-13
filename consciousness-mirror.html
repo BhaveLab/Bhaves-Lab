@@ -917,6 +917,19 @@ to { opacity: 1; transform: translateY(0); }
     <p class="loading-text">The Mirror is reading what you brought...</p>
   </div>
 
+  <!-- EMAIL CAPTURE -->
+
+  <div id="email-screen" class="screen" style="display:none; text-align:center; padding:80px 0;">
+    <p class="lab-label">One more step</p>
+    <h2 style="font-family:'Cormorant Garamond',serif; font-size:clamp(28px,6vw,44px); font-weight:300; font-style:italic; color:#e8e0d4; margin-bottom:16px;">Receive your reflection.</h2>
+    <p style="font-family:'Cormorant Garamond',serif; font-size:clamp(15px,2.5vw,18px); font-weight:300; font-style:italic; color:rgba(232,224,212,0.5); line-height:1.7; margin-bottom:40px;">Enter your email and the Mirror will show you what it sees.</p>
+    <div style="display:flex; border:1px solid rgba(201,169,110,0.25); max-width:420px; margin:0 auto 16px;">
+      <input type="email" id="mirror-email" placeholder="Your email address" style="flex:1; background:transparent; border:none; outline:none; padding:16px 20px; font-family:'Syne',sans-serif; font-size:12px; color:#e8e0d4; letter-spacing:0.08em;">
+      <button onclick="submitMirrorEmail()" style="background:transparent; border:none; border-left:1px solid rgba(201,169,110,0.25); padding:16px 24px; font-family:'Syne',sans-serif; font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:#c9a96e; cursor:pointer; white-space:nowrap;">See Reflection</button>
+    </div>
+    <p style="font-size:10px; letter-spacing:0.15em; color:rgba(232,224,212,0.2); font-family:'Syne',sans-serif;">Your answers stay private. Only you see your reflection.</p>
+  </div>
+
   <!-- REFLECTION -->
 
   <div id="reflection-screen" class="screen">
@@ -1104,8 +1117,55 @@ function goNext() {
     currentQuestion++;
     renderQuestion();
   } else {
-    showReflection();
+    showEmailScreen();
   }
+}
+
+function showEmailScreen() {
+  document.getElementById('question-screen').style.display = 'none';
+  document.getElementById('email-screen').style.display = 'block';
+}
+
+function submitMirrorEmail() {
+  const email = document.getElementById('mirror-email').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('mirror-email').placeholder = 'Please enter a valid email';
+    return;
+  }
+
+  calculateScores();
+  const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  const sessionNames = { innerMining: 'Inner Mining Session', auracle: 'Auracle Session', frequency: 'Frequency Alignment Session' };
+
+  // Build answers summary
+  const answerSummary = answers.map((answerIndex, qIndex) => {
+    if (answerIndex !== undefined) {
+      return `Q${qIndex+1}: ${questions[qIndex].options[answerIndex].label}`;
+    }
+    return '';
+  }).join(' | ');
+
+  // Submit to Mailchimp
+  const formData = new FormData();
+  formData.append('EMAIL', email);
+  formData.append('b_037838dfc703ebc26a9667953_128fa75a50', '');
+  formData.append('MERGE2', `Session Type: ${sessionNames[primary]} | ${answerSummary}`);
+
+  fetch('https://lilegoverse.us20.list-manage.com/subscribe/post?u=037838dfc703ebc26a9667953&id=128fa75a50&f_id=00ab88e5f0', {
+    method: 'POST',
+    body: formData,
+    mode: 'no-cors'
+  });
+
+  // Show reflection
+  document.getElementById('email-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'block';
+
+  setTimeout(() => {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('reflection-screen').style.display = 'block';
+    renderReflection();
+  }, 2800);
 }
 
 function goBack() {
@@ -1127,18 +1187,7 @@ function calculateScores() {
   });
 }
 
-function showReflection() {
-  document.getElementById('question-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'block';
-
-  setTimeout(() => {
-    calculateScores();
-
-    document.getElementById('loading-screen').style.display = 'none';
-    const rs = document.getElementById('reflection-screen');
-    rs.style.display = 'block';
-
-    // Determine primary path
+function renderReflection() {
     const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
     const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
 
@@ -1148,7 +1197,6 @@ function showReflection() {
     document.getElementById('reflection-secondary').textContent = ref.secondary;
     document.getElementById('cta-text').textContent = ref.cta;
 
-    // Show paths — primary highlighted, others present
     const container = document.getElementById('paths-container');
     container.innerHTML = '';
     sorted.forEach(([key], idx) => {
@@ -1158,7 +1206,17 @@ function showReflection() {
       card.innerHTML = `<p class="path-name">${path.name}</p><p class="path-desc">${path.desc}</p>`;
       container.appendChild(card);
     });
+}
 
+function showReflection() {
+  document.getElementById('question-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'block';
+
+  setTimeout(() => {
+    calculateScores();
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('reflection-screen').style.display = 'block';
+    renderReflection();
   }, 2800);
 }
 
