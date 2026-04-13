@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're In — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background-color: #080808;
+color: #ede8e0;
+font-family: ‘Syne’, Georgia, sans-serif;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+padding: 40px 24px;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,169,110,0.05) 0%, transparent 70%);
+pointer-events: none;
+}
+
+.inner {
+position: relative;
+z-index: 1;
+max-width: 480px;
+animation: fadeUp 1.2s ease forwards;
+}
+
+.lab-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.4em;
+text-transform: uppercase;
+color: #c9a96e;
+opacity: 0.7;
+margin-bottom: 48px;
+}
+
+.divider-top {
+width: 1px;
+height: 48px;
+background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4));
+margin: 0 auto 48px;
+}
+
+.heading {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(48px, 10vw, 80px);
+font-weight: 300;
+line-height: 1.0;
+color: #ede8e0;
+margin-bottom: 8px;
+}
+
+.heading em {
+font-style: italic;
+color: #c9a96e;
+}
+
+.subheading {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(16px, 3vw, 20px);
+font-weight: 300;
+font-style: italic;
+color: rgba(237,232,224,0.45);
+margin-bottom: 56px;
+line-height: 1.6;
+}
+
+.divider {
+width: 40px;
+height: 1px;
+background: rgba(201,169,110,0.3);
+margin: 0 auto 48px;
+}
+
+.body-text {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(16px, 2.5vw, 19px);
+font-weight: 300;
+line-height: 1.85;
+color: rgba(237,232,224,0.5);
+margin-bottom: 56px;
+}
+
+.back-link {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: #c9a96e;
+border: 1px solid rgba(201,169,110,0.3);
+padding: 16px 40px;
+text-decoration: none;
+transition: all 0.3s;
+display: inline-block;
+}
+
+.back-link:hover { background: rgba(201,169,110,0.1); }
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+<div class="inner">
+  <p class="lab-label">Bhavé's Lab</p>
+  <div class="divider-top"></div>
+  <h1 class="heading">You're <em>in</em>.</h1>
+  <p class="subheading">Stay close.</p>
+  <div class="divider"></div>
+  <p class="body-text">
+    The work transmits from here.<br>
+    You'll hear from the Lab when there's something worth saying.
+  </p>
+  <a href="/" class="back-link">Return to the Lab</a>
+</div>
+</body>
+</html>
+
+
+Displaying 82F40E85-2EFD-4969-839F-AC5179056A7F.PNG.
