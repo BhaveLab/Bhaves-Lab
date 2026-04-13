@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consciousness Mirror — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: rgba(255,255,255,0.06);
+    --gold: #c9a96e;
+    --gold-dim: rgba(201,169,110,0.15);
+    --gold-glow: rgba(201,169,110,0.04);
+    --text: #e8e0d4;
+    --text-dim: rgba(232,224,212,0.45);
+    --text-muted: rgba(232,224,212,0.25);
+    --inner-mining: #7c6f5e;
+    --auracle: #5e7c7a;
+    --frequency: #6b5e7c;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+cursor: default;
+}
+
+/* Ambient background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background:
+radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,169,110,0.05) 0%, transparent 70%),
+radial-gradient(ellipse 40% 30% at 80% 80%, rgba(94,124,122,0.04) 0%, transparent 60%),
+radial-gradient(ellipse 30% 40% at 20% 60%, rgba(107,94,124,0.03) 0%, transparent 60%);
+pointer-events: none;
+z-index: 0;
+}
+
+/* Grain overlay */
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+opacity: 0.4;
+pointer-events: none;
+z-index: 0;
+}
+
+.container {
+position: relative;
+z-index: 1;
+max-width: 680px;
+margin: 0 auto;
+padding: 0 24px;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+/* INTRO SCREEN */
+#intro {
+text-align: center;
+padding: 80px 0;
+animation: fadeUp 1.2s ease forwards;
+}
+
+.lab-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+font-weight: 400;
+letter-spacing: 0.3em;
+color: var(–gold);
+text-transform: uppercase;
+margin-bottom: 48px;
+opacity: 0.7;
+}
+
+.mirror-title {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(52px, 10vw, 80px);
+font-weight: 300;
+line-height: 1.0;
+letter-spacing: -0.02em;
+margin-bottom: 8px;
+color: var(–text);
+}
+
+.mirror-title em {
+font-style: italic;
+color: var(–gold);
+}
+
+.mirror-subtitle {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(14px, 3vw, 18px);
+font-weight: 300;
+font-style: italic;
+color: var(–text-dim);
+margin-bottom: 56px;
+line-height: 1.6;
+}
+
+.divider {
+width: 1px;
+height: 48px;
+background: linear-gradient(to bottom, transparent, var(–gold), transparent);
+margin: 0 auto 48px;
+opacity: 0.4;
+}
+
+.intro-body {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(16px, 3vw, 20px);
+font-weight: 300;
+line-height: 1.8;
+color: var(–text-dim);
+max-width: 480px;
+margin: 0 auto 56px;
+}
+
+.begin-btn {
+display: inline-block;
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 400;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–gold);
+background: transparent;
+border: 1px solid rgba(201,169,110,0.3);
+padding: 18px 48px;
+cursor: pointer;
+transition: all 0.4s ease;
+position: relative;
+overflow: hidden;
+}
+
+.begin-btn::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: var(–gold-dim);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.4s ease;
+}
+
+.begin-btn:hover::before { transform: scaleX(1); }
+.begin-btn:hover { border-color: rgba(201,169,110,0.6); }
+.begin-btn span { position: relative; z-index: 1; }
+
+/* QUESTION SCREEN */
+#question-screen {
+display: none;
+padding: 60px 0;
+animation: fadeUp 0.8s ease forwards;
+}
+
+.progress-bar {
+display: flex;
+gap: 6px;
+margin-bottom: 64px;
+justify-content: center;
+}
+
+.progress-dot {
+width: 24px;
+height: 1px;
+background: var(–border);
+transition: background 0.5s ease, width 0.3s ease;
+}
+
+.progress-dot.active { background: var(–gold); opacity: 0.6; }
+.progress-dot.done { background: var(–gold); opacity: 0.3; }
+
+.question-number {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.3em;
+color: var(–text-muted);
+text-transform: uppercase;
+margin-bottom: 24px;
+text-align: center;
+}
+
+.question-text {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(24px, 5vw, 36px);
+font-weight: 300;
+line-height: 1.5;
+color: var(–text);
+text-align: center;
+margin-bottom: 56px;
+min-height: 120px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.options-grid {
+display: flex;
+flex-direction: column;
+gap: 12px;
+margin-bottom: 48px;
+}
+
+.option-btn {
+background: transparent;
+border: 1px solid var(–border);
+color: var(–text-dim);
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(15px, 2.5vw, 18px);
+font-weight: 300;
+font-style: italic;
+line-height: 1.5;
+padding: 20px 28px;
+cursor: pointer;
+text-align: left;
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+.option-btn::before {
+content: ‘’;
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+width: 2px;
+background: var(–gold);
+transform: scaleY(0);
+transition: transform 0.3s ease;
+}
+
+.option-btn:hover {
+border-color: rgba(201,169,110,0.2);
+color: var(–text);
+background: var(–gold-glow);
+}
+
+.option-btn:hover::before { transform: scaleY(1); }
+
+.option-btn.selected {
+border-color: rgba(201,169,110,0.35);
+color: var(–text);
+background: var(–gold-glow);
+}
+
+.option-btn.selected::before { transform: scaleY(1); }
+
+.nav-row {
+display: flex;
+justify-content: center;
+gap: 16px;
+}
+
+.nav-btn {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+background: transparent;
+border: 1px solid var(–border);
+color: var(–text-muted);
+padding: 14px 32px;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.nav-btn:hover { border-color: rgba(201,169,110,0.3); color: var(–gold); }
+
+.nav-btn.primary {
+border-color: rgba(201,169,110,0.3);
+color: var(–gold);
+}
+
+.nav-btn.primary:hover {
+background: var(–gold-dim);
+}
+
+.nav-btn:disabled {
+opacity: 0.2;
+cursor: not-allowed;
+}
+
+/* REFLECTION SCREEN */
+#reflection-screen {
+display: none;
+padding: 60px 0;
+animation: fadeUp 1s ease forwards;
+}
+
+.reflection-header {
+text-align: center;
+margin-bottom: 56px;
+}
+
+.reflection-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.3em;
+color: var(–gold);
+text-transform: uppercase;
+opacity: 0.7;
+margin-bottom: 24px;
+}
+
+.reflection-title {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(32px, 6vw, 48px);
+font-weight: 300;
+font-style: italic;
+line-height: 1.2;
+color: var(–text);
+}
+
+.reflection-body {
+background: rgba(255,255,255,0.02);
+border: 1px solid var(–border);
+border-left: 2px solid rgba(201,169,110,0.3);
+padding: 36px 40px;
+margin-bottom: 40px;
+}
+
+.reflection-text {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(17px, 3vw, 21px);
+font-weight: 300;
+line-height: 1.8;
+color: var(–text-dim);
+margin-bottom: 24px;
+}
+
+.reflection-text:last-child { margin-bottom: 0; }
+
+.paths-section {
+margin-bottom: 48px;
+}
+
+.paths-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.3em;
+color: var(–text-muted);
+text-transform: uppercase;
+margin-bottom: 20px;
+text-align: center;
+}
+
+.path-card {
+border: 1px solid var(–border);
+padding: 24px 28px;
+margin-bottom: 10px;
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+.path-card::before {
+content: ‘’;
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+width: 2px;
+transition: opacity 0.3s ease;
+}
+
+.path-card.inner-mining::before { background: var(–inner-mining); }
+.path-card.auracle::before { background: var(–auracle); }
+.path-card.frequency::before { background: var(–frequency); }
+
+.path-card.highlighted {
+background: rgba(255,255,255,0.02);
+border-color: rgba(255,255,255,0.1);
+}
+
+.path-name {
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.path-card.inner-mining .path-name { color: #a89070; }
+.path-card.auracle .path-name { color: #70a8a5; }
+.path-card.frequency .path-name { color: #9070a8; }
+
+.path-desc {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(15px, 2.5vw, 17px);
+font-weight: 300;
+font-style: italic;
+color: var(–text-dim);
+line-height: 1.6;
+}
+
+.session-cta {
+text-align: center;
+padding: 48px 0 24px;
+border-top: 1px solid var(–border);
+}
+
+.cta-pre {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(16px, 3vw, 20px);
+font-weight: 300;
+font-style: italic;
+color: var(–text-dim);
+margin-bottom: 32px;
+line-height: 1.7;
+}
+
+.cta-btn {
+display: inline-block;
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 400;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–gold);
+background: transparent;
+border: 1px solid rgba(201,169,110,0.3);
+padding: 18px 48px;
+cursor: pointer;
+transition: all 0.4s ease;
+margin-bottom: 16px;
+position: relative;
+overflow: hidden;
+}
+
+.cta-btn::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: var(–gold-dim);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.4s ease;
+}
+
+.cta-btn:hover::before { transform: scaleX(1); }
+.cta-btn span { position: relative; z-index: 1; }
+
+.restart-link {
+display: block;
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–text-muted);
+background: none;
+border: none;
+cursor: pointer;
+margin-top: 16px;
+transition: color 0.3s ease;
+}
+
+.restart-link:hover { color: var(–text-dim); }
+
+/* LOADING */
+#loading-screen {
+display: none;
+text-align: center;
+padding: 120px 0;
+animation: fadeUp 0.6s ease forwards;
+}
+
+.loading-pulse {
+width: 48px;
+height: 48px;
+border: 1px solid rgba(201,169,110,0.2);
+border-top-color: var(–gold);
+border-radius: 50%;
+margin: 0 auto 32px;
+animation: spin 1.5s linear infinite;
+}
+
+.loading-text {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 18px;
+font-weight: 300;
+font-style: italic;
+color: var(–text-dim);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.screen { transition: opacity 0.4s ease; }
+
+/* Responsive */
+@media (max-width: 480px) {
+.container { padding: 0 20px; }
+.reflection-body { padding: 24px 20px; }
+.path-card { padding: 20px 20px; }
+.option-btn { padding: 18px 20px; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <!-- INTRO -->
+
+  <div id="intro" class="screen">
+    <p class="lab-label">Bhavé's Lab</p>
+    <h1 class="mirror-title">The <em>Consciousness</em><br>Mirror</h1>
+    <p class="mirror-subtitle">Six questions. No answers given.<br>Only what is already there — reflected back.</p>
+    <div class="divider"></div>
+    <p class="intro-body">
+      This isn't a test. There is nothing to pass or fail.<br><br>
+      Answer what feels true right now. The Mirror will show you what it sees — not what to do with it. That part belongs to you.
+    </p>
+    <button class="begin-btn" onclick="startMirror()"><span>Enter the Mirror</span></button>
+  </div>
+
+  <!-- QUESTIONS -->
+
+  <div id="question-screen" class="screen">
+    <div class="progress-bar" id="progress-bar"></div>
+    <p class="question-number" id="question-number"></p>
+    <div class="question-text" id="question-text"></div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="back-btn" onclick="goBack()">Back</button>
+      <button class="nav-btn primary" id="next-btn" onclick="goNext()" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+
+  <div id="loading-screen" class="screen">
+    <div class="loading-pulse"></div>
+    <p class="loading-text">The Mirror is reading what you brought...</p>
+  </div>
+
+  <!-- REFLECTION -->
+
+  <div id="reflection-screen" class="screen">
+    <div class="reflection-header">
+      <p class="reflection-label">Your Reflection</p>
+      <h2 class="reflection-title" id="reflection-title"></h2>
+    </div>
+    <div class="reflection-body">
+      <p class="reflection-text" id="reflection-main"></p>
+      <p class="reflection-text" id="reflection-secondary"></p>
+    </div>
+    <div class="paths-section">
+      <p class="paths-label">Paths to feel into</p>
+      <div id="paths-container"></div>
+    </div>
+    <div class="session-cta">
+      <p class="cta-pre" id="cta-text"></p>
+      <button class="cta-btn" onclick="bookSession()"><span>Explore a Session</span></button>
+      <button class="restart-link" onclick="restartMirror()">Return to the beginning</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1,
+    text: "When you look at the current version of your life, does it feel like a story you are writing — or a story you are remembering?",
+    options: [
+      { label: "I am writing it. I feel authorship over where it goes.", points: { innerMining: 0, auracle: 1, frequency: 2 } },
+      { label: "Something in between — some parts feel chosen, others feel inherited.", points: { innerMining: 2, auracle: 1, frequency: 0 } },
+      { label: "I am remembering it. Like I am following a script I didn't write.", points: { innerMining: 3, auracle: 0, frequency: 0 } }
+    ],
+    type: "innerMining"
+  },
+  {
+    id: 2,
+    text: "Do you ever notice a way you respond to pressure, change, or repetition that feels almost automatic — like it started somewhere you can't quite see?",
+    options: [
+      { label: "Yes — there is a pattern I keep returning to that I don't fully understand.", points: { innerMining: 3, auracle: 0, frequency: 0 } },
+      { label: "Sometimes — I notice it but I'm not sure it runs that deep.", points: { innerMining: 1, auracle: 2, frequency: 1 } },
+      { label: "Not really — my responses feel mostly intentional.", points: { innerMining: 0, auracle: 1, frequency: 2 } }
+    ],
+    type: "innerMining"
+  },
+  {
+    id: 3,
+    text: "Right now, do you feel more like you're inside your experience — or watching it happen?",
+    options: [
+      { label: "Inside it — fully immersed, sometimes too much.", points: { innerMining: 1, auracle: 2, frequency: 1 } },
+      { label: "Watching it — like I'm observing my own life from a slight distance.", points: { innerMining: 0, auracle: 3, frequency: 1 } },
+      { label: "I move between both, sometimes without choosing to.", points: { innerMining: 2, auracle: 1, frequency: 0 } }
+    ],
+    type: "auracle"
+  },
+  {
+    id: 4,
+    text: "When you slow down, what becomes more noticeable — your body, your thoughts, or something else entirely?",
+    options: [
+      { label: "My body — sensations, tension, physical signals I usually move past.", points: { innerMining: 0, auracle: 3, frequency: 1 } },
+      { label: "My thoughts — the volume and pace of what runs through my mind.", points: { innerMining: 2, auracle: 1, frequency: 0 } },
+      { label: "Something harder to name — a presence, a weight, a frequency.", points: { innerMining: 1, auracle: 1, frequency: 3 } }
+    ],
+    type: "auracle"
+  },
+  {
+    id: 5,
+    text: "Is there something in your life you understand clearly — but it still hasn't shifted?",
+    options: [
+      { label: "Yes — I know what it is but knowing hasn't been enough to move it.", points: { innerMining: 2, auracle: 0, frequency: 3 } },
+      { label: "There is something, but I'm not sure I fully understand it yet.", points: { innerMining: 3, auracle: 1, frequency: 0 } },
+      { label: "Most things that I understand, I've been able to work through.", points: { innerMining: 0, auracle: 2, frequency: 1 } }
+    ],
+    type: "frequency"
+  },
+  {
+    id: 6,
+    text: "Does your current state feel like something you're choosing — or something you've been carrying?",
+    options: [
+      { label: "Choosing — I feel agency over how I show up.", points: { innerMining: 0, auracle: 1, frequency: 3 } },
+      { label: "Carrying — there is a weight that has been with me for a while.", points: { innerMining: 3, auracle: 1, frequency: 0 } },
+      { label: "Both — there are parts I've claimed and parts I haven't yet.", points: { innerMining: 1, auracle: 2, frequency: 1 } }
+    ],
+    type: "frequency"
+  }
+];
+
+const sessionPaths = {
+  innerMining: {
+    name: "Inner Mining",
+    class: "inner-mining",
+    desc: "There is something beneath the surface that hasn't been located yet. This path goes to the origin — not to fix it, but to finally see it clearly."
+  },
+  auracle: {
+    name: "Auracle Session",
+    class: "auracle",
+    desc: "Your inner state has a pattern that can be observed in real time. This path uses biofeedback tools to make visible what you already sense but can't quite name."
+  },
+  frequency: {
+    name: "Frequency Alignment",
+    class: "frequency",
+    desc: "There is something you are ready to shift. Not because something is wrong — but because you can feel a different state is available to you."
+  }
+};
+
+const reflections = {
+  innerMining: {
+    title: "Something is seeking its origin.",
+    main: "The Mirror sees a pattern — not a flaw. Something in how you move through life has a beginning point that hasn't been located yet. Not because you haven't tried. Because some things live beneath where looking normally reaches.",
+    secondary: "There is a difference between understanding something and seeing where it started. You may be closer to that second part than you think.",
+    cta: "What you're carrying has a source. If you're ready to look there, there is a path for that."
+  },
+  auracle: {
+    title: "You are ready to observe yourself.",
+    main: "The Mirror sees someone developing the ability to watch their own experience — not just live inside it. That is not a small thing. Most people never make that move.",
+    secondary: "What you sense about yourself is real. The question is whether you want to see it reflected back with precision — not as a judgment, but as data you can work with.",
+    cta: "Your inner state has a pattern that can be made visible. If you want to see what the Mirror sees — there is a way to go deeper."
+  },
+  frequency: {
+    title: "You are standing at a threshold.",
+    main: "The Mirror sees someone who knows something is ready to move. Not because something is broken. Because you can feel the distance between where you are and what is available to you.",
+    secondary: "Understanding arrives first. The shift comes after — and it doesn't always need more understanding. Sometimes it needs a different frequency entirely.",
+    cta: "There is a state available to you that this one is pointing toward. If you want to feel into what that transition looks like — there is a path open."
+  }
+};
+
+let currentQuestion = 0;
+let answers = [];
+let scores = { innerMining: 0, auracle: 0, frequency: 0 };
+
+function startMirror() {
+  document.getElementById('intro').style.display = 'none';
+  const qs = document.getElementById('question-screen');
+  qs.style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQuestion];
+
+  // Progress
+  const pb = document.getElementById('progress-bar');
+  pb.innerHTML = '';
+  questions.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (i === currentQuestion ? ' active' : i < currentQuestion ? ' done' : '');
+    pb.appendChild(dot);
+  });
+
+  document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+  document.getElementById('question-text').textContent = q.text;
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.label;
+    if (answers[currentQuestion] === i) btn.classList.add('selected');
+    btn.onclick = () => selectOption(i);
+    grid.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = answers[currentQuestion] === undefined;
+  nextBtn.textContent = currentQuestion === questions.length - 1 ? 'See Reflection' : 'Continue';
+
+  const backBtn = document.getElementById('back-btn');
+  backBtn.disabled = currentQuestion === 0;
+}
+
+function selectOption(index) {
+  answers[currentQuestion] = index;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+  document.getElementById('next-btn').disabled = false;
+}
+
+function goNext() {
+  if (answers[currentQuestion] === undefined) return;
+
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    showReflection();
+  }
+}
+
+function goBack() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+function calculateScores() {
+  scores = { innerMining: 0, auracle: 0, frequency: 0 };
+  answers.forEach((answerIndex, qIndex) => {
+    if (answerIndex !== undefined) {
+      const pts = questions[qIndex].options[answerIndex].points;
+      scores.innerMining += pts.innerMining;
+      scores.auracle += pts.auracle;
+      scores.frequency += pts.frequency;
+    }
+  });
+}
+
+function showReflection() {
+  document.getElementById('question-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'block';
+
+  setTimeout(() => {
+    calculateScores();
+
+    document.getElementById('loading-screen').style.display = 'none';
+    const rs = document.getElementById('reflection-screen');
+    rs.style.display = 'block';
+
+    // Determine primary path
+    const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+    const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+
+    const ref = reflections[primary];
+    document.getElementById('reflection-title').textContent = ref.title;
+    document.getElementById('reflection-main').textContent = ref.main;
+    document.getElementById('reflection-secondary').textContent = ref.secondary;
+    document.getElementById('cta-text').textContent = ref.cta;
+
+    // Show paths — primary highlighted, others present
+    const container = document.getElementById('paths-container');
+    container.innerHTML = '';
+    sorted.forEach(([key], idx) => {
+      const path = sessionPaths[key];
+      const card = document.createElement('div');
+      card.className = `path-card ${path.class}${idx === 0 ? ' highlighted' : ''}`;
+      card.innerHTML = `<p class="path-name">${path.name}</p><p class="path-desc">${path.desc}</p>`;
+      container.appendChild(card);
+    });
+
+  }, 2800);
+}
+
+function bookSession() {
+  // Replace with actual booking URL
+  alert('Session booking coming soon. This will link to your booking page.');
+}
+
+function restartMirror() {
+  currentQuestion = 0;
+  answers = [];
+  scores = { innerMining: 0, auracle: 0, frequency: 0 };
+  document.getElementById('reflection-screen').style.display = 'none';
+  document.getElementById('intro').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
+
+
+Displaying 82F40E85-2EFD-4969-839F-AC5179056A7F.PNG.
