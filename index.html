@@ -7,74 +7,60 @@
 <title>Bhavé's Lab — Metaphysical Strategist</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #080808;
-    --surface: #0f0f0f;
-    --surface-2: #141414;
-    --border: rgba(255,255,255,0.055);
-    --border-hover: rgba(255,255,255,0.12);
-    --gold: #c9a96e;
-    --gold-dim: rgba(201,169,110,0.12);
-    --gold-glow: rgba(201,169,110,0.04);
-    --text: #ede8e0;
-    --text-dim: rgba(237,232,224,0.5);
-    --text-muted: rgba(237,232,224,0.28);
-    --text-faint: rgba(237,232,224,0.14);
-  }
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
 
 body {
-background: var(–bg);
-color: var(–text);
-font-family: ‘Syne’, sans-serif;
+background-color: #080808 !important;
+background: #080808 !important;
+color: #ede8e0;
+font-family: ‘Syne’, Georgia, serif;
 font-weight: 300;
 overflow-x: hidden;
 -webkit-font-smoothing: antialiased;
 }
 
-/* GRAIN */
-body::after {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 512 512’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.75’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.025’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 9999;
-opacity: 0.5;
+:root {
+–bg: #080808;
+–surface: #111111;
+–border: rgba(255,255,255,0.06);
+–gold: #c9a96e;
+–gold-dim: rgba(201,169,110,0.12);
+–text: #ede8e0;
+–text-dim: rgba(237,232,224,0.5);
+–text-muted: rgba(237,232,224,0.28);
+–text-faint: rgba(237,232,224,0.14);
 }
 
 /* NAV */
 nav {
 position: fixed;
-top: 0;
-left: 0;
-right: 0;
+top: 0; left: 0; right: 0;
 z-index: 100;
-padding: 24px 48px;
+padding: 20px 40px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
-backdrop-filter: blur(12px);
+background: rgba(8,8,8,0.92);
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .nav-logo {
-font-family: ‘Cormorant Garamond’, serif;
+font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: 18px;
 font-weight: 400;
 letter-spacing: 0.08em;
-color: var(–text);
+color: #ede8e0;
 text-decoration: none;
 }
 
-.nav-logo span { color: var(–gold); }
+.nav-logo span { color: #c9a96e; }
 
 .nav-links {
 display: flex;
-gap: 40px;
+gap: 36px;
 list-style: none;
 }
 
@@ -83,369 +69,319 @@ font-size: 10px;
 font-weight: 400;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–text-dim);
+color: rgba(237,232,224,0.5);
 text-decoration: none;
-transition: color 0.3s ease;
+transition: color 0.3s;
 }
 
-.nav-links a:hover { color: var(–gold); }
+.nav-links a:hover { color: #c9a96e; }
 
 .nav-cta {
 font-size: 10px;
-font-weight: 400;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–gold);
-border: 1px solid rgba(201,169,110,0.3);
+color: #c9a96e;
+border: 1px solid rgba(201,169,110,0.35);
 padding: 12px 28px;
 text-decoration: none;
-transition: all 0.3s ease;
+transition: all 0.3s;
+background: transparent;
 }
 
-.nav-cta:hover { background: var(–gold-dim); }
+.nav-cta:hover { background: rgba(201,169,110,0.1); }
 
-/* SECTIONS */
-section {
-position: relative;
-z-index: 1;
-}
-
-.container {
-max-width: 1100px;
-margin: 0 auto;
-padding: 0 48px;
-}
-
-.container-narrow {
-max-width: 720px;
-margin: 0 auto;
-padding: 0 48px;
-}
-
-/* ── HERO ── */
+/* HERO */
 #hero {
 min-height: 100vh;
 display: flex;
 align-items: center;
 justify-content: center;
 text-align: center;
-padding: 120px 24px 80px;
+padding: 100px 24px 80px;
 position: relative;
 overflow: hidden;
+background-color: #080808;
 }
 
-#hero::before {
-content: ‘’;
+.hero-bg {
 position: absolute;
 inset: 0;
-background:
-radial-gradient(ellipse 70% 60% at 50% 30%, rgba(201,169,110,0.06) 0%, transparent 65%),
-radial-gradient(ellipse 40% 40% at 20% 80%, rgba(94,124,122,0.03) 0%, transparent 60%),
-radial-gradient(ellipse 30% 50% at 80% 20%, rgba(107,94,124,0.03) 0%, transparent 60%);
-pointer-events: none;
+background-image: url(‘hero-bg.png’);
+background-size: cover;
+background-position: center 30%;
+opacity: 0.25;
+z-index: 0;
 }
 
-/* Vertical lines decoration */
-#hero::after {
-content: ‘’;
+.hero-overlay {
 position: absolute;
-top: 0;
-left: 50%;
-transform: translateX(-50%);
-width: 1px;
-height: 80px;
-background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.3));
+inset: 0;
+background: linear-gradient(to bottom, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.3) 50%, rgba(8,8,8,0.85) 100%);
+z-index: 1;
 }
 
 .hero-inner {
 position: relative;
-z-index: 1;
-animation: heroFade 1.4s ease forwards;
+z-index: 2;
+animation: fadeUp 1.2s ease forwards;
 }
 
 .hero-label {
 font-size: 10px;
-font-weight: 400;
 letter-spacing: 0.4em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 opacity: 0.7;
 margin-bottom: 40px;
+font-family: ‘Syne’, sans-serif;
 }
 
 .hero-name {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(64px, 12vw, 120px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(72px, 14vw, 130px);
 font-weight: 300;
 line-height: 0.9;
 letter-spacing: -0.02em;
+color: #ede8e0;
 margin-bottom: 4px;
-color: var(–text);
 }
 
-.hero-name em {
-font-style: italic;
-color: var(–gold);
-}
+.hero-name em { font-style: italic; color: #c9a96e; }
 
 .hero-title {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(13px, 2vw, 16px);
-font-weight: 300;
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(11px, 1.8vw, 14px);
+font-weight: 400;
 letter-spacing: 0.35em;
 text-transform: uppercase;
-color: var(–text-muted);
-margin-bottom: 56px;
+color: rgba(237,232,224,0.35);
+margin-bottom: 48px;
 }
 
 .hero-line {
 width: 1px;
 height: 40px;
-background: linear-gradient(to bottom, rgba(201,169,110,0.4), transparent);
+background: linear-gradient(to bottom, rgba(201,169,110,0.5), transparent);
 margin: 0 auto 40px;
 }
 
 .hero-sub {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(20px, 3.5vw, 30px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(20px, 4vw, 32px);
 font-weight: 300;
 font-style: italic;
 line-height: 1.5;
-color: var(–text-dim);
-max-width: 560px;
+color: rgba(237,232,224,0.75);
+max-width: 520px;
 margin: 0 auto 16px;
 }
 
 .hero-support {
-font-size: 12px;
-font-weight: 400;
+font-size: 11px;
 letter-spacing: 0.15em;
-color: var(–text-muted);
-margin-bottom: 56px;
+color: rgba(237,232,224,0.35);
+margin-bottom: 52px;
+font-family: ‘Syne’, sans-serif;
 }
 
 .btn-group {
 display: flex;
-gap: 16px;
+gap: 14px;
 justify-content: center;
 flex-wrap: wrap;
 }
 
 .btn-primary {
+font-family: ‘Syne’, sans-serif;
 font-size: 11px;
 font-weight: 400;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–bg);
-background: var(–gold);
-border: 1px solid var(–gold);
-padding: 18px 48px;
+color: #080808;
+background: #c9a96e;
+border: 1px solid #c9a96e;
+padding: 17px 44px;
 cursor: pointer;
 text-decoration: none;
-transition: all 0.3s ease;
+transition: all 0.3s;
 display: inline-block;
 }
 
-.btn-primary:hover { background: #d4b47a; border-color: #d4b47a; }
+.btn-primary:hover { background: #d4b47a; }
 
 .btn-secondary {
+font-family: ‘Syne’, sans-serif;
 font-size: 11px;
 font-weight: 400;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 background: transparent;
-border: 1px solid rgba(201,169,110,0.3);
-padding: 18px 48px;
+border: 1px solid rgba(201,169,110,0.35);
+padding: 17px 44px;
 cursor: pointer;
 text-decoration: none;
-transition: all 0.3s ease;
+transition: all 0.3s;
 display: inline-block;
+}
+
+.btn-secondary:hover { background: rgba(201,169,110,0.1); }
+
+/* SECTIONS */
+section {
+background-color: #080808;
 position: relative;
-overflow: hidden;
+z-index: 1;
 }
 
-.btn-secondary::before {
-content: ‘’;
-position: absolute;
-inset: 0;
-background: var(–gold-dim);
-transform: scaleX(0);
-transform-origin: left;
-transition: transform 0.3s ease;
-}
+.container { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+.container-narrow { max-width: 680px; margin: 0 auto; padding: 0 40px; }
 
-.btn-secondary:hover::before { transform: scaleX(1); }
-.btn-secondary span { position: relative; z-index: 1; }
-
-/* ── WHAT THIS IS ── */
-#what {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-}
+/* WHAT */
+#what { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .section-label {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
-font-weight: 400;
 letter-spacing: 0.4em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 opacity: 0.6;
-margin-bottom: 32px;
+margin-bottom: 28px;
 }
 
 .section-heading {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(36px, 6vw, 60px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(36px, 6vw, 58px);
 font-weight: 300;
 line-height: 1.1;
 letter-spacing: -0.01em;
-margin-bottom: 48px;
-color: var(–text);
+margin-bottom: 40px;
+color: #ede8e0;
 }
 
-.section-heading em { font-style: italic; color: var(–gold); }
+.section-heading em { font-style: italic; color: #c9a96e; }
 
 .body-text {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(18px, 2.5vw, 22px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(17px, 2.5vw, 21px);
 font-weight: 300;
-line-height: 1.8;
-color: var(–text-dim);
-margin-bottom: 24px;
+line-height: 1.85;
+color: rgba(237,232,224,0.55);
+margin-bottom: 20px;
 }
-
-.body-text:last-child { margin-bottom: 0; }
 
 .precision-line {
 font-family: ‘Syne’, sans-serif;
-font-size: 12px;
+font-size: 11px;
 font-weight: 500;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–gold);
-margin-top: 40px;
-padding-top: 40px;
-border-top: 1px solid var(–border);
+color: #c9a96e;
+margin-top: 36px;
+padding-top: 36px;
+border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-/* ── FRAMEWORK ── */
-#framework {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-text-align: center;
-}
+/* FRAMEWORK */
+#framework { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; }
 
 .framework-flow {
 display: flex;
 align-items: center;
 justify-content: center;
-gap: 0;
 flex-wrap: wrap;
-margin: 64px 0 48px;
-}
-
-.framework-node {
-text-align: center;
-padding: 0 20px;
+gap: 0;
+margin: 56px 0 40px;
 }
 
 .framework-word {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(18px, 3vw, 26px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(17px, 3vw, 26px);
 font-weight: 400;
-letter-spacing: 0.08em;
-color: var(–text);
-display: block;
-margin-bottom: 6px;
+letter-spacing: 0.06em;
+color: #ede8e0;
+padding: 0 16px;
 }
 
 .framework-arrow {
-font-size: 14px;
-color: var(–gold);
+color: #c9a96e;
 opacity: 0.4;
-padding: 0 4px;
-align-self: center;
-margin-bottom: 16px;
+font-size: 14px;
 }
 
 .framework-caption {
-font-family: ‘Cormorant Garamond’, serif;
+font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(16px, 2.5vw, 20px);
 font-weight: 300;
 font-style: italic;
-color: var(–text-dim);
-max-width: 480px;
+color: rgba(237,232,224,0.5);
+max-width: 460px;
 margin: 0 auto;
 line-height: 1.7;
 }
 
-/* ── MIRROR CTA ── */
-#mirror-cta {
-padding: 100px 0;
-border-top: 1px solid var(–border);
-}
+/* MIRROR CTA */
+#mirror-cta { padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .mirror-block {
-background: var(–surface);
-border: 1px solid var(–border);
+background: #0f0f0f;
+border: 1px solid rgba(255,255,255,0.06);
 border-left: 2px solid rgba(201,169,110,0.4);
-padding: 64px 72px;
+padding: 56px 64px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-gap: 48px;
+gap: 40px;
 flex-wrap: wrap;
 }
 
-.mirror-block-text { flex: 1; min-width: 280px; }
+.mirror-block-text { flex: 1; min-width: 260px; }
 
 .mirror-block-label {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.35em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 opacity: 0.6;
-margin-bottom: 20px;
+margin-bottom: 16px;
 }
 
 .mirror-block-heading {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(28px, 4vw, 42px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(26px, 4vw, 40px);
 font-weight: 300;
 line-height: 1.2;
-color: var(–text);
-margin-bottom: 20px;
+color: #ede8e0;
+margin-bottom: 16px;
 }
 
 .mirror-block-body {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(16px, 2vw, 19px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(15px, 2vw, 18px);
 font-weight: 300;
 font-style: italic;
-color: var(–text-dim);
+color: rgba(237,232,224,0.5);
 line-height: 1.7;
 }
 
-/* ── SERVICES ── */
-#services {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-}
+/* SERVICES */
+#services { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .services-grid {
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+grid-template-columns: repeat(2, 1fr);
 gap: 1px;
-background: var(–border);
-margin-top: 64px;
-border: 1px solid var(–border);
+background: rgba(255,255,255,0.06);
+margin-top: 56px;
+border: 1px solid rgba(255,255,255,0.06);
 }
 
 .service-card {
-background: var(–bg);
-padding: 48px 40px;
-transition: background 0.3s ease;
+background: #080808;
+padding: 44px 36px;
+transition: background 0.3s;
 position: relative;
 overflow: hidden;
 }
@@ -453,191 +389,170 @@ overflow: hidden;
 .service-card::before {
 content: ‘’;
 position: absolute;
-top: 0;
-left: 0;
-right: 0;
+top: 0; left: 0; right: 0;
 height: 1px;
-background: var(–gold);
+background: #c9a96e;
 transform: scaleX(0);
 transform-origin: left;
-transition: transform 0.4s ease;
+transition: transform 0.4s;
 }
 
-.service-card:hover { background: var(–surface); }
+.service-card:hover { background: #0f0f0f; }
 .service-card:hover::before { transform: scaleX(1); }
 
 .service-number {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.3em;
-color: var(–text-faint);
-margin-bottom: 20px;
+color: rgba(237,232,224,0.2);
+margin-bottom: 16px;
 }
 
 .service-name {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(20px, 2.5vw, 26px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(19px, 2.5vw, 25px);
 font-weight: 400;
-color: var(–text);
-margin-bottom: 16px;
+color: #ede8e0;
+margin-bottom: 12px;
 line-height: 1.2;
 }
 
 .service-desc {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(14px, 1.8vw, 17px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(14px, 1.8vw, 16px);
 font-weight: 300;
 font-style: italic;
-color: var(–text-dim);
+color: rgba(237,232,224,0.45);
 line-height: 1.7;
 }
 
-/* ── WHO ── */
-#who {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-}
+/* WHO */
+#who { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .who-grid {
 display: grid;
 grid-template-columns: 1fr 1fr;
-gap: 48px 80px;
-margin-top: 64px;
+gap: 36px 64px;
+margin-top: 56px;
 }
 
-.who-item {
-display: flex;
-gap: 20px;
-align-items: flex-start;
-}
+.who-item { display: flex; gap: 16px; align-items: flex-start; }
 
 .who-dash {
 width: 20px;
 height: 1px;
-background: var(–gold);
+background: #c9a96e;
 opacity: 0.5;
-margin-top: 14px;
+margin-top: 13px;
 flex-shrink: 0;
 }
 
 .who-text {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(17px, 2vw, 21px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(16px, 2vw, 20px);
 font-weight: 300;
 font-style: italic;
-color: var(–text-dim);
-line-height: 1.6;
+color: rgba(237,232,224,0.55);
+line-height: 1.65;
 }
 
-/* ── ABOUT ── */
-#about {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-}
+/* ABOUT */
+#about { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .about-grid {
 display: grid;
 grid-template-columns: 1fr 1fr;
-gap: 80px;
-align-items: center;
+gap: 72px;
+align-items: start;
 }
 
-.about-left { }
-
 .about-right {
-border-left: 1px solid var(–border);
-padding-left: 80px;
+border-left: 1px solid rgba(255,255,255,0.06);
+padding-left: 72px;
 }
 
 .about-stat {
-margin-bottom: 40px;
-padding-bottom: 40px;
-border-bottom: 1px solid var(–border);
+margin-bottom: 32px;
+padding-bottom: 32px;
+border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.about-stat:last-child {
-margin-bottom: 0;
-padding-bottom: 0;
-border-bottom: none;
-}
+.about-stat:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 
 .about-stat-label {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.3em;
 text-transform: uppercase;
-color: var(–text-muted);
+color: rgba(237,232,224,0.3);
 margin-bottom: 8px;
 }
 
 .about-stat-value {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(16px, 2vw, 20px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(15px, 2vw, 18px);
 font-weight: 300;
-color: var(–text-dim);
-line-height: 1.5;
+color: rgba(237,232,224,0.55);
+line-height: 1.6;
 }
 
-/* ── EVENTS ── */
-#events {
-padding: 140px 0;
-border-top: 1px solid var(–border);
-}
-
-.events-list {
-margin-top: 64px;
-}
+/* EVENTS */
+#events { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
 .event-row {
 display: flex;
 align-items: center;
 justify-content: space-between;
-padding: 32px 0;
-border-bottom: 1px solid var(–border);
-gap: 24px;
+padding: 28px 0;
+border-bottom: 1px solid rgba(255,255,255,0.06);
+gap: 20px;
 flex-wrap: wrap;
-transition: all 0.3s ease;
+transition: padding-left 0.3s;
 }
 
-.event-row:first-child { border-top: 1px solid var(–border); }
-.event-row:hover { padding-left: 16px; }
+.event-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+.event-row:hover { padding-left: 12px; }
 
 .event-date {
+font-family: ‘Syne’, sans-serif;
 font-size: 11px;
 letter-spacing: 0.2em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 opacity: 0.7;
 min-width: 140px;
 }
 
 .event-name {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(18px, 2.5vw, 24px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(17px, 2.5vw, 22px);
 font-weight: 300;
-color: var(–text);
+color: #ede8e0;
 flex: 1;
 }
 
 .event-location {
-font-size: 11px;
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
 letter-spacing: 0.15em;
-color: var(–text-muted);
+color: rgba(237,232,224,0.3);
 text-transform: uppercase;
 }
 
 .event-role {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.2em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 border: 1px solid rgba(201,169,110,0.25);
-padding: 6px 16px;
-opacity: 0.8;
+padding: 6px 14px;
 }
 
-/* ── CTA ── */
+/* CTA */
 #cta {
-padding: 160px 0;
-border-top: 1px solid var(–border);
+padding: 120px 0;
+border-top: 1px solid rgba(255,255,255,0.06);
 text-align: center;
 position: relative;
 overflow: hidden;
@@ -647,48 +562,47 @@ overflow: hidden;
 content: ‘’;
 position: absolute;
 inset: 0;
-background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.05) 0%, transparent 70%);
+background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.04) 0%, transparent 70%);
 pointer-events: none;
 }
 
 .cta-inner { position: relative; z-index: 1; }
 
 .cta-pre {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.4em;
 text-transform: uppercase;
-color: var(–text-muted);
-margin-bottom: 40px;
+color: rgba(237,232,224,0.3);
+margin-bottom: 32px;
 }
 
 .cta-heading {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(40px, 7vw, 72px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(40px, 7vw, 70px);
 font-weight: 300;
 line-height: 1.1;
-color: var(–text);
-margin-bottom: 24px;
+color: #ede8e0;
+margin-bottom: 20px;
 }
 
-.cta-heading em { font-style: italic; color: var(–gold); }
+.cta-heading em { font-style: italic; color: #c9a96e; }
 
 .cta-body {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: clamp(17px, 2.5vw, 21px);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(16px, 2.5vw, 20px);
 font-weight: 300;
 font-style: italic;
-color: var(–text-dim);
-max-width: 480px;
-margin: 0 auto 56px;
-line-height: 1.7;
+color: rgba(237,232,224,0.5);
+max-width: 460px;
+margin: 0 auto 48px;
+line-height: 1.75;
 }
 
-/* EMAIL CAPTURE */
 .email-capture {
 display: flex;
-gap: 0;
-max-width: 440px;
-margin: 0 auto 48px;
+max-width: 420px;
+margin: 0 auto 16px;
 border: 1px solid rgba(201,169,110,0.25);
 }
 
@@ -697,120 +611,116 @@ flex: 1;
 background: transparent;
 border: none;
 outline: none;
-padding: 18px 24px;
+padding: 16px 20px;
 font-family: ‘Syne’, sans-serif;
 font-size: 12px;
-letter-spacing: 0.1em;
-color: var(–text);
-font-weight: 300;
+letter-spacing: 0.08em;
+color: #ede8e0;
 }
 
-.email-input::placeholder { color: var(–text-muted); }
+.email-input::placeholder { color: rgba(237,232,224,0.3); }
 
 .email-btn {
 background: transparent;
 border: none;
 border-left: 1px solid rgba(201,169,110,0.25);
-padding: 18px 28px;
+padding: 16px 24px;
 font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–gold);
+color: #c9a96e;
 cursor: pointer;
-transition: background 0.3s ease;
+transition: background 0.3s;
 white-space: nowrap;
 }
 
-.email-btn:hover { background: var(–gold-dim); }
+.email-btn:hover { background: rgba(201,169,110,0.1); }
 
 .email-note {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
-letter-spacing: 0.15em;
-color: var(–text-faint);
-margin-bottom: 48px;
+letter-spacing: 0.12em;
+color: rgba(237,232,224,0.2);
+margin-bottom: 44px;
 }
 
 /* FOOTER */
 footer {
-padding: 48px;
-border-top: 1px solid var(–border);
+padding: 40px;
+border-top: 1px solid rgba(255,255,255,0.06);
 display: flex;
 align-items: center;
 justify-content: space-between;
 flex-wrap: wrap;
-gap: 24px;
+gap: 20px;
+background-color: #080808;
 }
 
 .footer-logo {
-font-family: ‘Cormorant Garamond’, serif;
+font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: 16px;
-font-weight: 400;
-color: var(–text-dim);
+color: rgba(237,232,224,0.5);
 letter-spacing: 0.08em;
 }
 
-.footer-logo span { color: var(–gold); }
+.footer-logo span { color: #c9a96e; }
 
 .footer-location {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.25em;
 text-transform: uppercase;
-color: var(–text-muted);
+color: rgba(237,232,224,0.25);
 }
 
-.footer-links {
-display: flex;
-gap: 32px;
-list-style: none;
-}
+.footer-links { display: flex; gap: 28px; list-style: none; }
 
 .footer-links a {
+font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.2em;
 text-transform: uppercase;
-color: var(–text-muted);
+color: rgba(237,232,224,0.25);
 text-decoration: none;
-transition: color 0.3s ease;
+transition: color 0.3s;
 }
 
-.footer-links a:hover { color: var(–gold); }
+.footer-links a:hover { color: #c9a96e; }
 
 /* ANIMATIONS */
-@keyframes heroFade {
-from { opacity: 0; transform: translateY(24px); }
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
 to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
 opacity: 0;
-transform: translateY(20px);
-transition: opacity 0.8s ease, transform 0.8s ease;
+transform: translateY(16px);
+transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.fade-in.visible {
-opacity: 1;
-transform: translateY(0);
-}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
 
-/* RESPONSIVE */
+/* MOBILE */
 @media (max-width: 768px) {
-nav { padding: 20px 24px; }
+nav { padding: 16px 20px; }
 .nav-links { display: none; }
-.container, .container-narrow { padding: 0 24px; }
-.about-grid { grid-template-columns: 1fr; }
-.about-right { border-left: none; padding-left: 0; border-top: 1px solid var(–border); padding-top: 48px; }
-.who-grid { grid-template-columns: 1fr; gap: 32px; }
-.mirror-block { padding: 40px 32px; }
-footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
-.event-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+.container, .container-narrow { padding: 0 20px; }
+#what, #framework, #mirror-cta, #services, #who, #about, #events, #cta { padding: 72px 0; }
+.about-grid { grid-template-columns: 1fr; gap: 48px; }
+.about-right { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 48px; }
+.who-grid { grid-template-columns: 1fr; gap: 24px; }
+.services-grid { grid-template-columns: 1fr; }
+.mirror-block { padding: 36px 28px; }
+.event-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
+.footer-links { flex-wrap: wrap; gap: 20px; }
 }
 </style>
 
 </head>
 <body>
-
-<!-- NAV -->
 
 <nav>
   <a href="#" class="nav-logo">Bhav<span>é</span>'s Lab</a>
@@ -826,6 +736,8 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
 <!-- HERO -->
 
 <section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
   <div class="hero-inner">
     <p class="hero-label">Bhavé's Lab — Roatan</p>
     <h1 class="hero-name">Bhav<em>é</em></h1>
@@ -835,27 +747,21 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
     <p class="hero-support">Hypnosis · Biofeedback · Structured Self-Observation</p>
     <div class="btn-group">
       <a href="#cta" class="btn-primary">Book a Session</a>
-      <a href="#mirror-cta" class="btn-secondary"><span>Enter the Mirror</span></a>
+      <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror</a>
     </div>
   </div>
 </section>
 
-<!-- WHAT THIS IS -->
+<!-- WHAT -->
 
 <section id="what">
   <div class="container-narrow">
     <div class="fade-in">
       <p class="section-label">The Work</p>
       <h2 class="section-heading">This is not<br><em>surface-level</em> work.</h2>
-      <p class="body-text">
-        Most people try to change outcomes without understanding the patterns creating them. The result is effort without movement — the same experience wearing different details.
-      </p>
-      <p class="body-text">
-        This work focuses on identifying what is actually running beneath your behavior, perception, and decisions — and shifting it at the level it was created.
-      </p>
-      <p class="body-text">
-        State shapes perception. Perception drives decision. Decision produces experience. Experience builds reality. Work anywhere else and you are working on the surface.
-      </p>
+      <p class="body-text">Most people try to change outcomes without understanding the patterns creating them. The result is effort without movement — the same experience wearing different details.</p>
+      <p class="body-text">This work focuses on identifying what is actually running beneath your behavior, perception, and decisions — and shifting it at the level it was created.</p>
+      <p class="body-text">State shapes perception. Perception drives decision. Decision produces experience. Experience builds reality. Work anywhere else and you are working on the surface.</p>
       <p class="precision-line">Precision work. Not guesswork.</p>
     </div>
   </div>
@@ -866,37 +772,25 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
 <section id="framework">
   <div class="container">
     <div class="fade-in">
-      <p class="section-label">The Framework</p>
+      <p class="section-label" style="text-align:center;">The Framework</p>
       <h2 class="section-heading" style="text-align:center;">Everything runs<br>through this sequence.</h2>
       <div class="framework-flow">
-        <div class="framework-node">
-          <span class="framework-word">State</span>
-        </div>
-        <div class="framework-arrow">→</div>
-        <div class="framework-node">
-          <span class="framework-word">Perception</span>
-        </div>
-        <div class="framework-arrow">→</div>
-        <div class="framework-node">
-          <span class="framework-word">Decision</span>
-        </div>
-        <div class="framework-arrow">→</div>
-        <div class="framework-node">
-          <span class="framework-word">Experience</span>
-        </div>
-        <div class="framework-arrow">→</div>
-        <div class="framework-node">
-          <span class="framework-word">Reality</span>
-        </div>
+        <span class="framework-word">State</span>
+        <span class="framework-arrow">→</span>
+        <span class="framework-word">Perception</span>
+        <span class="framework-arrow">→</span>
+        <span class="framework-word">Decision</span>
+        <span class="framework-arrow">→</span>
+        <span class="framework-word">Experience</span>
+        <span class="framework-arrow">→</span>
+        <span class="framework-word">Reality</span>
       </div>
-      <p class="framework-caption">
-        We work at the level of state and pattern — where real change occurs. Not at the level of behavior, symptom, or outcome.
-      </p>
+      <p class="framework-caption">We work at the level of state and pattern — where real change occurs. Not at the level of behavior, symptom, or outcome.</p>
     </div>
   </div>
 </section>
 
-<!-- CONSCIOUSNESS MIRROR CTA -->
+<!-- MIRROR CTA -->
 
 <section id="mirror-cta">
   <div class="container">
@@ -904,11 +798,9 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
       <div class="mirror-block-text">
         <p class="mirror-block-label">Consciousness Mirror</p>
         <h3 class="mirror-block-heading">See what is<br>already running.</h3>
-        <p class="mirror-block-body">
-          Six questions. No answers given. Only what is already there — reflected back. The Mirror shows you routes. You decide which one to feel into.
-        </p>
+        <p class="mirror-block-body">Six questions. No answers given. Only what is already there — reflected back. The Mirror shows you routes. You decide which one to feel into.</p>
       </div>
-      <a href="consciousness-mirror.html" class="btn-secondary" style="flex-shrink:0;"><span>Enter the Mirror</span></a>
+      <a href="consciousness-mirror.html" class="btn-secondary" style="flex-shrink:0;">Enter the Mirror</a>
     </div>
   </div>
 </section>
@@ -926,38 +818,26 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
 ```
   <div class="service-card">
     <p class="service-number">01</p>
-    <h3 class="service-name">Inner Mining</h3>
-    <p class="service-desc">Deep guided session to access the subconscious patterns, past experiences, and internal structures shaping your current reality. We locate the origin — not just the symptom.</p>
+    <h3 class="service-name">Inner Mining Session</h3>
+    <p class="service-desc">Deep guided hypnosis session using QHHT to access the subconscious patterns, past experiences, and internal structures shaping your current reality. We locate the origin — not just the symptom.</p>
   </div>
 
   <div class="service-card">
     <p class="service-number">02</p>
-    <h3 class="service-name">Auracle Session</h3>
-    <p class="service-desc">Biofeedback tools including HeartMath and Muse measure and map your internal state in real time. Your inner landscape becomes visible data — not just felt sense.</p>
+    <h3 class="service-name">Biofeedback Session</h3>
+    <p class="service-desc">Using Muse and HeartMath to measure and map your internal state in real time. Your inner landscape becomes visible data — not just felt sense. Observe yourself objectively.</p>
   </div>
 
   <div class="service-card">
     <p class="service-number">03</p>
-    <h3 class="service-name">Frequency Alignment</h3>
-    <p class="service-desc">For those ready to shift a state that has been stable long enough. Using gemstone frequency work and structured awareness to support a natural transition.</p>
+    <h3 class="service-name">Frequency Alignment Session</h3>
+    <p class="service-desc">For those ready to shift a state that has been stable long enough. Using gemstone frequency work and structured awareness to support a natural transition into what is available.</p>
   </div>
 
   <div class="service-card">
     <p class="service-number">04</p>
-    <h3 class="service-name">Awareness Training</h3>
-    <p class="service-desc">Practical methods to strengthen attention, internal observation, and presence. The foundation everything else builds from — without it, patterns remain invisible.</p>
-  </div>
-
-  <div class="service-card">
-    <p class="service-number">05</p>
     <h3 class="service-name">Study Yourself Session</h3>
-    <p class="service-desc">A structured experience built around the Study Yourself framework. State → Perception → Decision → Experience → Reality — applied directly to where you are right now.</p>
-  </div>
-
-  <div class="service-card">
-    <p class="service-number">06</p>
-    <h3 class="service-name">Group Inner Lab</h3>
-    <p class="service-desc">The collective experience of the Inner Lab framework. For groups ready to observe their own patterns together and begin the process of seeing clearly.</p>
+    <p class="service-desc">The State → Perception → Decision → Experience → Reality framework applied directly to where you are right now. Precision questions. Real time observation. Your own patterns — made visible.</p>
   </div>
 
 </div>
@@ -966,7 +846,7 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
   </div>
 </section>
 
-<!-- WHO THIS IS FOR -->
+<!-- WHO -->
 
 <section id="who">
   <div class="container">
@@ -1003,15 +883,9 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
       <div class="about-left">
         <p class="section-label">About</p>
         <h2 class="section-heading">The Lab is<br>the <em>source</em>.</h2>
-        <p class="body-text">
-          I work at the intersection of awareness and physiology. My background includes hypnosis, biofeedback systems, meditation training, and decades of consciousness research.
-        </p>
-        <p class="body-text">
-          I don't focus on symptoms. I focus on patterns. Once a pattern is seen clearly — truly seen — everything else becomes easier to move.
-        </p>
-        <p class="body-text">
-          Bhavé's Lab operates from Roatan. The work transmits from here. The right people find it.
-        </p>
+        <p class="body-text">I work at the intersection of awareness and physiology. My background includes hypnosis, biofeedback systems, meditation training, and decades of consciousness research.</p>
+        <p class="body-text">I don't focus on symptoms. I focus on patterns. Once a pattern is seen clearly — truly seen — everything else becomes easier to move.</p>
+        <p class="body-text">Bhavé's Lab operates from Roatan. The work transmits from here. The right people find it.</p>
       </div>
       <div class="about-right">
         <div class="about-stat">
@@ -1020,7 +894,7 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
         </div>
         <div class="about-stat">
           <p class="about-stat-label">Modalities</p>
-          <p class="about-stat-value">Hypnosis (QHHT) · HeartMath · Muse Biofeedback · Gemstone Frequency · Structured Self-Observation</p>
+          <p class="about-stat-value">QHHT Hypnosis · HeartMath · Muse Biofeedback · Gemstone Frequency · Structured Self-Observation</p>
         </div>
         <div class="about-stat">
           <p class="about-stat-label">Framework</p>
@@ -1042,7 +916,7 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
     <div class="fade-in">
       <p class="section-label">Appearances & Events</p>
       <h2 class="section-heading">Where the work<br><em>travels</em>.</h2>
-      <div class="events-list">
+      <div style="margin-top:48px;">
         <div class="event-row">
           <span class="event-date">June 16–23, 2026</span>
           <span class="event-name">Magik Medicine Alkaline Healing Retreat</span>
@@ -1067,30 +941,20 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
     <div class="cta-inner fade-in">
       <p class="cta-pre">Ready to work</p>
       <h2 class="cta-heading">The pattern<br>has a <em>source</em>.</h2>
-      <p class="cta-body">
-        If you are serious about understanding and shifting what has been running your experience — a session is where that begins.
-      </p>
-
-```
-  <!-- Email Capture -->
-  <p style="font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-muted); margin-bottom:20px;">Stay connected to the work</p>
-  <div class="email-capture">
-    <input type="email" class="email-input" placeholder="Your email address">
-    <button class="email-btn">Join</button>
-  </div>
-  <p class="email-note">Study Yourself updates · Session availability · Framework releases</p>
-
-  <div class="btn-group">
-    <a href="#" class="btn-primary">Book Your Session</a>
-    <a href="consciousness-mirror.html" class="btn-secondary"><span>Enter the Mirror First</span></a>
-  </div>
-</div>
-```
-
+      <p class="cta-body">If you are serious about understanding and shifting what has been running your experience — a session is where that begins.</p>
+      <p style="font-family:'Syne',sans-serif;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(237,232,224,0.3);margin-bottom:16px;">Stay connected to the work</p>
+      <div class="email-capture">
+        <input type="email" class="email-input" placeholder="Your email address">
+        <button class="email-btn" onclick="handleEmail()">Join</button>
+      </div>
+      <p class="email-note">Study Yourself updates · Session availability · Framework releases</p>
+      <div class="btn-group">
+        <a href="#" class="btn-primary">Book Your Session</a>
+        <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror First</a>
+      </div>
+    </div>
   </div>
 </section>
-
-<!-- FOOTER -->
 
 <footer>
   <div class="footer-logo">Bhav<span>é</span>'s Lab</div>
@@ -1104,28 +968,24 @@ footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
 </footer>
 
 <script>
-  // Scroll fade-in
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.1 });
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
 
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-  // Email capture
-  document.querySelector('.email-btn').addEventListener('click', () => {
+  function handleEmail() {
     const input = document.querySelector('.email-input');
     if (input.value && input.value.includes('@')) {
       input.value = '';
-      input.placeholder = 'You\'re in.';
+      input.placeholder = "You're in.";
       setTimeout(() => { input.placeholder = 'Your email address'; }, 3000);
     }
-  });
+  }
 </script>
 
 </body>
 </html>
 
+
+Displaying 82F40E85-2EFD-4969-839F-AC5179056A7F.PNG.
