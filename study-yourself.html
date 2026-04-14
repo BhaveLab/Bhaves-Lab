@@ -758,9 +758,7 @@ textarea:disabled { opacity: 0.5; }
   }
 })();
 </script>
-
-
-  <script>
+<script>
 const BACKEND = "https://bhaveslab-backend.vercel.app";
 const SAVE_KEY = "sy_course_v3";
 
@@ -1034,6 +1032,12 @@ function startObservation() {
   renderQuestions(SECTIONS[state.secIdx]);
 }
 
+function getNextLabel() {
+  if (state.secIdx === SECTIONS.length - 1) return 'VIEW YOUR PATTERN MAP';
+  var next = SECTIONS[state.secIdx + 1];
+  return 'CONTINUE TO ' + next.number + ' — ' + next.title.toUpperCase();
+}
+
 function renderQuestions(sec) {
   const area = document.getElementById('questions-area');
   let html = '';
@@ -1077,7 +1081,7 @@ function renderQuestions(sec) {
 
 } else {
 if (document.getElementById(‘questions-area’) && state.sectionSummary) {
-html += `<div class="summary-block"> <div class="summary-label">SECTION COMPLETE</div> <div class="summary-text">${escHtml(state.sectionSummary)}</div> </div> <div class="summary-actions"> <button class="btn-outline" onclick="nextSection()">${state.secIdx === SECTIONS.length - 1 ? 'VIEW YOUR PATTERN MAP' :`CONTINUE TO ${SECTIONS[state.secIdx + 1]?.number} — ${SECTIONS[state.secIdx + 1]?.title.toUpperCase()}`}</button> </div> `;
+html += `<div class="summary-block"> <div class="summary-label">SECTION COMPLETE</div> <div class="summary-text">${escHtml(state.sectionSummary)}</div> </div> <div class="summary-actions"> <button class="btn-outline" onclick="nextSection()">${' + getNextLabel() + '}</button> </div>`;
 }
 }
 
