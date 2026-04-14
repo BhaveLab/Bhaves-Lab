@@ -741,6 +741,19 @@ textarea:disabled { opacity: 0.5; }
   </div><!-- /container -->
 
 <script>
+(function(){
+  var pwd = localStorage.getItem('sy_access');
+  if(pwd !== 'studyyourself2026'){
+    var entered = prompt('Enter access code to continue:');
+    if(entered !== 'studyyourself2026'){
+      document.body.innerHTML = '<div style="background:#0a0a0a;color:#c4a45a;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:1.2rem;letter-spacing:0.1em;">ACCESS RESTRICTED</div>';
+      return;
+    }
+    localStorage.setItem('sy_access','studyyourself2026');
+  }
+})();
+</script>
+  <script>
 const BACKEND = "https://bhaveslab-backend.vercel.app";
 const SAVE_KEY = "sy_course_v3";
 
