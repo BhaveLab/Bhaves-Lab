@@ -10,6 +10,11 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
 ```
+html {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+}
+
 body {
   background: #0a0a0a !important;
   background-color: #0a0a0a !important;
@@ -17,6 +22,7 @@ body {
   font-family: 'Cormorant Garamond', serif;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* NAV */
@@ -741,19 +747,6 @@ textarea:disabled { opacity: 0.5; }
   </div><!-- /container -->
 
 <script>
-(function(){
-  var pwd = localStorage.getItem('sy_access');
-  if(pwd !== 'studyyourself2026'){
-    var entered = prompt('Enter access code to continue:');
-    if(entered !== 'studyyourself2026'){
-      document.body.innerHTML = '<div style="background:#0a0a0a;color:#c4a45a;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:1.2rem;letter-spacing:0.1em;">ACCESS RESTRICTED</div>';
-      return;
-    }
-    localStorage.setItem('sy_access','studyyourself2026');
-  }
-})();
-</script>
-  <script>
 const BACKEND = "https://bhaveslab-backend.vercel.app";
 const SAVE_KEY = "sy_course_v3";
 
@@ -936,19 +929,30 @@ function initIntro() {
 }
 
 function beginCourse() {
-  const name = document.getElementById('input-name').value.trim();
-  const email = document.getElementById('input-email').value.trim();
-  const errEl = document.getElementById('form-error');
-
-  if (!name) { errEl.textContent = "Please enter your name."; errEl.style.display = 'block'; return; }
-  if (!email || !email.includes('@')) { errEl.textContent = "Please enter a valid email address."; errEl.style.display = 'block'; return; }
-  errEl.style.display = 'none';
-
-  state.userName = name;
-  state.userEmail = email;
-  saveStateToStorage();
-  renderSection();
-  showScreen('section');
+  try {
+    var nameEl = document.getElementById('input-name');
+    var emailEl = document.getElementById('input-email');
+    var errEl = document.getElementById('form-error');
+    var name = nameEl ? nameEl.value.trim() : '';
+    var email = emailEl ? emailEl.value.trim() : '';
+    if (!name) {
+      if (errEl) { errEl.textContent = "Please enter your name."; errEl.style.display = 'block'; }
+      return;
+    }
+    if (!email || !email.includes('@')) {
+      if (errEl) { errEl.textContent = "Please enter a valid email address."; errEl.style.display = 'block'; }
+      return;
+    }
+    if (errEl) errEl.style.display = 'none';
+    state.userName = name;
+    state.userEmail = email;
+    saveStateToStorage();
+    renderSection();
+    showScreen('section');
+  } catch(e) {
+    renderSection();
+    showScreen('section');
+  }
 }
 
 function resumeCourse() {
