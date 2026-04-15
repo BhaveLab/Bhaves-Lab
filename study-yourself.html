@@ -661,7 +661,7 @@ textarea:disabled { opacity: 0.5; }
 <div id="screen-intro" class="screen active">
   <div class="logo-mark">
     <div class="logo-mark-box"><div class="logo-mark-dot"></div></div>
-    <span class="logo-mark-label">BHAVÉ'S LAB</span>
+    <span class="logo-mark-label">BHAV&#201;&#39;S LAB</span>
   </div>
 
   <h1 class="intro-title">Study Yourself</h1>
@@ -725,7 +725,7 @@ textarea:disabled { opacity: 0.5; }
 <div id="screen-map" class="screen">
   <div class="logo-mark">
     <div class="logo-mark-box"><div class="logo-mark-dot"></div></div>
-    <span class="logo-mark-label">BHAVÉ'S LAB</span>
+    <span class="logo-mark-label">BHAV&#201;&#39;S LAB</span>
   </div>
   <h1 class="map-title" id="map-title">Your Pattern Map</h1>
   <p class="map-subtitle">Built entirely from your own observations.</p>
@@ -747,6 +747,52 @@ textarea:disabled { opacity: 0.5; }
   </div><!-- /container -->
 
 <script>
+// ACCESS LOCK
+function checkAccess() {
+  var pwd = localStorage.getItem('sy_access');
+  if (pwd === 'studyyourself2026') return;
+
+  // Show access overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'access-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;';
+  overlay.innerHTML = '<div style="width:36px;height:36px;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;margin-bottom:2rem;"><div style="width:12px;height:12px;background:#c4a45a;border-radius:50%;"></div></div><p style="font-family:Georgia,serif;font-size:0.6rem;letter-spacing:0.25em;color:#444;margin-bottom:3rem;">BHAV&#201;&#39;S LAB</p><h2 style="font-family:Georgia,serif;font-size:2rem;font-weight:300;color:#f5f0e8;margin-bottom:0.5rem;text-align:center;">Study Yourself</h2><p style="font-family:Georgia,serif;font-size:0.9rem;color:#888;font-style:italic;margin-bottom:2.5rem;text-align:center;">Enter your access code to continue</p><input id="access-input" type="password" placeholder="Access code" style="width:100%;max-width:320px;background:rgba(255,255,255,0.03);border:1px solid #2a2a2a;border-bottom:1px solid #c4a45a;color:#f5f0e8;font-family:Georgia,serif;font-size:1rem;padding:0.75rem 1rem;outline:none;text-align:center;margin-bottom:1rem;"><div id="access-error" style="color:#e06060;font-size:0.8rem;margin-bottom:1rem;display:none;">Incorrect code. Try again.</div><button onclick="submitAccess()" style="background:#c4a45a;border:none;color:#0a0a0a;padding:0.9rem 3rem;font-family:Georgia,serif;font-size:0.75rem;letter-spacing:0.2em;cursor:pointer;">ENTER</button>';
+  document.body.appendChild(overlay);
+
+  // Focus input
+  setTimeout(function() {
+    var inp = document.getElementById('access-input');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function submitAccess() {
+  var inp = document.getElementById('access-input');
+  var errEl = document.getElementById('access-error');
+  if (!inp) return;
+  var val = inp.value.trim();
+  if (val === 'studyyourself2026') {
+    localStorage.setItem('sy_access', 'studyyourself2026');
+    var overlay = document.getElementById('access-overlay');
+    if (overlay) overlay.remove();
+  } else {
+    if (errEl) errEl.style.display = 'block';
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+// Run on load
+window.addEventListener('DOMContentLoaded', function() {
+  checkAccess();
+  // Allow enter key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && document.getElementById('access-overlay')) {
+      submitAccess();
+    }
+  });
+});
+
 const BACKEND = "https://bhaveslab-backend.vercel.app";
 const SAVE_KEY = "sy_course_v3";
 
@@ -1060,20 +1106,23 @@ function renderQuestions(sec) {
       <span class="cmd-hint">⌘ + Enter to submit</span>
       <div class="action-right">
         <span id="observing-label" class="observing-label" style="display:none;">OBSERVING</span>
-        <button id="submit-btn" class="btn-outline" onclick="submitAnswer()">CONTINUE</button>
+        <button id="submit-btn" class="btn-outline" onclick="submitAnswer()">${isLast ? 'COMPLETE SECTION' : 'CONTINUE'}</button>
       </div>
     </div>
   </div>
-
-
+`;
+```
 
 } else {
 if (document.getElementById(‘questions-area’) && state.sectionSummary) {
-html += `<div class="summary-block"> <div class="summary-label">SECTION COMPLETE</div> <div class="summary-text">${escHtml(state.sectionSummary)}</div> </div> <div class="summary-actions"> <button class="btn-outline" onclick="nextSection()">${' + getNextLabel() + '}</button> </div>`;
+html += `<div class="summary-block"> <div class="summary-label">SECTION COMPLETE</div> <div class="summary-text">${escHtml(state.sectionSummary)}</div> </div> <div class="summary-actions"> <button class="btn-outline" id="next-section-btn" onclick="nextSection()">CONTINUE</button> </div>`;
 }
 }
 
 area.innerHTML = html;
+// Update next section button label
+var nextBtn = document.getElementById(‘next-section-btn’);
+if (nextBtn) nextBtn.textContent = getNextLabel();
 setTimeout(() => {
 const ta = document.getElementById(‘answer-input’);
 if (ta) ta.focus();
