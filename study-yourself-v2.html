@@ -525,14 +525,16 @@ html += '</div></div></div>';
 if (state.sectionSummary) {
 html += '<div class="summary-block">';
 html += '<div class="summary-label">SECTION COMPLETE</div>';
-html += '<div class="summary-text">’ + escHtml(state.sectionSummary) + '</div>’;
+html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
+
 html += '</div>';
 html += '<div class="summary-actions">';
 var nextLabel = “CONTINUE”;
 if (state.secIdx === SECTIONS.length - 1) {
 nextLabel = “VIEW YOUR PATTERN MAP”;
 } else {
-var next = SECTIONS[state.secIdx + 1];
+nextLabel = "CONTINUE TO " + next.number + " - " + next.title.toUpperCase();
+
 nextLabel = “CONTINUE TO “ + next.number + “ - “ + next.title.toUpperCase();
 }
 html += ‘<button id="next-section-btn" class="btn-outline">’ + nextLabel + ‘</button>’;
