@@ -198,7 +198,7 @@ function checkAccess() {
   html += '<p style="font-family:Georgia,serif;font-size:0.6rem;letter-spacing:0.25em;color:#444;margin-bottom:3rem;">BHAVE\'S LAB</p>';
   html += '<h2 style="font-family:Georgia,serif;font-size:2rem;font-weight:300;color:#f5f0e8;margin-bottom:0.5rem;text-align:center;">Study Yourself</h2>';
   html += '<p style="font-family:Georgia,serif;font-size:0.9rem;color:#888;font-style:italic;margin-bottom:2.5rem;text-align:center;">Enter your access code to continue</p>';
-  html += '<input id="access-input" type="password" placeholder="Access code">';
+  html += '<input id="access-input" type="password" placeholder="Access code" onkeydown="if(event.key===\'Enter\')submitAccess()">';
   html += '<div id="access-error">Incorrect code. Try again.</div>';
   html += '<button onclick="submitAccess()" class="btn-gold" style="margin-top:1rem;">ENTER</button>';
   overlay.innerHTML = html;
@@ -486,8 +486,9 @@ function escHtml(str) {
 function renderQuestions(sec) {
   var area = document.getElementById("questions-area");
   var html = "";
-  var limit = state.showSummary ? sec.questions.length : state.qIdx;
 
+  // Render all previously answered questions with their reflections
+  var limit = state.showSummary ? sec.questions.length : state.qIdx;
   for (var i = 0; i < limit; i++) {
     var key = sec.id + "_" + i;
     var ans = state.answers[key];
@@ -505,43 +506,51 @@ function renderQuestions(sec) {
     html += '</div>';
   }
 
-  if (!state.showSummary) {
+  // FIX: Only show the summary block if showSummary is true AND sectionSummary exists
+  if (state.showSummary && state.sectionSummary) {
+    html += '<div class="summary-block">';
+    html += '<div class="summary-label">SECTION COMPLETE</div>';
+    html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
+    html += '</div>';
+    html += '<div class="summary-actions">';
+
+    // FIX: Build next label safely — define next before using it
+    var nextLabel;
+    if (state.secIdx === SECTIONS.length - 1) {
+      nextLabel = 'VIEW YOUR PATTERN MAP';
+    } else {
+      var next = SECTIONS[state.secIdx + 1];
+      nextLabel = 'CONTINUE TO ' + next.number + ' — ' + next.title.toUpperCase();
+    }
+    html += '<button id="next-section-btn" class="btn-outline">' + nextLabel + '</button>';
+    html += '</div>';
+
+  } else if (state.showSummary && !state.sectionSummary) {
+    // FIX: Generating state — show spinner while summary is being fetched
+    html += '<div class="generating">BUILDING YOUR SECTION SUMMARY…</div>';
+
+  } else {
+    // Active question input
     var q = sec.questions[state.qIdx];
     html += '<div id="current-question">';
     html += '<div class="question-counter">' + (state.qIdx + 1) + " / " + sec.questions.length + '</div>';
     html += '<div class="question-text">' + q + '</div>';
     html += '<textarea id="answer-input" rows="6" placeholder="Write honestly. Not the answer that sounds right — the honest one."></textarea>';
 
-
+```
 html += '<div class="question-actions">';
 html += '<span class="cmd-hint">Ctrl + Enter to submit</span>';
 html += '<div class="action-right">';
 html += '<span id="observing-label" class="observing-label" style="display:none;">OBSERVING</span>';
 html += '<button id="submit-btn" class="btn-outline">CONTINUE</button>';
 html += '</div></div></div>';
+```
 
-
-} else {
-if (state.sectionSummary) {
-html += '<div class="summary-block">';
-html += '<div class="summary-label">SECTION COMPLETE</div>';
-html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
-
-html += '</div>';
-html += '<div class="summary-actions">';
-var nextLabel = 'CONTINUE';
-if (state.secIdx === SECTIONS.length - 1) {
-nextLabel = 'VIEW YOUR PATTERN MAP';
-} else {
-nextLabel = 'CONTINUE TO " + next.number + ' - ' + next.title. toUpperCase();
-}
-html += ‘<button id="next-section-btn" class="btn-outline">’ + nextLabel + ‘</button>’;
-html += ‘</div>’;
-}
 }
 
 area.innerHTML = html;
 
+// Attach listeners after rendering
 var submitBtn = document.getElementById(“submit-btn”);
 if (submitBtn) {
 submitBtn.addEventListener(“click”, submitAnswer);
@@ -568,6 +577,7 @@ var input = ta.value.trim();
 var sec = SECTIONS[state.secIdx];
 var key = sec.id + “_” + state.qIdx;
 
+// Disable input while processing
 ta.disabled = true;
 var btn = document.getElementById(“submit-btn”);
 if (btn) btn.disabled = true;
@@ -587,6 +597,13 @@ state.reflections[key] = reflection;
 
 ```
 if (isLastQ) {
+  // FIX: Set showSummary = true but sectionSummary = "" BEFORE re-render
+  // so the "generating" spinner shows while we fetch the summary
+  state.showSummary = true;
+  state.sectionSummary = "";
+  saveStateToStorage();
+  renderQuestions(sec);
+
   var allA = "";
   for (var i = 0; i < sec.questions.length; i++) {
     var k = sec.id + "_" + i;
@@ -595,7 +612,6 @@ if (isLastQ) {
   callReflect(sec.summaryPrompt, [{ role: "user", content: "Here are all answers:\n\n" + allA + "\nGenerate the section summary." }], function(sum) {
     state.sectionSummary = sum;
     state.summaries[sec.id] = sum;
-    state.showSummary = true;
     saveStateToStorage();
     renderQuestions(sec);
   });
@@ -681,11 +697,6 @@ showScreen(“intro”);
 window.addEventListener(“DOMContentLoaded”, function() {
 checkAccess();
 initIntro();
-document.addEventListener(“keydown”, function(e) {
-if (e.key === “Enter” && document.getElementById(“access-overlay”)) {
-submitAccess();
-}
-});
 });
 </script>
 
