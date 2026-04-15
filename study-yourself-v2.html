@@ -187,43 +187,7 @@
 var BACKEND = "https://bhaveslab-backend.vercel.app";
 var SAVE_KEY = "sy_course_v3";
 
-// ACCESS LOCK
-function checkAccess() {
-  var pwd = localStorage.getItem("sy_access");
-  if (pwd === "studyyourself2026") return;
-  var overlay = document.createElement("div");
-  overlay.id = "access-overlay";
-  var html = "";
-  html += '<div class="logo-mark-box" style="margin-bottom:2rem;"><div class="logo-mark-dot"></div></div>';
-  html += '<p style="font-family:Georgia,serif;font-size:0.6rem;letter-spacing:0.25em;color:#444;margin-bottom:3rem;">BHAVE\'S LAB</p>';
-  html += '<h2 style="font-family:Georgia,serif;font-size:2rem;font-weight:300;color:#f5f0e8;margin-bottom:0.5rem;text-align:center;">Study Yourself</h2>';
-  html += '<p style="font-family:Georgia,serif;font-size:0.9rem;color:#888;font-style:italic;margin-bottom:2.5rem;text-align:center;">Enter your access code to continue</p>';
-  html += '<input id="access-input" type="password" placeholder="Access code" onkeydown="if(event.key===\'Enter\')submitAccess()">';
-  html += '<div id="access-error">Incorrect code. Try again.</div>';
-  html += '<button onclick="submitAccess()" class="btn-gold" style="margin-top:1rem;">ENTER</button>';
-  overlay.innerHTML = html;
-  document.body.appendChild(overlay);
-  setTimeout(function() {
-    var inp = document.getElementById("access-input");
-    if (inp) inp.focus();
-  }, 200);
-}
 
-function submitAccess() {
-  var inp = document.getElementById("access-input");
-  var errEl = document.getElementById("access-error");
-  if (!inp) return;
-  var val = inp.value.trim();
-  if (val === "studyyourself2026") {
-    localStorage.setItem("sy_access", "studyyourself2026");
-    var overlay = document.getElementById("access-overlay");
-    if (overlay) overlay.parentNode.removeChild(overlay);
-  } else {
-    if (errEl) errEl.style.display = "block";
-    inp.value = "";
-    inp.focus();
-  }
-}
 
 // COURSE DATA
 var SECTIONS = [
@@ -695,7 +659,6 @@ showScreen(“intro”);
 
 // INIT
 window.addEventListener(“DOMContentLoaded”, function() {
-checkAccess();
 initIntro();
 });
 </script>
