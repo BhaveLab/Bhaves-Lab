@@ -606,7 +606,7 @@ window.scrollTo(0, 0);
 
 function showMapScreen() {
 var mapTitle = document.getElementById("map-title");
-if (mapTitle) mapTitle.textContent = state.userName ? state.userName + "’s Pattern Map" : "Your Pattern Map";
+if (mapTitle) mapTitle.textContent = state.userName ? state.userName + "'s Pattern Map" : "Your Pattern Map";
 
 var mapMsg = document.getElementById("map-email-msg");
 if (mapMsg && state.userEmail) {
@@ -619,13 +619,13 @@ for (var i = 0; i < SECTIONS.length; i++) {
 var s = SECTIONS[i];
 var sum = state.summaries[s.id];
 if (!sum) continue;
-html += ‘<div class="map-section">’;
-html += ‘<div class="map-section-header">’;
-html += ‘<span class="map-section-num">’ + s.number + ‘</span>’;
-html += ‘<span class="map-section-title">’ + s.title.toUpperCase() + ‘</span>’;
-html += ‘</div>’;
-html += ‘<div class="map-section-text">’ + escHtml(sum) + ‘</div>’;
-html += ‘</div>’;
+html += '<div class="map-section">';
+html += '<div class="map-section-header">';
+html += '<span class="map-section-num">' + s.number + '</span>';
+html += '<span class="map-section-title">' + s.title.toUpperCase() + '</span>';
+html += '</div>';
+html += '<div class="map-section-text">' + escHtml(sum) + '</div>';
+html += '</div>';
 }
 mapSections.innerHTML = html;
 
