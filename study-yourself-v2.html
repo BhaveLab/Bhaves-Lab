@@ -529,11 +529,11 @@ html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
 
 html += '</div>';
 html += '<div class="summary-actions">';
-var nextLabel = “CONTINUE”;
+var nextLabel = 'CONTINUE';
 if (state.secIdx === SECTIONS.length - 1) {
-nextLabel = “VIEW YOUR PATTERN MAP”;
+nextLabel = 'VIEW YOUR PATTERN MAP';
 } else {
-nextLabel = "CONTINUE TO " + next.number + " - " + next.title. toUpperCase();
+nextLabel = 'CONTINUE TO " + next.number + ' - ' + next.title. toUpperCase();
 }
 html += ‘<button id="next-section-btn" class="btn-outline">’ + nextLabel + ‘</button>’;
 html += ‘</div>’;
