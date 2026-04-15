@@ -513,48 +513,48 @@ html += '</div></div></div>';
 area.innerHTML = html;
 
 // Attach listeners after rendering
-var submitBtn = document.getElementById(“submit-btn”);
+var submitBtn = document.getElementById("submit-btn");
 if (submitBtn) {
-submitBtn.addEventListener(“click”, submitAnswer);
+submitBtn.addEventListener("click", submitAnswer);
 }
 
-var nextBtn = document.getElementById(“next-section-btn”);
+var nextBtn = document.getElementById("next-section-btn");
 if (nextBtn) {
-nextBtn.addEventListener(“click”, nextSection);
+nextBtn.addEventListener("click", nextSection);
 }
 
-var ta = document.getElementById(“answer-input”);
+var ta = document.getElementById("answer-input");
 if (ta) {
-ta.addEventListener(“keydown”, function(e) {
-if (e.key === “Enter” && (e.metaKey || e.ctrlKey)) submitAnswer();
+ta.addEventListener("keydown", function(e) {
+if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submitAnswer();
 });
 setTimeout(function() { ta.focus(); }, 100);
 }
 }
 
 function submitAnswer() {
-var ta = document.getElementById(“answer-input”);
+var ta = document.getElementById("answer-input");
 if (!ta || !ta.value.trim()) return;
 var input = ta.value.trim();
 var sec = SECTIONS[state.secIdx];
-var key = sec.id + “_” + state.qIdx;
+var key = sec.id + "_" + state.qIdx;
 
 // Disable input while processing
 ta.disabled = true;
-var btn = document.getElementById(“submit-btn”);
+var btn = document.getElementById("submit-btn");
 if (btn) btn.disabled = true;
-var obs = document.getElementById(“observing-label”);
-if (obs) obs.style.display = “inline”;
+var obs = document.getElementById"observing-label");
+if (obs) obs.style.display = "inline";
 
 state.answers[key] = input;
 var newHistory = conversationHistory.slice();
-newHistory.push({ role: “user”, content: input });
+newHistory.push({ role: "user", content: input });
 
 var isLastQ = (state.qIdx === sec.questions.length - 1);
 
 callReflect(sec.systemPrompt, newHistory, function(reflection) {
 conversationHistory = newHistory.slice();
-conversationHistory.push({ role: “assistant”, content: reflection });
+conversationHistory.push({ role: "assistant", content: reflection });
 state.reflections[key] = reflection;
 
 
@@ -595,26 +595,26 @@ state.secIdx++;
 state.qIdx = 0;
 state.showTeaching = true;
 state.showSummary = false;
-state.sectionSummary = “”;
+state.sectionSummary = "";
 conversationHistory = [];
 saveStateToStorage();
-document.getElementById(“teaching-block”).style.display = “block”;
+document.getElementById("teaching-block").style.display = "block";
 renderSection();
 window.scrollTo(0, 0);
 }
 }
 
 function showMapScreen() {
-var mapTitle = document.getElementById(“map-title”);
-if (mapTitle) mapTitle.textContent = state.userName ? state.userName + “’s Pattern Map” : “Your Pattern Map”;
+var mapTitle = document.getElementById("map-title");
+if (mapTitle) mapTitle.textContent = state.userName ? state.userName + "’s Pattern Map" : "Your Pattern Map";
 
-var mapMsg = document.getElementById(“map-email-msg”);
+var mapMsg = document.getElementById("map-email-msg");
 if (mapMsg && state.userEmail) {
-mapMsg.textContent = “Your pattern map has been sent to “ + state.userEmail + “. Ready to go deeper?”;
+mapMsg.textContent = "Your pattern map has been sent to “ + state.userEmail + “. Ready to go deeper?";
 }
 
-var mapSections = document.getElementById(“map-sections”);
-var html = “”;
+var mapSections = document.getElementById("map-sections");
+var html = "";
 for (var i = 0; i < SECTIONS.length; i++) {
 var s = SECTIONS[i];
 var sum = state.summaries[s.id];
@@ -629,7 +629,7 @@ html += ‘</div>’;
 }
 mapSections.innerHTML = html;
 
-showScreen(“map”);
+showScreen("map");
 
 if (!state.emailSent && state.userEmail) {
 state.emailSent = true;
@@ -641,22 +641,22 @@ sendPatternMap();
 function restartCourse() {
 clearStoredState();
 state = {
-userName: “”, userEmail: “”, secIdx: 0, qIdx: 0,
+userName: ", userEmail: “", secIdx: 0, qIdx: 0,
 showTeaching: true, answers: {}, reflections: {}, summaries: {},
-showSummary: false, sectionSummary: “”, emailSent: false
+showSummary: false, sectionSummary: ", emailSent: false
 };
 conversationHistory = [];
-var nameEl = document.getElementById(“input-name”);
-var emailEl = document.getElementById(“input-email”);
-if (nameEl) nameEl.value = “”;
-if (emailEl) emailEl.value = “”;
-document.getElementById(“resume-banner”).style.display = “none”;
-document.getElementById(“teaching-block”).style.display = “block”;
-showScreen(“intro”);
+var nameEl = document.getElementById("input-name");
+var emailEl = document.getElementById("input-email");
+if (nameEl) nameEl.value = "";
+if (emailEl) emailEl.value = "";
+document.getElementById("resume-banner").style.display = "none";
+document.getElementById("teaching-block").style.display = "block";
+showScreen("intro");
 }
 
 // INIT
-window.addEventListener(“DOMContentLoaded”, function() {
+window.addEventListener("DOMContentLoaded", function() {
 initIntro();
 });
 </script>
