@@ -533,9 +533,7 @@ var nextLabel = “CONTINUE”;
 if (state.secIdx === SECTIONS.length - 1) {
 nextLabel = “VIEW YOUR PATTERN MAP”;
 } else {
-nextLabel = "CONTINUE TO " + next.number + " - " + next.title.toUpperCase();
-
-nextLabel = “CONTINUE TO “ + next.number + “ - “ + next.title.toUpperCase();
+nextLabel = "CONTINUE TO " + next.number + " - " + next.title. toUpperCase();
 }
 html += ‘<button id="next-section-btn" class="btn-outline">’ + nextLabel + ‘</button>’;
 html += ‘</div>’;
