@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Yourself - Bhave's Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { background: #0a0a0a; }
+    body {
+      background: #0a0a0a;
+      color: #e8e0d4;
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; color: #e8e0d4; text-decoration: none; }
+    .nav-logo span { color: #c4a45a; }
+    .nav-btn { font-family: 'Syne', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; color: #c4a45a; border: 1px solid #c4a45a; padding: 0.6rem 1.25rem; text-decoration: none; background: transparent; cursor: pointer; }
+    .container { max-width: 660px; margin: 0 auto; padding: 6rem 1.5rem 4rem; min-height: 100vh; }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeUp 0.6s ease forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .logo-mark { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 3rem; }
+    .logo-mark-box { width: 36px; height: 36px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .logo-mark-dot { width: 12px; height: 12px; background: #c4a45a; border-radius: 50%; }
+    .logo-mark-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.25em; color: #444; }
+    .intro-title { font-size: 3.5rem; font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; color: #f5f0e8; margin-bottom: 1rem; text-align: center; }
+    .intro-subtitle { font-size: 1rem; color: #888; font-style: italic; text-align: center; margin-bottom: 2.5rem; }
+    .intro-quote { border-top: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e; padding: 1.75rem 0; margin-bottom: 2.5rem; text-align: center; }
+    .intro-quote p { font-size: 1.1rem; font-style: italic; color: #999; line-height: 1.9; }
+    .intro-body { font-size: 0.95rem; line-height: 1.9; color: #999; margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; color: #888; margin-bottom: 0.5rem; }
+    .form-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid #2a2a2a; border-bottom: 1px solid #c4a45a; color: #f5f0e8; font-family: 'Cormorant Garamond', serif; font-size: 1rem; padding: 0.75rem 1rem; outline: none; }
+    .form-input::placeholder { color: #444; font-style: italic; }
+    .form-error { color: #e06060; font-size: 0.8rem; margin-top: 0.5rem; display: none; }
+    .sections-list { margin-bottom: 3rem; }
+    .section-row { display: flex; gap: 1.5rem; padding: 0.7rem 0; border-bottom: 1px solid #1a1a1a; align-items: baseline; }
+    .section-num { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #444; letter-spacing: 0.1em; min-width: 18px; }
+    .section-name { font-size: 0.9rem; color: #777; }
+    .section-sub { font-size: 0.75rem; color: #444; margin-left: 0.75rem; font-style: italic; }
+    .resume-banner { text-align: center; margin-top: 1.5rem; display: none; }
+    .resume-banner p { font-size: 0.75rem; color: #888; margin-bottom: 0.5rem; }
+    .resume-link { background: transparent; border: none; color: #c4a45a; font-size: 0.75rem; letter-spacing: 0.1em; text-decoration: underline; cursor: pointer; font-family: 'Cormorant Garamond', serif; }
+    .btn-gold { background: #c4a45a; border: none; color: #0a0a0a; padding: 1rem 3.5rem; font-family: 'Syne', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; cursor: pointer; transition: opacity 0.2s; display: block; margin: 0 auto; }
+    .btn-gold:hover { opacity: 0.85; }
+    .btn-outline { background: transparent; border: 1px solid #c4a45a; color: #c4a45a; padding: 0.8rem 2.5rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.18em; cursor: pointer; transition: all 0.2s; }
+    .btn-outline:hover { background: #c4a45a; color: #0a0a0a; }
+    .btn-ghost { background: transparent; border: 1px solid #2a2a2a; color: #444; padding: 0.6rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; cursor: pointer; }
+    .progress-wrap { margin-bottom: 2.5rem; }
+    .progress-labels { display: flex; justify-content: space-between; margin-bottom: 0.4rem; }
+    .progress-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; color: #444; }
+    .progress-track { height: 1px; background: #1e1e1e; }
+    .progress-fill { height: 1px; background: #c4a45a; transition: width 0.8s ease; }
+    .section-header { margin-bottom: 2rem; }
+    .section-num-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; color: #c4a45a; margin-right: 1rem; }
+    .section-title { font-size: 2rem; font-weight: 300; color: #f5f0e8; letter-spacing: -0.01em; }
+    .section-subtitle { font-size: 0.8rem; color: #444; font-style: italic; margin-top: 0.35rem; margin-left: 2.2rem; }
+    .teaching-block { margin-bottom: 2.5rem; padding: 1.75rem; background: #111; border: 1px solid #1e1e1e; }
+    .teaching-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.25em; color: #c4a45a; margin-bottom: 1.25rem; }
+    .teaching-p { font-size: 1rem; line-height: 1.85; color: #888; margin-bottom: 1rem; font-weight: 300; }
+    .teaching-p.first { color: #f5f0e8; font-weight: 600; }
+    .teaching-transition { font-size: 0.9rem; font-style: italic; color: #c4a45a; line-height: 1.7; border-top: 1px solid #1e1e1e; padding-top: 1rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+    .past-answer { margin-bottom: 2rem; }
+    .past-question { font-size: 0.75rem; color: #444; margin-bottom: 0.5rem; line-height: 1.6; }
+    .past-text { font-size: 0.95rem; line-height: 1.8; color: #ccc; padding-left: 1rem; border-left: 1px solid #1e1e1e; }
+    .reflection { margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(196,164,90,0.1); border-left: 2px solid #c4a45a; }
+    .reflection-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; margin-bottom: 0.5rem; }
+    .reflection-text { font-size: 0.95rem; line-height: 1.75; color: #ccc; font-style: italic; }
+    .question-counter { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #444; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+    .question-text { font-size: 1.05rem; line-height: 1.8; color: #e8e3d8; margin-bottom: 1rem; font-weight: 400; }
+    textarea { width: 100%; background: rgba(255,255,255,0.025); border: 1px solid #2a2a2a; border-bottom: 1px solid #c4a45a; color: #f5f0e8; font-family: 'Cormorant Garamond', serif; font-size: 1rem; line-height: 1.8; padding: 1rem; resize: none; outline: none; min-height: 140px; }
+    textarea::placeholder { color: #444; font-style: italic; }
+    textarea:disabled { opacity: 0.5; }
+    .question-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; }
+    .cmd-hint { font-family: 'Syne', sans-serif; font-size: 0.55rem; color: #333; letter-spacing: 0.08em; }
+    .action-right { display: flex; gap: 1rem; align-items: center; }
+    .observing-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #c4a45a; letter-spacing: 0.15em; animation: pulse 1.5s infinite; }
+    .summary-block { margin-top: 2rem; padding: 1.5rem; border: 1px solid #2a2a2a; background: rgba(255,255,255,0.02); }
+    .summary-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; margin-bottom: 1rem; }
+    .summary-text { font-size: 0.95rem; line-height: 1.85; color: #e8e3d8; white-space: pre-wrap; }
+    .summary-actions { text-align: center; margin-top: 2.5rem; }
+    .generating { text-align: center; padding: 2rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; color: #444; }
+    .map-title { font-size: 2.8rem; font-weight: 300; color: #f5f0e8; letter-spacing: -0.02em; text-align: center; margin: 2rem 0 0.75rem; }
+    .map-subtitle { font-size: 1rem; font-style: italic; color: #888; text-align: center; margin-bottom: 2.5rem; }
+    .map-quote { border-top: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e; padding: 1.5rem 0; margin-bottom: 3rem; text-align: center; }
+    .map-quote p { font-style: italic; color: #888; font-size: 1.05rem; line-height: 1.9; }
+    .map-section { margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid #1e1e1e; background: rgba(255,255,255,0.015); }
+    .map-section-header { display: flex; gap: 1rem; align-items: baseline; margin-bottom: 0.75rem; }
+    .map-section-num { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; }
+    .map-section-title { font-size: 0.85rem; color: #f5f0e8; font-weight: 600; letter-spacing: 0.06em; font-family: 'Syne', sans-serif; }
+    .map-section-text { font-size: 0.9rem; line-height: 1.85; color: #bbb; white-space: pre-wrap; }
+    .map-footer { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #1e1e1e; }
+    .map-footer-msg { font-size: 0.85rem; color: #888; line-height: 1.8; margin-bottom: 1.5rem; }
+    .map-footer a { color: #c4a45a; font-family: 'Syne', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-decoration: none; }
+    .map-footer-brand { font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; color: #444; margin-top: 2rem; }
+  </style>
+</head>
