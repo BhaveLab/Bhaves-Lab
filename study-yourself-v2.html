@@ -106,6 +106,7 @@
     .map-footer-msg { font-size: 0.85rem; color: #888; line-height: 1.8; margin-bottom: 1.5rem; }
     .map-footer a { color: #c4a45a; font-family: 'Syne', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-decoration: none; }
     .map-footer-brand { font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; color: #444; margin-top: 2rem; }
+
   </style>
 </head>
 <body>
@@ -183,6 +184,8 @@
 <script>
 var BACKEND = "https://bhaveslab-backend.vercel.app";
 var SAVE_KEY = "sy_course_v3";
+
+
 
 // COURSE DATA
 var SECTIONS = [
@@ -446,6 +449,7 @@ function renderQuestions(sec) {
   var area = document.getElementById("questions-area");
   var html = "";
 
+  // Render all previously answered questions with their reflections
   var limit = state.showSummary ? sec.questions.length : state.qIdx;
   for (var i = 0; i < limit; i++) {
     var key = sec.id + "_" + i;
@@ -464,12 +468,15 @@ function renderQuestions(sec) {
     html += '</div>';
   }
 
+  // FIX: Only show the summary block if showSummary is true AND sectionSummary exists
   if (state.showSummary && state.sectionSummary) {
     html += '<div class="summary-block">';
     html += '<div class="summary-label">SECTION COMPLETE</div>';
     html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
     html += '</div>';
     html += '<div class="summary-actions">';
+
+    // FIX: Build next label safely -- define next before using it
     var nextLabel;
     if (state.secIdx === SECTIONS.length - 1) {
       nextLabel = 'VIEW YOUR PATTERN MAP';
@@ -481,73 +488,79 @@ function renderQuestions(sec) {
     html += '</div>';
 
   } else if (state.showSummary && !state.sectionSummary) {
+    // FIX: Generating state -- show spinner while summary is being fetched
     html += '<div class="generating">BUILDING YOUR SECTION SUMMARY...</div>';
 
   } else {
+    // Active question input
     var q = sec.questions[state.qIdx];
     html += '<div id="current-question">';
     html += '<div class="question-counter">' + (state.qIdx + 1) + " / " + sec.questions.length + '</div>';
     html += '<div class="question-text">' + q + '</div>';
     html += '<textarea id="answer-input" rows="6" placeholder="Write honestly. Not the answer that sounds right -- the honest one."></textarea>';
 
-```
+
 html += '<div class="question-actions">';
 html += '<span class="cmd-hint">Ctrl + Enter to submit</span>';
 html += '<div class="action-right">';
 html += '<span id="observing-label" class="observing-label" style="display:none;">OBSERVING</span>';
 html += '<button id="submit-btn" class="btn-outline">CONTINUE</button>';
 html += '</div></div></div>';
-```
+
 
 }
 
 area.innerHTML = html;
 
-var submitBtn = document.getElementById(“submit-btn”);
+// Attach listeners after rendering
+var submitBtn = document.getElementById("submit-btn");
 if (submitBtn) {
-submitBtn.addEventListener(“click”, submitAnswer);
+submitBtn.addEventListener("click", submitAnswer);
 }
 
-var nextBtn = document.getElementById(“next-section-btn”);
+var nextBtn = document.getElementById("next-section-btn");
 if (nextBtn) {
-nextBtn.addEventListener(“click”, nextSection);
+nextBtn.addEventListener("click", nextSection);
 }
 
-var ta = document.getElementById(“answer-input”);
+var ta = document.getElementById("answer-input");
 if (ta) {
-ta.addEventListener(“keydown”, function(e) {
-if (e.key === “Enter” && (e.metaKey || e.ctrlKey)) submitAnswer();
+ta.addEventListener("keydown", function(e) {
+if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submitAnswer();
 });
 setTimeout(function() { ta.focus(); }, 100);
 }
 }
 
 function submitAnswer() {
-var ta = document.getElementById(“answer-input”);
+var ta = document.getElementById("answer-input");
 if (!ta || !ta.value.trim()) return;
 var input = ta.value.trim();
 var sec = SECTIONS[state.secIdx];
-var key = sec.id + “_” + state.qIdx;
+var key = sec.id + "_" + state.qIdx;
 
+// Disable input while processing
 ta.disabled = true;
-var btn = document.getElementById(“submit-btn”);
+var btn = document.getElementById("submit-btn");
 if (btn) btn.disabled = true;
-var obs = document.getElementById(“observing-label”);
-if (obs) obs.style.display = “inline”;
+var obs = document.getElementById("observing-label");
+if (obs) obs.style.display = "inline";
 
 state.answers[key] = input;
 var newHistory = conversationHistory.slice();
-newHistory.push({ role: “user”, content: input });
+newHistory.push({ role: "user", content: input });
 
 var isLastQ = (state.qIdx === sec.questions.length - 1);
 
 callReflect(sec.systemPrompt, newHistory, function(reflection) {
 conversationHistory = newHistory.slice();
-conversationHistory.push({ role: “assistant”, content: reflection });
+conversationHistory.push({ role: "assistant", content: reflection });
 state.reflections[key] = reflection;
 
-```
+
 if (isLastQ) {
+  // FIX: Set showSummary = true but sectionSummary = "" BEFORE re-render
+  // so the "generating" spinner shows while we fetch the summary
   state.showSummary = true;
   state.sectionSummary = "";
   saveStateToStorage();
@@ -569,7 +582,7 @@ if (isLastQ) {
   saveStateToStorage();
   renderQuestions(sec);
 }
-```
+
 
 });
 }
@@ -582,41 +595,41 @@ state.secIdx++;
 state.qIdx = 0;
 state.showTeaching = true;
 state.showSummary = false;
-state.sectionSummary = “”;
+state.sectionSummary = "";
 conversationHistory = [];
 saveStateToStorage();
-document.getElementById(“teaching-block”).style.display = “block”;
+document.getElementById("teaching-block").style.display = "block";
 renderSection();
 window.scrollTo(0, 0);
 }
 }
 
 function showMapScreen() {
-var mapTitle = document.getElementById(“map-title”);
-if (mapTitle) mapTitle.textContent = state.userName ? state.userName + “’s Pattern Map” : “Your Pattern Map”;
+var mapTitle = document.getElementById("map-title");
+if (mapTitle) mapTitle.textContent = state.userName ? state.userName + "'s Pattern Map" : "Your Pattern Map";
 
-var mapMsg = document.getElementById(“map-email-msg”);
+var mapMsg = document.getElementById("map-email-msg");
 if (mapMsg && state.userEmail) {
-mapMsg.textContent = “Your pattern map has been sent to “ + state.userEmail + “. Ready to go deeper?”;
+mapMsg.textContent = "Your pattern map has been sent to “ + state.userEmail + “. Ready to go deeper?";
 }
 
-var mapSections = document.getElementById(“map-sections”);
-var html = “”;
+var mapSections = document.getElementById("map-sections");
+var html = "";
 for (var i = 0; i < SECTIONS.length; i++) {
 var s = SECTIONS[i];
 var sum = state.summaries[s.id];
 if (!sum) continue;
-html += ‘<div class="map-section">’;
-html += ‘<div class="map-section-header">’;
-html += ‘<span class="map-section-num">’ + s.number + ‘</span>’;
-html += ‘<span class="map-section-title">’ + s.title.toUpperCase() + ‘</span>’;
-html += ‘</div>’;
-html += ‘<div class="map-section-text">’ + escHtml(sum) + ‘</div>’;
-html += ‘</div>’;
+html += '<div class="map-section">';
+html += '<div class="map-section-header">';
+html += '<span class="map-section-num">' + s.number + '</span>';
+html += '<span class="map-section-title">' + s.title.toUpperCase() + '</span>';
+html += '</div>';
+html += '<div class="map-section-text">' + escHtml(sum) + '</div>';
+html += '</div>';
 }
 mapSections.innerHTML = html;
 
-showScreen(“map”);
+showScreen("map");
 
 if (!state.emailSent && state.userEmail) {
 state.emailSent = true;
@@ -628,22 +641,22 @@ sendPatternMap();
 function restartCourse() {
 clearStoredState();
 state = {
-userName: “”, userEmail: “”, secIdx: 0, qIdx: 0,
+userName: ", userEmail: "", secIdx: 0, qIdx: 0,
 showTeaching: true, answers: {}, reflections: {}, summaries: {},
-showSummary: false, sectionSummary: “”, emailSent: false
+showSummary: false, sectionSummary: "", emailSent: false
 };
 conversationHistory = [];
-var nameEl = document.getElementById(“input-name”);
-var emailEl = document.getElementById(“input-email”);
-if (nameEl) nameEl.value = “”;
-if (emailEl) emailEl.value = “”;
-document.getElementById(“resume-banner”).style.display = “none”;
-document.getElementById(“teaching-block”).style.display = “block”;
-showScreen(“intro”);
+var nameEl = document.getElementById("input-name");
+var emailEl = document.getElementById("input-email");
+if (nameEl) nameEl.value = "";
+if (emailEl) emailEl.value = "";
+document.getElementById("resume-banner").style.display = "none";
+document.getElementById("teaching-block").style.display = "block";
+showScreen("intro");
 }
 
 // INIT
-window.addEventListener(“DOMContentLoaded”, function() {
+window.addEventListener("DOMContentLoaded", function() {
 initIntro();
 });
 </script>
