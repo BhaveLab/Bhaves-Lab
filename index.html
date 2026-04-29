@@ -1,994 +1,880 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bhavé's Lab — Metaphysical Strategist</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Bhavé's Lab — An Interactive Awareness Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-body {
-background-color: #080808 !important;
-background: #080808 !important;
-color: #ede8e0;
-font-family: ‘Syne’, Georgia, serif;
-font-weight: 300;
-overflow-x: hidden;
--webkit-font-smoothing: antialiased;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-–bg: #080808;
-–surface: #111111;
-–border: rgba(255,255,255,0.06);
+–black: #060606;
 –gold: #c9a96e;
-–gold-dim: rgba(201,169,110,0.12);
+–gold-dim: rgba(201,169,110,0.15);
+–gold-faint: rgba(201,169,110,0.06);
 –text: #ede8e0;
-–text-dim: rgba(237,232,224,0.5);
-–text-muted: rgba(237,232,224,0.28);
-–text-faint: rgba(237,232,224,0.14);
+–text-dim: rgba(237,232,224,0.45);
+–text-faint: rgba(237,232,224,0.18);
+–border: rgba(255,255,255,0.05);
 }
-
-/* NAV */
-nav {
+html, body {
+width: 100%; height: 100%;
+overflow: hidden;
+background: var(–black);
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+cursor: none;
+}
+/* CUSTOM CURSOR */
+#cursor {
 position: fixed;
-top: 0; left: 0; right: 0;
-z-index: 100;
-padding: 20px 40px;
+width: 6px; height: 6px;
+background: var(–gold);
+border-radius: 50%;
+pointer-events: none;
+z-index: 9999;
+transform: translate(-50%, -50%);
+transition: width 0.2s, height 0.2s, opacity 0.2s;
+mix-blend-mode: screen;
+}
+#cursor-ring {
+position: fixed;
+width: 32px; height: 32px;
+border: 1px solid rgba(201,169,110,0.4);
+border-radius: 50%;
+pointer-events: none;
+z-index: 9998;
+transform: translate(-50%, -50%);
+transition: width 0.4s ease, height 0.4s ease, border-color 0.3s;
+}
+body:has(.node:hover) #cursor-ring {
+width: 56px; height: 56px;
+border-color: rgba(201,169,110,0.7);
+}
+/* CANVAS */
+#canvas {
+position: fixed;
+inset: 0;
+z-index: 0;
+}
+/* PORTAL WRAPPER */
+#portal {
+position: fixed;
+inset: 0;
+z-index: 10;
 display: flex;
-align-items: center;
-justify-content: space-between;
-background: rgba(8,8,8,0.92);
-backdrop-filter: blur(16px);
--webkit-backdrop-filter: blur(16px);
-border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.nav-logo {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: 18px;
-font-weight: 400;
-letter-spacing: 0.08em;
-color: #ede8e0;
-text-decoration: none;
-}
-
-.nav-logo span { color: #c9a96e; }
-
-.nav-links {
-display: flex;
-gap: 36px;
-list-style: none;
-}
-
-.nav-links a {
-font-size: 10px;
-font-weight: 400;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: rgba(237,232,224,0.5);
-text-decoration: none;
-transition: color 0.3s;
-}
-
-.nav-links a:hover { color: #c9a96e; }
-
-.nav-cta {
-font-size: 10px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: #c9a96e;
-border: 1px solid rgba(201,169,110,0.35);
-padding: 12px 28px;
-text-decoration: none;
-transition: all 0.3s;
-background: transparent;
-}
-
-.nav-cta:hover { background: rgba(201,169,110,0.1); }
-
-/* HERO */
-#hero {
-min-height: 100vh;
-display: flex;
+flex-direction: column;
 align-items: center;
 justify-content: center;
-text-align: center;
-padding: 100px 24px 80px;
-position: relative;
-overflow: hidden;
-background-color: #080808;
 }
-
-.hero-inner {
-position: relative;
-z-index: 2;
-animation: fadeUp 1.2s ease forwards;
+/* ENTRY STATE */
+#entry {
+position: absolute;
+inset: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 20;
+transition: opacity 1.2s ease, transform 1.2s ease;
 }
-
-.hero-label {
-font-size: 10px;
-letter-spacing: 0.4em;
-text-transform: uppercase;
-color: #c9a96e;
-opacity: 0.7;
-margin-bottom: 40px;
+#entry.dissolve {
+opacity: 0;
+transform: scale(1.04);
+pointer-events: none;
+}
+.entry-label {
 font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.5em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.5);
+margin-bottom: 48px;
+animation: fadeIn 2s ease forwards;
 }
-
-.hero-name {
+.entry-mark {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(72px, 14vw, 130px);
-font-weight: 300;
+font-size: clamp(64px, 12vw, 120px);
+font-weight: 200;
+font-style: italic;
+color: var(–text);
 line-height: 0.9;
 letter-spacing: -0.02em;
-color: #ede8e0;
-margin-bottom: 4px;
+margin-bottom: 8px;
+animation: fadeIn 2.4s ease forwards;
 }
-
-.hero-name em { font-style: italic; color: #c9a96e; }
-
-.hero-title {
+.entry-mark span { color: var(–gold); }
+.entry-sub {
 font-family: ‘Syne’, sans-serif;
-font-size: clamp(11px, 1.8vw, 14px);
-font-weight: 400;
-letter-spacing: 0.35em;
+font-size: 9px;
+letter-spacing: 0.4em;
 text-transform: uppercase;
-color: rgba(237,232,224,0.35);
-margin-bottom: 48px;
+color: var(–text-faint);
+margin-bottom: 72px;
+animation: fadeIn 2.8s ease forwards;
 }
-
-.hero-line {
-width: 1px;
-height: 40px;
-background: linear-gradient(to bottom, rgba(201,169,110,0.5), transparent);
-margin: 0 auto 40px;
-}
-
-.hero-sub {
+.entry-prompt {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(20px, 4vw, 32px);
+font-size: clamp(18px, 3vw, 26px);
 font-weight: 300;
 font-style: italic;
-line-height: 1.5;
-color: rgba(237,232,224,0.75);
-max-width: 520px;
-margin: 0 auto 16px;
+color: var(–text-dim);
+margin-bottom: 56px;
+text-align: center;
+max-width: 360px;
+line-height: 1.6;
+animation: fadeIn 3.2s ease forwards;
 }
-
-.hero-support {
-font-size: 11px;
-letter-spacing: 0.15em;
-color: rgba(237,232,224,0.35);
-margin-bottom: 52px;
-font-family: ‘Syne’, sans-serif;
-}
-
-.btn-group {
-display: flex;
-gap: 14px;
-justify-content: center;
-flex-wrap: wrap;
-}
-
-.btn-primary {
-font-family: ‘Syne’, sans-serif;
-font-size: 11px;
-font-weight: 400;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: #080808;
-background: #c9a96e;
-border: 1px solid #c9a96e;
-padding: 17px 44px;
-cursor: pointer;
-text-decoration: none;
-transition: all 0.3s;
-display: inline-block;
-}
-
-.btn-primary:hover { background: #d4b47a; }
-
-.btn-secondary {
-font-family: ‘Syne’, sans-serif;
-font-size: 11px;
-font-weight: 400;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: #c9a96e;
-background: transparent;
-border: 1px solid rgba(201,169,110,0.35);
-padding: 17px 44px;
-cursor: pointer;
-text-decoration: none;
-transition: all 0.3s;
-display: inline-block;
-}
-
-.btn-secondary:hover { background: rgba(201,169,110,0.1); }
-
-/* SECTIONS */
-section {
-background-color: #080808;
-position: relative;
-z-index: 1;
-}
-
-.container { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
-.container-narrow { max-width: 680px; margin: 0 auto; padding: 0 40px; }
-
-/* WHAT */
-#what { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.section-label {
+.entry-btn {
 font-family: ‘Syne’, sans-serif;
 font-size: 10px;
 letter-spacing: 0.4em;
 text-transform: uppercase;
-color: #c9a96e;
-opacity: 0.6;
-margin-bottom: 28px;
-}
-
-.section-heading {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(36px, 6vw, 58px);
-font-weight: 300;
-line-height: 1.1;
-letter-spacing: -0.01em;
-margin-bottom: 40px;
-color: #ede8e0;
-}
-
-.section-heading em { font-style: italic; color: #c9a96e; }
-
-.body-text {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(17px, 2.5vw, 21px);
-font-weight: 300;
-line-height: 1.85;
-color: rgba(237,232,224,0.55);
-margin-bottom: 20px;
-}
-
-.precision-line {
-font-family: ‘Syne’, sans-serif;
-font-size: 11px;
-font-weight: 500;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: #c9a96e;
-margin-top: 36px;
-padding-top: 36px;
-border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-/* FRAMEWORK */
-#framework { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; }
-
-.framework-flow {
-display: flex;
-align-items: center;
-justify-content: center;
-flex-wrap: wrap;
-gap: 0;
-margin: 56px 0 40px;
-}
-
-.framework-word {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(17px, 3vw, 26px);
-font-weight: 400;
-letter-spacing: 0.06em;
-color: #ede8e0;
-padding: 0 16px;
-}
-
-.framework-arrow {
-color: #c9a96e;
-opacity: 0.4;
-font-size: 14px;
-}
-
-.framework-caption {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(16px, 2.5vw, 20px);
-font-weight: 300;
-font-style: italic;
-color: rgba(237,232,224,0.5);
-max-width: 460px;
-margin: 0 auto;
-line-height: 1.7;
-}
-
-/* MIRROR CTA */
-#mirror-cta { padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.mirror-block {
-background: #0f0f0f;
-border: 1px solid rgba(255,255,255,0.06);
-border-left: 2px solid rgba(201,169,110,0.4);
-padding: 56px 64px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 40px;
-flex-wrap: wrap;
-}
-
-.mirror-block-text { flex: 1; min-width: 260px; }
-
-.mirror-block-label {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.35em;
-text-transform: uppercase;
-color: #c9a96e;
-opacity: 0.6;
-margin-bottom: 16px;
-}
-
-.mirror-block-heading {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(26px, 4vw, 40px);
-font-weight: 300;
-line-height: 1.2;
-color: #ede8e0;
-margin-bottom: 16px;
-}
-
-.mirror-block-body {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(15px, 2vw, 18px);
-font-weight: 300;
-font-style: italic;
-color: rgba(237,232,224,0.5);
-line-height: 1.7;
-}
-
-/* SERVICES */
-#services { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.services-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 1px;
-background: rgba(255,255,255,0.06);
-margin-top: 56px;
-border: 1px solid rgba(255,255,255,0.06);
-}
-
-.service-card {
-background: #080808;
-padding: 44px 36px;
-transition: background 0.3s;
+color: var(–gold);
+border: 1px solid rgba(201,169,110,0.3);
+padding: 18px 52px;
+background: transparent;
+cursor: none;
+transition: all 0.4s ease;
+animation: fadeIn 3.6s ease forwards;
 position: relative;
 overflow: hidden;
 }
-
-.service-card::before {
-content: ‘’;
-position: absolute;
-top: 0; left: 0; right: 0;
-height: 1px;
-background: #c9a96e;
-transform: scaleX(0);
-transform-origin: left;
-transition: transform 0.4s;
-}
-
-.service-card:hover { background: #0f0f0f; }
-.service-card:hover::before { transform: scaleX(1); }
-
-.service-number {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.3em;
-color: rgba(237,232,224,0.2);
-margin-bottom: 16px;
-}
-
-.service-name {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(19px, 2.5vw, 25px);
-font-weight: 400;
-color: #ede8e0;
-margin-bottom: 12px;
-line-height: 1.2;
-}
-
-.service-desc {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(14px, 1.8vw, 16px);
-font-weight: 300;
-font-style: italic;
-color: rgba(237,232,224,0.45);
-line-height: 1.7;
-}
-
-/* WHO */
-#who { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.who-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 36px 64px;
-margin-top: 56px;
-}
-
-.who-item { display: flex; gap: 16px; align-items: flex-start; }
-
-.who-dash {
-width: 20px;
-height: 1px;
-background: #c9a96e;
-opacity: 0.5;
-margin-top: 13px;
-flex-shrink: 0;
-}
-
-.who-text {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(16px, 2vw, 20px);
-font-weight: 300;
-font-style: italic;
-color: rgba(237,232,224,0.55);
-line-height: 1.65;
-}
-
-/* ABOUT */
-#about { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.about-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 72px;
-align-items: start;
-}
-
-.about-right {
-border-left: 1px solid rgba(255,255,255,0.06);
-padding-left: 72px;
-}
-
-.about-stat {
-margin-bottom: 32px;
-padding-bottom: 32px;
-border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.about-stat:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-
-.about-stat-label {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.3em;
-text-transform: uppercase;
-color: rgba(237,232,224,0.3);
-margin-bottom: 8px;
-}
-
-.about-stat-value {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(15px, 2vw, 18px);
-font-weight: 300;
-color: rgba(237,232,224,0.55);
-line-height: 1.6;
-}
-
-/* EVENTS */
-#events { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.event-row {
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 28px 0;
-border-bottom: 1px solid rgba(255,255,255,0.06);
-gap: 20px;
-flex-wrap: wrap;
-transition: padding-left 0.3s;
-}
-
-.event-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
-.event-row:hover { padding-left: 12px; }
-
-.event-date {
-font-family: ‘Syne’, sans-serif;
-font-size: 11px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: #c9a96e;
-opacity: 0.7;
-min-width: 140px;
-}
-
-.event-name {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(17px, 2.5vw, 22px);
-font-weight: 300;
-color: #ede8e0;
-flex: 1;
-}
-
-.event-location {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.15em;
-color: rgba(237,232,224,0.3);
-text-transform: uppercase;
-}
-
-.event-role {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: #c9a96e;
-border: 1px solid rgba(201,169,110,0.25);
-padding: 6px 14px;
-}
-
-/* CTA */
-#cta {
-padding: 120px 0;
-border-top: 1px solid rgba(255,255,255,0.06);
-text-align: center;
-position: relative;
-overflow: hidden;
-}
-
-#cta::before {
+.entry-btn::before {
 content: ‘’;
 position: absolute;
 inset: 0;
-background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.04) 0%, transparent 70%);
-pointer-events: none;
+background: var(–gold-dim);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.4s ease;
 }
-
-.cta-inner { position: relative; z-index: 1; }
-
-.cta-pre {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.4em;
-text-transform: uppercase;
-color: rgba(237,232,224,0.3);
-margin-bottom: 32px;
+.entry-btn:hover::before { transform: scaleX(1); }
+.entry-btn:hover { border-color: rgba(201,169,110,0.6); }
+.entry-line {
+width: 1px;
+height: 0;
+background: linear-gradient(to bottom, rgba(201,169,110,0.4), transparent);
+margin: 0 auto 40px;
+animation: growLine 2s ease 1s forwards;
 }
-
-.cta-heading {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(40px, 7vw, 70px);
-font-weight: 300;
-line-height: 1.1;
-color: #ede8e0;
-margin-bottom: 20px;
+@keyframes growLine {
+to { height: 48px; }
 }
-
-.cta-heading em { font-style: italic; color: #c9a96e; }
-
-.cta-body {
-font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: clamp(16px, 2.5vw, 20px);
-font-weight: 300;
-font-style: italic;
-color: rgba(237,232,224,0.5);
-max-width: 460px;
-margin: 0 auto 48px;
-line-height: 1.75;
-}
-
-.email-capture {
+/* INNER PORTAL — after entry */
+#inner {
+position: absolute;
+inset: 0;
 display: flex;
-max-width: 420px;
-margin: 0 auto 16px;
-border: 1px solid rgba(201,169,110,0.25);
+flex-direction: column;
+align-items: center;
+justify-content: center;
+opacity: 0;
+pointer-events: none;
+transition: opacity 1.4s ease 0.4s;
 }
-
-.email-input {
-flex: 1;
-background: transparent;
-border: none;
-outline: none;
-padding: 16px 20px;
-font-family: ‘Syne’, sans-serif;
-font-size: 12px;
-letter-spacing: 0.08em;
-color: #ede8e0;
+#inner.active {
+opacity: 1;
+pointer-events: all;
 }
-
-.email-input::placeholder { color: rgba(237,232,224,0.3); }
-
-.email-btn {
-background: transparent;
-border: none;
-border-left: 1px solid rgba(201,169,110,0.25);
-padding: 16px 24px;
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: #c9a96e;
-cursor: pointer;
-transition: background 0.3s;
-white-space: nowrap;
+/* FRAMEWORK PULSE — center of portal */
+.framework-center {
+text-align: center;
+margin-bottom: 72px;
+position: relative;
 }
-
-.email-btn:hover { background: rgba(201,169,110,0.1); }
-
-.email-note {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.12em;
-color: rgba(237,232,224,0.2);
-margin-bottom: 44px;
-}
-
-/* FOOTER */
-footer {
-padding: 40px;
-border-top: 1px solid rgba(255,255,255,0.06);
+.framework-sequence {
 display: flex;
 align-items: center;
-justify-content: space-between;
+justify-content: center;
+gap: 0;
 flex-wrap: wrap;
-gap: 20px;
-background-color: #080808;
+margin-bottom: 20px;
 }
-
-.footer-logo {
+.fw-word {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
-font-size: 16px;
-color: rgba(237,232,224,0.5);
+font-size: clamp(13px, 2vw, 18px);
+font-weight: 300;
 letter-spacing: 0.08em;
+color: var(–text-faint);
+padding: 0 10px;
+transition: color 0.6s ease;
 }
-
-.footer-logo span { color: #c9a96e; }
-
-.footer-location {
-font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: rgba(237,232,224,0.25);
+.fw-word.active-word { color: var(–text-dim); }
+.fw-word.formation { color: rgba(201,169,110,0.5); }
+.fw-arrow {
+color: rgba(201,169,110,0.2);
+font-size: 11px;
+letter-spacing: 0;
+padding: 0;
 }
-
-.footer-links { display: flex; gap: 28px; list-style: none; }
-
-.footer-links a {
+.framework-caption {
 font-family: ‘Syne’, sans-serif;
-font-size: 10px;
-letter-spacing: 0.2em;
+font-size: 8px;
+letter-spacing: 0.35em;
 text-transform: uppercase;
-color: rgba(237,232,224,0.25);
+color: var(–text-faint);
+}
+/* NODES */
+.nodes {
+display: flex;
+align-items: center;
+gap: 2px;
+margin-bottom: 64px;
+}
+.node-divider {
+width: 1px;
+height: 60px;
+background: var(–border);
+}
+.node {
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+padding: 36px 48px;
+cursor: none;
+position: relative;
+transition: all 0.4s ease;
 text-decoration: none;
+group: true;
+}
+.node::before {
+content: ‘’;
+position: absolute;
+bottom: 0; left: 50%; right: 50%;
+height: 1px;
+background: var(–gold);
+transition: left 0.4s ease, right 0.4s ease;
+}
+.node:hover::before {
+left: 20%;
+right: 20%;
+}
+.node-num {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.4em;
+color: var(–text-faint);
+margin-bottom: 20px;
+text-transform: uppercase;
+}
+.node-name {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(20px, 3vw, 30px);
+font-weight: 300;
+color: var(–text-dim);
+margin-bottom: 12px;
+line-height: 1.1;
+transition: color 0.3s ease;
+}
+.node:hover .node-name { color: var(–text); }
+.node-desc {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(13px, 1.6vw, 15px);
+font-weight: 300;
+font-style: italic;
+color: var(–text-faint);
+max-width: 200px;
+line-height: 1.6;
+margin-bottom: 24px;
+transition: color 0.3s ease;
+}
+.node:hover .node-desc { color: var(–text-dim); }
+.node-action {
+font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.4);
+transition: color 0.3s ease;
+}
+.node:hover .node-action { color: var(–gold); }
+.node-tag {
+position: absolute;
+top: 12px; right: 12px;
+font-family: ‘Syne’, sans-serif;
+font-size: 7px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–gold);
+border: 1px solid rgba(201,169,110,0.2);
+padding: 4px 8px;
+}
+/* BOTTOM — portal signature */
+.portal-sig {
+position: absolute;
+bottom: 40px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+align-items: center;
+gap: 40px;
+white-space: nowrap;
+}
+.sig-text {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.35em;
+text-transform: uppercase;
+color: var(–text-faint);
+}
+.sig-dot {
+width: 2px; height: 2px;
+background: rgba(201,169,110,0.3);
+border-radius: 50%;
+}
+/* TOP — lab mark */
+.lab-mark {
+position: absolute;
+top: 36px;
+left: 50%;
+transform: translateX(-50%);
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: 13px;
+font-weight: 300;
+letter-spacing: 0.2em;
+color: var(–text-faint);
+white-space: nowrap;
 transition: color 0.3s;
 }
-
-.footer-links a:hover { color: #c9a96e; }
-
+.lab-mark span { color: rgba(201,169,110,0.4); }
+.lab-mark:hover { color: var(–text-dim); }
+/* AMBIENT PULSE — radial breathing ring */
+.pulse-ring {
+position: fixed;
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+width: 600px; height: 600px;
+border-radius: 50%;
+border: 1px solid rgba(201,169,110,0.04);
+pointer-events: none;
+z-index: 5;
+animation: breathe 8s ease-in-out infinite;
+}
+.pulse-ring:nth-child(2) {
+width: 900px; height: 900px;
+animation-delay: 2s;
+border-color: rgba(201,169,110,0.025);
+}
+.pulse-ring:nth-child(3) {
+width: 1200px; height: 1200px;
+animation-delay: 4s;
+border-color: rgba(201,169,110,0.015);
+}
+@keyframes breathe {
+0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+}
+/* FRAMEWORK PULSE animation */
+@keyframes sequencePulse {
+0% { color: var(–text-faint); }
+50% { color: var(–text-dim); }
+100% { color: var(–text-faint); }
+}
 /* ANIMATIONS */
-@keyframes fadeUp {
-from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(12px); }
 to { opacity: 1; transform: translateY(0); }
 }
-
-.fade-in {
+.inner-reveal {
+opacity: 0;
+transform: translateY(16px);
+transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.inner-reveal.show {
 opacity: 1;
 transform: translateY(0);
 }
-
-.fade-in.visible { opacity: 1; transform: translateY(0); }
-
+/* OVERLAY — what is running prompt */
+#awareness-overlay {
+position: fixed;
+inset: 0;
+z-index: 50;
+background: rgba(6,6,6,0.96);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.6s ease;
+padding: 40px;
+}
+#awareness-overlay.open {
+opacity: 1;
+pointer-events: all;
+}
+.overlay-close {
+position: absolute;
+top: 36px; right: 40px;
+font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–text-faint);
+cursor: none;
+transition: color 0.3s;
+}
+.overlay-close:hover { color: var(–text-dim); }
+.overlay-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.5em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.4);
+margin-bottom: 32px;
+}
+.overlay-prompt {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(28px, 5vw, 52px);
+font-weight: 200;
+font-style: italic;
+color: var(–text);
+text-align: center;
+max-width: 600px;
+line-height: 1.3;
+margin-bottom: 48px;
+}
+.overlay-input {
+width: 100%;
+max-width: 520px;
+background: transparent;
+border: none;
+border-bottom: 1px solid rgba(201,169,110,0.2);
+outline: none;
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(16px, 2.5vw, 22px);
+font-weight: 300;
+font-style: italic;
+color: var(–text);
+padding: 16px 0;
+text-align: center;
+caret-color: var(–gold);
+margin-bottom: 16px;
+}
+.overlay-input::placeholder {
+color: var(–text-faint);
+}
+.overlay-note {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–text-faint);
+margin-bottom: 40px;
+}
+.overlay-actions {
+display: flex;
+gap: 20px;
+flex-wrap: wrap;
+justify-content: center;
+}
+.overlay-btn {
+font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+padding: 14px 36px;
+cursor: none;
+transition: all 0.3s ease;
+text-decoration: none;
+display: inline-block;
+}
+.overlay-btn-primary {
+color: #060606;
+background: var(–gold);
+border: 1px solid var(–gold);
+}
+.overlay-btn-primary:hover { background: #d4b47a; }
+.overlay-btn-secondary {
+color: var(–gold);
+background: transparent;
+border: 1px solid rgba(201,169,110,0.3);
+}
+.overlay-btn-secondary:hover { background: var(–gold-dim); }
 /* MOBILE */
 @media (max-width: 768px) {
-nav { padding: 16px 20px; }
-.nav-links { display: none; }
-.container, .container-narrow { padding: 0 20px; }
-#what, #framework, #mirror-cta, #services, #who, #about, #events, #cta { padding: 72px 0; }
-.about-grid { grid-template-columns: 1fr; gap: 48px; }
-.about-right { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 48px; }
-.who-grid { grid-template-columns: 1fr; gap: 24px; }
-.services-grid { grid-template-columns: 1fr; }
-.mirror-block { padding: 36px 28px; }
-.event-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
-.footer-links { flex-wrap: wrap; gap: 20px; }
+html, body { overflow-y: auto; }
+#cursor, #cursor-ring { display: none; }
+body { cursor: auto; }
+.entry-btn, .node, .overlay-close, .overlay-btn { cursor: pointer; }
+.nodes {
+flex-direction: column;
+gap: 0;
+}
+.node-divider {
+width: 60px; height: 1px;
+}
+.node { padding: 28px 24px; }
+.portal-sig { gap: 20px; }
+#inner { padding: 20px; justify-content: flex-start; padding-top: 100px; overflow-y: auto; }
 }
 </style>
-
 </head>
 <body>
-
-<nav>
-  <a href="#" class="nav-logo">Bhav<span>é</span>'s Lab</a>
-  <ul class="nav-links">
-    <li><a href="#what">The Work</a></li>
-    <li><a href="#services">Sessions</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#events">Events</a></li>
-  </ul>
-  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="nav-cta">Book a Session</a>
-</nav>
-
-<!-- HERO -->
-
-<section id="hero">
-  <div class="hero-inner">
-    <p class="hero-label">Bhavé's Lab </p>
-    <h1 class="hero-name">Bhav<em>é</em></h1>
-    <p class="hero-title">Metaphysical Strategist</p>
-    <div class="hero-line"></div>
-    <p class="hero-sub">You are running patterns you didn't consciously choose.</p>
-    <p class="hero-support">Hypnosis · Biofeedback · Structured Self-Observation</p>
-    <div class="btn-group">
-      <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary">Book a Session</a>
-      <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror</a>
-    </div>
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<!-- PARTICLE CANVAS -->
+<canvas id="canvas"></canvas>
+<!-- BREATHING RINGS -->
+<div class="pulse-ring"></div>
+<div class="pulse-ring"></div>
+<div class="pulse-ring"></div>
+<!-- PORTAL -->
+<div id="portal">
+  <!-- ENTRY STATE -->
+  <div id="entry">
+    <p class="entry-label">Bhavé's Lab</p>
+    <h1 class="entry-mark">Bhav<span>é</span>'s Lab</h1>
+    <p class="entry-sub">An Interactive Awareness Experience</p>
+    <div class="entry-line"></div>
+    <p class="entry-prompt">You are already in the middle of something.</p>
+    <button class="entry-btn" id="enter-btn">Enter the Portal</button>
   </div>
-</section>
-
-<!-- WHAT -->
-
-<section id="what">
-  <div class="container-narrow">
-    <div class="fade-in">
-      <p class="section-label">The Work</p>
-      <h2 class="section-heading">This is not<br><em>surface-level</em> work.</h2>
-      <p class="body-text">Most people try to change outcomes without understanding the patterns creating them. The result is effort without movement — the same experience wearing different details.</p>
-      <p class="body-text">This work focuses on identifying what is actually running beneath your behavior, perception, and decisions — and shifting it at the level it was created.</p>
-      <p class="body-text">State shapes perception. Perception drives decision. Decision produces experience. Experience builds reality. Work anywhere else and you are working on the surface.</p>
-      <p class="precision-line">Precision work. Not guesswork.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FRAMEWORK -->
-
-<section id="framework">
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label" style="text-align:center;">The Framework</p>
-      <h2 class="section-heading" style="text-align:center;">Everything runs<br>through this sequence.</h2>
-      <div class="framework-flow">
-        <span class="framework-word">State</span>
-        <span class="framework-arrow">→</span>
-        <span class="framework-word">Perception</span>
-        <span class="framework-arrow">→</span>
-        <span class="framework-word">Decision</span>
-        <span class="framework-arrow">→</span>
-        <span class="framework-word">Experience</span>
-        <span class="framework-arrow">→</span>
-        <span class="framework-word">Reality</span>
-      </div>
-      <p class="framework-caption">We work at the level of state and pattern — where real change occurs. Not at the level of behavior, symptom, or outcome.</p>
-    </div>
-  </div>
-</section>
-
-<!-- MIRROR CTA -->
-
-<section id="mirror-cta">
-  <div class="container">
-    <div class="mirror-block fade-in">
-      <div class="mirror-block-text">
-        <p class="mirror-block-label">Consciousness Mirror</p>
-        <h3 class="mirror-block-heading">See what is<br>already running.</h3>
-        <p class="mirror-block-body">Six questions. No answers given. Only what is already there — reflected back. The Mirror shows you routes. You decide which one to feel into.</p>
-      </div>
-      <a href="consciousness-mirror.html" class="btn-secondary" style="flex-shrink:0;">Enter the Mirror</a>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICES -->
-
-<section id="services">
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">Sessions</p>
-      <h2 class="section-heading">Work With Me</h2>
-    </div>
-    <div class="services-grid fade-in">
-
+  <!-- INNER PORTAL -->
+  <div id="inner">
 ```
-  <div class="service-card">
-    <p class="service-number">01</p>
-    <h3 class="service-name">Inner Mining Session</h3>
-    <p class="service-desc">Deep guided hypnosis session using QHHT to access the subconscious patterns, past experiences, and internal structures shaping your current reality. We locate the origin — not just the symptom.</p>
+<div class="lab-mark">Bhav<span>é</span>'s Lab</div>
+<!-- FRAMEWORK -->
+<div class="framework-center inner-reveal">
+  <div class="framework-sequence">
+    <span class="fw-word" id="fw-state">State</span>
+    <span class="fw-arrow">→</span>
+    <span class="fw-word" id="fw-perception">Perception</span>
+    <span class="fw-arrow">→</span>
+    <span class="fw-word formation" id="fw-formation">Formation</span>
+    <span class="fw-arrow">→</span>
+    <span class="fw-word" id="fw-decision">Decision</span>
+    <span class="fw-arrow">→</span>
+    <span class="fw-word" id="fw-experience">Experience</span>
+    <span class="fw-arrow">→</span>
+    <span class="fw-word" id="fw-reality">Reality</span>
   </div>
-
-  <div class="service-card">
-    <p class="service-number">02</p>
-    <h3 class="service-name">Biofeedback Session</h3>
-    <p class="service-desc">Using Muse and HeartMath to measure and map your internal state in real time. Your inner landscape becomes visible data — not just felt sense. Observe yourself objectively.</p>
+  <p class="framework-caption">The sequence running beneath everything</p>
+</div>
+<!-- NODES -->
+<div class="nodes inner-reveal" style="transition-delay: 0.2s;">
+  <a href="study-yourself-v2.html" class="node">
+    <span class="node-tag">$25</span>
+    <p class="node-num">01</p>
+    <h2 class="node-name">Study<br>Yourself</h2>
+    <p class="node-desc">A guided course through your own patterns. Your answers build a complete map.</p>
+    <span class="node-action">Begin →</span>
+  </a>
+  <div class="node-divider"></div>
+  <a href="consciousness-mirror.html" class="node">
+    <span class="node-tag">Free</span>
+    <p class="node-num">02</p>
+    <h2 class="node-name">Consciousness<br>Mirror</h2>
+    <p class="node-desc">Six questions. No answers given. Only what is already running — reflected back.</p>
+    <span class="node-action">Enter →</span>
+  </a>
+  <div class="node-divider"></div>
+  <div class="node" id="awareness-node" style="cursor:none;">
+    <p class="node-num">03</p>
+    <h2 class="node-name">What Is<br>Running</h2>
+    <p class="node-desc">Name what is active in you right now. The field listens.</p>
+    <span class="node-action">Observe →</span>
   </div>
-
-  <div class="service-card">
-    <p class="service-number">03</p>
-    <h3 class="service-name">Frequency Alignment Session</h3>
-    <p class="service-desc">For those ready to shift a state that has been stable long enough. Using gemstone frequency work and structured awareness to support a natural transition into what is available.</p>
-  </div>
-
-  <div class="service-card">
-    <p class="service-number">04</p>
-    <h3 class="service-name">Study Yourself Session</h3>
-    <p class="service-desc">The State → Perception → Decision → Experience → Reality framework applied directly to where you are right now. Precision questions. Real time observation. Your own patterns — made visible.</p>
-  </div>
-
+</div>
+<!-- PORTAL SIGNATURE -->
+<div class="portal-sig inner-reveal" style="transition-delay:0.4s;">
+  <span class="sig-text">State shapes perception</span>
+  <div class="sig-dot"></div>
+  <span class="sig-text">Perception drives decision</span>
+  <div class="sig-dot"></div>
+  <span class="sig-text">The work begins here</span>
 </div>
 ```
-
   </div>
-</section>
-
-<!-- WHO -->
-
-<section id="who">
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">Who This Is For</p>
-      <h2 class="section-heading">This is for you <em>if</em></h2>
-      <div class="who-grid">
-        <div class="who-item">
-          <div class="who-dash"></div>
-          <p class="who-text">You keep experiencing the same patterns in different forms and you're ready to locate the source.</p>
-        </div>
-        <div class="who-item">
-          <div class="who-dash"></div>
-          <p class="who-text">You want clarity — not motivation. You've had enough of surface-level solutions.</p>
-        </div>
-        <div class="who-item">
-          <div class="who-dash"></div>
-          <p class="who-text">You understand something clearly but it still hasn't shifted. You know the gap is deeper than knowledge.</p>
-        </div>
-        <div class="who-item">
-          <div class="who-dash"></div>
-          <p class="who-text">You are open to seeing what is actually running your life — even when that requires going somewhere unfamiliar.</p>
-        </div>
-      </div>
-    </div>
+</div>
+<!-- AWARENESS OVERLAY -->
+<div id="awareness-overlay">
+  <span class="overlay-close" id="overlay-close">Close</span>
+  <p class="overlay-label">What Is Active</p>
+  <p class="overlay-prompt">What is running in you right now?</p>
+  <input
+    type="text"
+    class="overlay-input"
+    id="awareness-input"
+    placeholder="Name it without editing it"
+    autocomplete="off"
+  >
+  <p class="overlay-note">This stays with you — not stored, not sent</p>
+  <div class="overlay-actions">
+    <a href="consciousness-mirror.html" class="overlay-btn overlay-btn-primary">Take it to the Mirror</a>
+    <a href="study-yourself-v2.html" class="overlay-btn overlay-btn-secondary">Begin the Study</a>
   </div>
-</section>
-
-<!-- ABOUT -->
-
-<section id="about">
-  <div class="container">
-    <div class="about-grid fade-in">
-      <div class="about-left">
-        <p class="section-label">About</p>
-        <h2 class="section-heading">The Lab is<br>the <em>source</em>.</h2>
-        <p class="body-text">I work at the intersection of awareness and physiology. My background includes a Master's in Metaphysics, doctoral research in meditation and consciousness expansion, hypnosis, biofeedback systems, and decades of consciousness research.</p>
-        <p class="body-text">I don't focus on symptoms. I focus on patterns. Once a pattern is seen clearly — truly seen — everything else becomes easier to move.</p>
-        <p class="body-text">Bhavé's Lab operates from within. The work transmits from here. The right people find it.</p>
-      </div>
-      <div class="about-right">
-        <div class="about-stat">
-          <p class="about-stat-label">Approach</p>
-          <p class="about-stat-value">Pattern-based. Precision-focused. No guesswork.</p>
-        </div>
-        <div class="about-stat">
-          <p class="about-stat-label">Education</p>
-          <p class="about-stat-value">Master's in Metaphysics · Doctoral research in meditation and consciousness expansion</p>
-        </div>
-        <div class="about-stat">
-          <p class="about-stat-label">Modalities</p>
-          <p class="about-stat-value">QHHT Hypnosis · HeartMath · Muse Biofeedback · Gemstone Frequency · Structured Self-Observation</p>
-        </div>
-        <div class="about-stat">
-          <p class="about-stat-label">Framework</p>
-          <p class="about-stat-value">State → Perception → Decision → Experience → Reality</p>
-        </div>
-        <div class="about-stat">
-          <p class="about-stat-label">Based</p>
-          <p class="about-stat-value"> · Sessions available worldwide</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- EVENTS -->
-
-<section id="events">
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">Appearances & Events</p>
-      <h2 class="section-heading">Where the work<br><em>travels</em>.</h2>
-      <div style="margin-top:48px;">
-        <div class="event-row">
-          <span class="event-date">June 16–23, 2026</span>
-          <span class="event-name">Magik Medicine Alkaline Healing Retreat</span>
-          <span class="event-location">La Ceiba, Honduras</span>
-          <span class="event-role">Guest Facilitator</span>
-        </div>
-        <div class="event-row">
-          <span class="event-date">Nov 10–17, 2026</span>
-          <span class="event-name">CoPán Retreat</span>
-          <span class="event-location">CoPán, Honduras</span>
-          <span class="event-role">Guest Facilitator</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-
-<section id="cta">
-  <div class="container">
-    <div class="cta-inner fade-in">
-      <p class="cta-pre">Ready to work</p>
-      <h2 class="cta-heading">The pattern<br>has a <em>source</em>.</h2>
-      <p class="cta-body">If you are serious about understanding and shifting what has been running your experience — a session is where that begins.</p>
-      <p style="font-family:'Syne',sans-serif;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(237,232,224,0.3);margin-bottom:16px;">Stay connected to the work</p>
-      <div class="email-capture">
-        <input type="email" id="bhave-email" class="email-input" placeholder="Your email address">
-        <button class="email-btn" onclick="submitEmail()">Join</button>
-      </div>
-      <p class="email-note">Study Yourself updates · Session availability · Framework releases</p>
-      <div class="btn-group">
-        <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary">Book Your Session</a>
-        <a href="consciousness-mirror.html" class="btn-secondary">Enter the Mirror First</a>
-       <a href="study-yourself-v2" class="btn-secondary">Study Yourself</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-logo">Bhav<span>é</span>'s Lab</div>
-  <p class="footer-location">Operating Worldwide</p>
-  <ul class="footer-links">
-    <li><a href="#what">The Work</a></li>
-    <li><a href="#services">Sessions</a></li>
-    <li><a href="consciousness-mirror.html">Mirror</a></li>
-    <li><a href="mailto:info@bhaveslab.com">Contact</a></li>
-   <li><a href="study-yourself-v2-v2.html.html">Study Yourself</a></li>
-  </ul>
- <p class="footer-email">info@bhaveslab.com</p>
-</footer>
-
+</div>
 <script>
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0, rootMargin: '0px 0px -50px 0px' });
-
-  // Make all fade-in elements visible immediately as fallback
-  setTimeout(() => {
-    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
-  }, 500);
-
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  function submitEmail() {
-    const email = document.getElementById('bhave-email').value;
-    if (!email || !email.includes('@')) return;
-
-    const btn = document.querySelector('.email-btn');
-    btn.textContent = '...';
-
-    const formData = new FormData();
-    formData.append('EMAIL', email);
-    formData.append('b_037838dfc703ebc26a9667953_128fa75a50', '');
-
-    fetch('https://lilegoverse.us20.list-manage.com/subscribe/post?u=037838dfc703ebc26a9667953&id=128fa75a50&f_id=00ab88e5f0', {
-      method: 'POST',
-      body: formData,
-      mode: 'no-cors'
-    }).then(() => {
-      window.location.href = '/thank-you.html';
-    }).catch(() => {
-      window.location.href = '/thank-you.html';
-    });
+// ── CURSOR ──────────────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+// ── PARTICLE FIELD ───────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], mouse = { x: -1000, y: -1000 };
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); initParticles(); });
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+window.addEventListener('touchmove', e => {
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: true });
+window.addEventListener('touchend', () => {
+  setTimeout(() => { mouse.x = -1000; mouse.y = -1000; }, 1200);
+});
+class Particle {
+  constructor() { this.reset(true); }
+  reset(init) {
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : -10;
+    this.ox = this.x;
+    this.oy = this.y;
+    this.size = Math.random() * 1.4 + 0.3;
+    this.speedX = (Math.random() - 0.5) * 0.18;
+    this.speedY = Math.random() * 0.22 + 0.06;
+    this.opacity = Math.random() * 0.45 + 0.08;
+    this.pulse = Math.random() * Math.PI * 2;
+    this.pulseSpeed = 0.008 + Math.random() * 0.012;
+    this.gold = Math.random() > 0.72;
   }
+  update() {
+    this.pulse += this.pulseSpeed;
+    const pulseFactor = 0.85 + Math.sin(this.pulse) * 0.15;
+    // Mouse repulsion
+    const dx = this.x - mouse.x;
+    const dy = this.y - mouse.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const repelRadius = 120;
+    if (dist < repelRadius) {
+      const force = (repelRadius - dist) / repelRadius;
+      this.x += (dx / dist) * force * 2.8;
+      this.y += (dy / dist) * force * 2.8;
+    } else {
+      // Drift back toward original drift path
+      this.x += (this.ox - this.x) * 0.008;
+      this.y += (this.oy - this.y) * 0.008;
+    }
+    this.ox += this.speedX;
+    this.oy += this.speedY;
+    if (this.oy > H + 20) this.reset(false);
+    return pulseFactor;
+  }
+  draw() {
+    const pf = this.update();
+    ctx.save();
+    ctx.globalAlpha = this.opacity * pf;
+    if (this.gold) {
+      ctx.fillStyle = `rgba(201, 169, 110, ${this.opacity * pf})`;
+    } else {
+      ctx.fillStyle = `rgba(237, 232, 224, ${this.opacity * pf * 0.6})`;
+    }
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * pf, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+// Connection lines between close particles
+function drawConnections() {
+  const maxDist = 90;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < maxDist) {
+        const alpha = (1 - dist / maxDist) * 0.06;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(201, 169, 110, ${alpha})`;
+        ctx.lineWidth = 0.4;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+function initParticles() {
+  const count = Math.min(Math.floor((W * H) / 9000), 140);
+  particles = Array.from({ length: count }, () => new Particle());
+}
+// ── SHOOTING STARS ───────────────────────────────────────────────────────────
+class ShootingStar {
+  constructor() { this.reset(); }
+  reset() {
+    // Start from random point along top or left edge
+    const edge = Math.random() > 0.5;
+    this.x = edge ? Math.random() * W : Math.random() * W * 0.3;
+    this.y = edge ? Math.random() * H * 0.3 : Math.random() * H * 0.2;
+    // Angle — always moving down-right at varying degrees
+    const angle = (Math.PI / 4) + (Math.random() - 0.5) * (Math.PI / 5);
+    const speed = 6 + Math.random() * 10;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.length = 80 + Math.random() * 160;
+    this.opacity = 0;
+    this.maxOpacity = 0.5 + Math.random() * 0.4;
+    this.width = 0.8 + Math.random() * 1.2;
+    this.gold = Math.random() > 0.4;
+    this.life = 0;
+    this.maxLife = 60 + Math.random() * 40;
+    this.active = false;
+    this.tail = [];
+  }
+  activate() {
+    this.reset();
+    this.active = true;
+  }
+  update() {
+    if (!this.active) return;
+    this.life++;
+    this.x += this.vx;
+    this.y += this.vy;
+    // Store tail positions
+    this.tail.unshift({ x: this.x, y: this.y });
+    if (this.tail.length > 12) this.tail.pop();
+    // Fade in then out
+    const progress = this.life / this.maxLife;
+    if (progress < 0.15) {
+      this.opacity = (progress / 0.15) * this.maxOpacity;
+    } else if (progress > 0.7) {
+      this.opacity = ((1 - progress) / 0.3) * this.maxOpacity;
+    } else {
+      this.opacity = this.maxOpacity;
+    }
+    if (this.life >= this.maxLife || this.x > W + 100 || this.y > H + 100) {
+      this.active = false;
+    }
+  }
+  draw() {
+    if (!this.active || this.opacity <= 0) return;
+    const tailX = this.x - (this.vx / Math.hypot(this.vx, this.vy)) * this.length;
+    const tailY = this.y - (this.vy / Math.hypot(this.vx, this.vy)) * this.length;
+    const color = this.gold ? '201, 169, 110' : '237, 232, 224';
+    const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+    grad.addColorStop(0, `rgba(${color}, ${this.opacity})`);
+    grad.addColorStop(0.3, `rgba(${color}, ${this.opacity * 0.4})`);
+    grad.addColorStop(1, `rgba(${color}, 0)`);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(tailX, tailY);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = this.width;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    // Head glow
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.width * 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${color}, ${this.opacity * 0.8})`;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+const shootingStars = Array.from({ length: 6 }, () => new ShootingStar());
+function spawnShootingStar() {
+  const inactive = shootingStars.find(s => !s.active);
+  if (inactive) inactive.activate();
+}
+// Spawn at random intervals — 2 to 7 seconds
+function scheduleShootingStar() {
+  const delay = 2000 + Math.random() * 5000;
+  setTimeout(() => {
+    spawnShootingStar();
+    scheduleShootingStar();
+  }, delay);
+}
+// First one fires quickly on load
+setTimeout(spawnShootingStar, 1200);
+setTimeout(spawnShootingStar, 3400);
+scheduleShootingStar();
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  // Subtle radial vignette
+  const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H) * 0.7);
+  grad.addColorStop(0, 'rgba(201,169,110,0.012)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+  shootingStars.forEach(s => { s.update(); s.draw(); });
+  drawConnections();
+  particles.forEach(p => p.draw());
+  requestAnimationFrame(animate);
+}
+initParticles();
+animate();
+// ── FRAMEWORK PULSE ──────────────────────────────────────────────────────────
+const fwWords = ['fw-state','fw-perception','fw-formation','fw-decision','fw-experience','fw-reality'];
+let fwIndex = 0;
+function pulseFramework() {
+  fwWords.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.color = '';
+  });
+  const el = document.getElementById(fwWords[fwIndex]);
+  if (el) el.style.color = 'rgba(201,169,110,0.7)';
+  fwIndex = (fwIndex + 1) % fwWords.length;
+}
+// ── ENTRY → INNER ────────────────────────────────────────────────────────────
+document.getElementById('enter-btn').addEventListener('click', () => {
+  const entry = document.getElementById('entry');
+  const inner = document.getElementById('inner');
+  entry.classList.add('dissolve');
+  setTimeout(() => {
+    entry.style.display = 'none';
+    inner.classList.add('active');
+    setTimeout(() => {
+      document.querySelectorAll('.inner-reveal').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), i * 200);
+      });
+      // Start framework pulse after reveal
+      setTimeout(() => {
+        pulseFramework();
+        setInterval(pulseFramework, 1800);
+      }, 1200);
+    }, 100);
+  }, 1200);
+});
+// ── AWARENESS NODE ───────────────────────────────────────────────────────────
+document.getElementById('awareness-node').addEventListener('click', () => {
+  document.getElementById('awareness-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('awareness-input').focus(), 400);
+});
+document.getElementById('overlay-close').addEventListener('click', () => {
+  document.getElementById('awareness-overlay').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('awareness-overlay').classList.remove('open');
+  }
+});
 </script>
-
 </body>
 </html>
+
 
