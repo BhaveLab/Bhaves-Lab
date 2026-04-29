@@ -227,8 +227,20 @@ font-size: clamp(13px, 2vw, 18px);
 font-weight: 300;
 letter-spacing: 0.08em;
 color: var(–text-faint);
-padding: 0 10px;
-transition: color 0.6s ease;
+padding: 6px 10px;
+transition: color 0.6s ease, background 0.3s ease;
+cursor: none;
+border-bottom: 1px solid transparent;
+background: transparent;
+border-top: none;
+border-left: none;
+border-right: none;
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+}
+
+.fw-word:hover {
+color: var(–text-dim);
+border-bottom-color: rgba(201,169,110,0.2);
 }
 
 .fw-word.active-word { color: var(–text-dim); }
@@ -248,6 +260,62 @@ letter-spacing: 0.35em;
 text-transform: uppercase;
 color: var(–text-faint);
 }
+
+/* DEFINITION PANEL */
+#def-panel {
+position: fixed;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%) translateY(100%);
+width: 100%;
+max-width: 600px;
+background: rgba(10,10,10,0.97);
+border-top: 1px solid rgba(201,169,110,0.15);
+border-left: 1px solid rgba(255,255,255,0.04);
+border-right: 1px solid rgba(255,255,255,0.04);
+padding: 36px 48px 40px;
+z-index: 200;
+transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+backdrop-filter: blur(20px);
+}
+
+#def-panel.open {
+transform: translateX(-50%) translateY(0);
+}
+
+.def-word {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.4em;
+text-transform: uppercase;
+color: var(–gold);
+margin-bottom: 12px;
+}
+
+.def-text {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(17px, 2.5vw, 22px);
+font-weight: 300;
+font-style: italic;
+color: var(–text-dim);
+line-height: 1.7;
+margin-bottom: 20px;
+}
+
+.def-close {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–text-faint);
+cursor: none;
+background: none;
+border: none;
+padding: 0;
+transition: color 0.3s;
+}
+
+.def-close:hover { color: var(–text-dim); }
 
 /* NODES */
 .nodes {
@@ -350,14 +418,14 @@ padding: 4px 8px;
 
 /* BOTTOM — portal signature */
 .portal-sig {
-position: absolute;
-bottom: 40px;
-left: 50%;
-transform: translateX(-50%);
+position: relative;
+margin-top: 8px;
 display: flex;
 align-items: center;
-gap: 40px;
-white-space: nowrap;
+justify-content: center;
+gap: 28px;
+flex-wrap: wrap;
+padding: 0 20px 20px;
 }
 
 .sig-text {
@@ -634,19 +702,19 @@ width: 60px; height: 1px;
 <!-- FRAMEWORK -->
 <div class="framework-center inner-reveal">
   <div class="framework-sequence">
-    <span class="fw-word" id="fw-state">State</span>
+    <button class="fw-word" id="fw-state" data-word="state">State</button>
     <span class="fw-arrow">→</span>
-    <span class="fw-word" id="fw-perception">Perception</span>
+    <button class="fw-word" id="fw-perception" data-word="perception">Perception</button>
     <span class="fw-arrow">→</span>
-    <span class="fw-word formation" id="fw-formation">Formation</span>
+    <button class="fw-word formation" id="fw-formation" data-word="formation">Formation</button>
     <span class="fw-arrow">→</span>
-    <span class="fw-word" id="fw-decision">Decision</span>
+    <button class="fw-word" id="fw-decision" data-word="decision">Decision</button>
     <span class="fw-arrow">→</span>
-    <span class="fw-word" id="fw-experience">Experience</span>
+    <button class="fw-word" id="fw-experience" data-word="experience">Experience</button>
     <span class="fw-arrow">→</span>
-    <span class="fw-word" id="fw-reality">Reality</span>
+    <button class="fw-word" id="fw-reality" data-word="reality">Reality</button>
   </div>
-  <p class="framework-caption">The sequence running beneath everything</p>
+  <p class="framework-caption">Tap any word — the sequence running beneath everything</p>
 </div>
 
 <!-- NODES -->
@@ -1099,9 +1167,75 @@ document.getElementById('overlay-close').addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.getElementById('awareness-overlay').classList.remove('open');
+    document.getElementById('def-panel').classList.remove('open');
+  }
+});
+
+// ── FRAMEWORK DEFINITIONS ────────────────────────────────────────────────────
+const definitions = {
+  state: {
+    label: 'State',
+    text: 'The actual operating condition of the system — body, mind, and environment before interpretation begins. State is not what you think is happening. It is what is happening. Everything else runs through this first.'
+  },
+  perception: {
+    label: 'Perception',
+    text: 'How State is being read. The filter layer — built from prior experience, installed patterns, and accumulated lens. Most distortion originates here, not in reality itself.'
+  },
+  formation: {
+    label: 'Formation',
+    text: 'Where meaning is assigned to what Perception has read. The raw signal gets interpreted through the operator\'s existing lens — producing either a reaction (automatic) or a response (intentional). This is the intervention point.'
+  },
+  decision: {
+    label: 'Decision',
+    text: 'What gets chosen based on perceived reality — not actual reality. Most decisions feel like free choices. Most are the output of Formation running on autopilot.'
+  },
+  experience: {
+    label: 'Experience',
+    text: 'What is generated by the decision in context. Experience is not random. It is the predictable output of the sequence that preceded it. Change the sequence — change what is generated.'
+  },
+  reality: {
+    label: 'Reality',
+    text: 'The feedback from experience that informs the next State. Reality is not fixed. It is the next entry point into the sequence. This is where the loop closes — and begins again.'
+  }
+};
+
+const defPanel = document.getElementById('def-panel');
+const defWordLabel = document.getElementById('def-word-label');
+const defWordText = document.getElementById('def-word-text');
+const defClose = document.getElementById('def-close');
+
+document.querySelectorAll('.fw-word').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const word = btn.getAttribute('data-word');
+    const def = definitions[word];
+    if (!def) return;
+    defWordLabel.textContent = def.label;
+    defWordText.textContent = def.text;
+    defPanel.classList.add('open');
+  });
+});
+
+defClose.addEventListener('click', () => {
+  defPanel.classList.remove('open');
+});
+
+// Close on outside click
+document.addEventListener('click', e => {
+  if (defPanel.classList.contains('open') &&
+      !defPanel.contains(e.target) &&
+      !e.target.classList.contains('fw-word')) {
+    defPanel.classList.remove('open');
   }
 });
 </script>
+
+<!-- DEFINITION PANEL -->
+
+<div id="def-panel">
+  <p class="def-word" id="def-word-label"></p>
+  <p class="def-text" id="def-word-text"></p>
+  <button class="def-close" id="def-close">Close</button>
+</div>
 
 </body>
 </html>
