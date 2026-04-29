@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp consciousness-mirror.html dist/ && cp study-yourself-v2.html dist/ && cp thank-you.html dist/ && cp CNAME dist/",
+    "build": "vite build && cp index.html dist/ && cp consciousness-mirror.html dist/ && cp study-yourself-v2.html dist/ && cp thank-you.html dist/ && cp CNAME dist/",
     "preview": "vite preview"
   }
 }

@@ -3,9 +3,11 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    {
-      "source": "/((?!consciousness-mirror\\.html|study-yourself-v2\\.html|thank-you\\.html|assets/).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/realm",              "destination": "/realm.html" },
+    { "source": "/realm/(.*)",         "destination": "/realm.html" },
+    { "source": "/consciousness-mirror", "destination": "/consciousness-mirror.html" },
+    { "source": "/study-session",      "destination": "/study-session.html" },
+    { "source": "/study-yourself",     "destination": "/study-yourself-v2.html" },
+    { "source": "/thank-you",          "destination": "/thank-you.html" }
   ]
 }
