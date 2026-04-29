@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 :root {
 –black: #060606;
 –gold: #c9a96e;
@@ -17,6 +19,7 @@
 –text-faint: rgba(237,232,224,0.18);
 –border: rgba(255,255,255,0.05);
 }
+
 html, body {
 width: 100%; height: 100%;
 overflow: hidden;
@@ -25,6 +28,7 @@ color: var(–text);
 font-family: ‘Syne’, sans-serif;
 cursor: none;
 }
+
 /* CUSTOM CURSOR */
 #cursor {
 position: fixed;
@@ -37,6 +41,7 @@ transform: translate(-50%, -50%);
 transition: width 0.2s, height 0.2s, opacity 0.2s;
 mix-blend-mode: screen;
 }
+
 #cursor-ring {
 position: fixed;
 width: 32px; height: 32px;
@@ -47,16 +52,19 @@ z-index: 9998;
 transform: translate(-50%, -50%);
 transition: width 0.4s ease, height 0.4s ease, border-color 0.3s;
 }
+
 body:has(.node:hover) #cursor-ring {
 width: 56px; height: 56px;
 border-color: rgba(201,169,110,0.7);
 }
+
 /* CANVAS */
 #canvas {
 position: fixed;
 inset: 0;
 z-index: 0;
 }
+
 /* PORTAL WRAPPER */
 #portal {
 position: fixed;
@@ -67,6 +75,7 @@ flex-direction: column;
 align-items: center;
 justify-content: center;
 }
+
 /* ENTRY STATE */
 #entry {
 position: absolute;
@@ -78,11 +87,13 @@ justify-content: center;
 z-index: 20;
 transition: opacity 1.2s ease, transform 1.2s ease;
 }
+
 #entry.dissolve {
 opacity: 0;
 transform: scale(1.04);
 pointer-events: none;
 }
+
 .entry-label {
 font-family: ‘Syne’, sans-serif;
 font-size: 9px;
@@ -92,6 +103,7 @@ color: rgba(201,169,110,0.5);
 margin-bottom: 48px;
 animation: fadeIn 2s ease forwards;
 }
+
 .entry-mark {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(64px, 12vw, 120px);
@@ -103,7 +115,9 @@ letter-spacing: -0.02em;
 margin-bottom: 8px;
 animation: fadeIn 2.4s ease forwards;
 }
+
 .entry-mark span { color: var(–gold); }
+
 .entry-sub {
 font-family: ‘Syne’, sans-serif;
 font-size: 9px;
@@ -113,6 +127,7 @@ color: var(–text-faint);
 margin-bottom: 72px;
 animation: fadeIn 2.8s ease forwards;
 }
+
 .entry-prompt {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(18px, 3vw, 26px);
@@ -125,6 +140,7 @@ max-width: 360px;
 line-height: 1.6;
 animation: fadeIn 3.2s ease forwards;
 }
+
 .entry-btn {
 font-family: ‘Syne’, sans-serif;
 font-size: 10px;
@@ -140,6 +156,7 @@ animation: fadeIn 3.6s ease forwards;
 position: relative;
 overflow: hidden;
 }
+
 .entry-btn::before {
 content: ‘’;
 position: absolute;
@@ -149,8 +166,10 @@ transform: scaleX(0);
 transform-origin: left;
 transition: transform 0.4s ease;
 }
+
 .entry-btn:hover::before { transform: scaleX(1); }
 .entry-btn:hover { border-color: rgba(201,169,110,0.6); }
+
 .entry-line {
 width: 1px;
 height: 0;
@@ -158,9 +177,11 @@ background: linear-gradient(to bottom, rgba(201,169,110,0.4), transparent);
 margin: 0 auto 40px;
 animation: growLine 2s ease 1s forwards;
 }
+
 @keyframes growLine {
 to { height: 48px; }
 }
+
 /* INNER PORTAL — after entry */
 #inner {
 position: absolute;
@@ -173,16 +194,19 @@ opacity: 0;
 pointer-events: none;
 transition: opacity 1.4s ease 0.4s;
 }
+
 #inner.active {
 opacity: 1;
 pointer-events: all;
 }
+
 /* FRAMEWORK PULSE — center of portal */
 .framework-center {
 text-align: center;
 margin-bottom: 72px;
 position: relative;
 }
+
 .framework-sequence {
 display: flex;
 align-items: center;
@@ -191,6 +215,7 @@ gap: 0;
 flex-wrap: wrap;
 margin-bottom: 20px;
 }
+
 .fw-word {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(13px, 2vw, 18px);
@@ -200,14 +225,17 @@ color: var(–text-faint);
 padding: 0 10px;
 transition: color 0.6s ease;
 }
+
 .fw-word.active-word { color: var(–text-dim); }
 .fw-word.formation { color: rgba(201,169,110,0.5); }
+
 .fw-arrow {
 color: rgba(201,169,110,0.2);
 font-size: 11px;
 letter-spacing: 0;
 padding: 0;
 }
+
 .framework-caption {
 font-family: ‘Syne’, sans-serif;
 font-size: 8px;
@@ -215,6 +243,7 @@ letter-spacing: 0.35em;
 text-transform: uppercase;
 color: var(–text-faint);
 }
+
 /* NODES */
 .nodes {
 display: flex;
@@ -222,11 +251,13 @@ align-items: center;
 gap: 2px;
 margin-bottom: 64px;
 }
+
 .node-divider {
 width: 1px;
 height: 60px;
 background: var(–border);
 }
+
 .node {
 display: flex;
 flex-direction: column;
@@ -239,6 +270,7 @@ transition: all 0.4s ease;
 text-decoration: none;
 group: true;
 }
+
 .node::before {
 content: ‘’;
 position: absolute;
@@ -247,10 +279,12 @@ height: 1px;
 background: var(–gold);
 transition: left 0.4s ease, right 0.4s ease;
 }
+
 .node:hover::before {
 left: 20%;
 right: 20%;
 }
+
 .node-num {
 font-family: ‘Syne’, sans-serif;
 font-size: 8px;
@@ -259,6 +293,7 @@ color: var(–text-faint);
 margin-bottom: 20px;
 text-transform: uppercase;
 }
+
 .node-name {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(20px, 3vw, 30px);
@@ -268,7 +303,9 @@ margin-bottom: 12px;
 line-height: 1.1;
 transition: color 0.3s ease;
 }
+
 .node:hover .node-name { color: var(–text); }
+
 .node-desc {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(13px, 1.6vw, 15px);
@@ -280,7 +317,9 @@ line-height: 1.6;
 margin-bottom: 24px;
 transition: color 0.3s ease;
 }
+
 .node:hover .node-desc { color: var(–text-dim); }
+
 .node-action {
 font-family: ‘Syne’, sans-serif;
 font-size: 9px;
@@ -289,7 +328,9 @@ text-transform: uppercase;
 color: rgba(201,169,110,0.4);
 transition: color 0.3s ease;
 }
+
 .node:hover .node-action { color: var(–gold); }
+
 .node-tag {
 position: absolute;
 top: 12px; right: 12px;
@@ -301,6 +342,7 @@ color: var(–gold);
 border: 1px solid rgba(201,169,110,0.2);
 padding: 4px 8px;
 }
+
 /* BOTTOM — portal signature */
 .portal-sig {
 position: absolute;
@@ -312,6 +354,7 @@ align-items: center;
 gap: 40px;
 white-space: nowrap;
 }
+
 .sig-text {
 font-family: ‘Syne’, sans-serif;
 font-size: 8px;
@@ -319,11 +362,13 @@ letter-spacing: 0.35em;
 text-transform: uppercase;
 color: var(–text-faint);
 }
+
 .sig-dot {
 width: 2px; height: 2px;
 background: rgba(201,169,110,0.3);
 border-radius: 50%;
 }
+
 /* TOP — lab mark */
 .lab-mark {
 position: absolute;
@@ -338,8 +383,10 @@ color: var(–text-faint);
 white-space: nowrap;
 transition: color 0.3s;
 }
+
 .lab-mark span { color: rgba(201,169,110,0.4); }
 .lab-mark:hover { color: var(–text-dim); }
+
 /* AMBIENT PULSE — radial breathing ring */
 .pulse-ring {
 position: fixed;
@@ -352,40 +399,48 @@ pointer-events: none;
 z-index: 5;
 animation: breathe 8s ease-in-out infinite;
 }
+
 .pulse-ring:nth-child(2) {
 width: 900px; height: 900px;
 animation-delay: 2s;
 border-color: rgba(201,169,110,0.025);
 }
+
 .pulse-ring:nth-child(3) {
 width: 1200px; height: 1200px;
 animation-delay: 4s;
 border-color: rgba(201,169,110,0.015);
 }
+
 @keyframes breathe {
 0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
 }
+
 /* FRAMEWORK PULSE animation */
 @keyframes sequencePulse {
 0% { color: var(–text-faint); }
 50% { color: var(–text-dim); }
 100% { color: var(–text-faint); }
 }
+
 /* ANIMATIONS */
 @keyframes fadeIn {
 from { opacity: 0; transform: translateY(12px); }
 to { opacity: 1; transform: translateY(0); }
 }
+
 .inner-reveal {
 opacity: 0;
 transform: translateY(16px);
 transition: opacity 0.8s ease, transform 0.8s ease;
 }
+
 .inner-reveal.show {
 opacity: 1;
 transform: translateY(0);
 }
+
 /* OVERLAY — what is running prompt */
 #awareness-overlay {
 position: fixed;
@@ -401,10 +456,12 @@ pointer-events: none;
 transition: opacity 0.6s ease;
 padding: 40px;
 }
+
 #awareness-overlay.open {
 opacity: 1;
 pointer-events: all;
 }
+
 .overlay-close {
 position: absolute;
 top: 36px; right: 40px;
@@ -416,7 +473,9 @@ color: var(–text-faint);
 cursor: none;
 transition: color 0.3s;
 }
+
 .overlay-close:hover { color: var(–text-dim); }
+
 .overlay-label {
 font-family: ‘Syne’, sans-serif;
 font-size: 8px;
@@ -425,6 +484,7 @@ text-transform: uppercase;
 color: rgba(201,169,110,0.4);
 margin-bottom: 32px;
 }
+
 .overlay-prompt {
 font-family: ‘Cormorant Garamond’, Georgia, serif;
 font-size: clamp(28px, 5vw, 52px);
@@ -436,6 +496,7 @@ max-width: 600px;
 line-height: 1.3;
 margin-bottom: 48px;
 }
+
 .overlay-input {
 width: 100%;
 max-width: 520px;
@@ -453,9 +514,11 @@ text-align: center;
 caret-color: var(–gold);
 margin-bottom: 16px;
 }
+
 .overlay-input::placeholder {
 color: var(–text-faint);
 }
+
 .overlay-note {
 font-family: ‘Syne’, sans-serif;
 font-size: 8px;
@@ -464,12 +527,14 @@ text-transform: uppercase;
 color: var(–text-faint);
 margin-bottom: 40px;
 }
+
 .overlay-actions {
 display: flex;
 gap: 20px;
 flex-wrap: wrap;
 justify-content: center;
 }
+
 .overlay-btn {
 font-family: ‘Syne’, sans-serif;
 font-size: 9px;
@@ -481,50 +546,71 @@ transition: all 0.3s ease;
 text-decoration: none;
 display: inline-block;
 }
+
 .overlay-btn-primary {
 color: #060606;
 background: var(–gold);
 border: 1px solid var(–gold);
 }
+
 .overlay-btn-primary:hover { background: #d4b47a; }
+
 .overlay-btn-secondary {
 color: var(–gold);
 background: transparent;
 border: 1px solid rgba(201,169,110,0.3);
 }
+
 .overlay-btn-secondary:hover { background: var(–gold-dim); }
+
 /* MOBILE */
 @media (max-width: 768px) {
 html, body { overflow-y: auto; }
 #cursor, #cursor-ring { display: none; }
 body { cursor: auto; }
 .entry-btn, .node, .overlay-close, .overlay-btn { cursor: pointer; }
+
 .nodes {
 flex-direction: column;
 gap: 0;
 }
+
 .node-divider {
 width: 60px; height: 1px;
 }
+
 .node { padding: 28px 24px; }
+
 .portal-sig { gap: 20px; }
+
 #inner { padding: 20px; justify-content: flex-start; padding-top: 100px; overflow-y: auto; }
 }
 </style>
+
 </head>
 <body>
+
 <!-- CURSOR -->
+
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
+
 <!-- PARTICLE CANVAS -->
+
 <canvas id="canvas"></canvas>
+
 <!-- BREATHING RINGS -->
+
 <div class="pulse-ring"></div>
 <div class="pulse-ring"></div>
 <div class="pulse-ring"></div>
+
 <!-- PORTAL -->
+
 <div id="portal">
+
   <!-- ENTRY STATE -->
+
   <div id="entry">
     <p class="entry-label">Bhavé's Lab</p>
     <h1 class="entry-mark">Bhav<span>é</span>'s Lab</h1>
@@ -533,10 +619,14 @@ width: 60px; height: 1px;
     <p class="entry-prompt">You are already in the middle of something.</p>
     <button class="entry-btn" id="enter-btn">Enter the Portal</button>
   </div>
+
   <!-- INNER PORTAL -->
+
   <div id="inner">
+
 ```
 <div class="lab-mark">Bhav<span>é</span>'s Lab</div>
+
 <!-- FRAMEWORK -->
 <div class="framework-center inner-reveal">
   <div class="framework-sequence">
@@ -554,8 +644,10 @@ width: 60px; height: 1px;
   </div>
   <p class="framework-caption">The sequence running beneath everything</p>
 </div>
+
 <!-- NODES -->
 <div class="nodes inner-reveal" style="transition-delay: 0.2s;">
+
   <a href="study-yourself-v2.html" class="node">
     <span class="node-tag">$25</span>
     <p class="node-num">01</p>
@@ -563,7 +655,9 @@ width: 60px; height: 1px;
     <p class="node-desc">A guided course through your own patterns. Your answers build a complete map.</p>
     <span class="node-action">Begin →</span>
   </a>
+
   <div class="node-divider"></div>
+
   <a href="consciousness-mirror.html" class="node">
     <span class="node-tag">Free</span>
     <p class="node-num">02</p>
@@ -571,14 +665,18 @@ width: 60px; height: 1px;
     <p class="node-desc">Six questions. No answers given. Only what is already running — reflected back.</p>
     <span class="node-action">Enter →</span>
   </a>
+
   <div class="node-divider"></div>
+
   <div class="node" id="awareness-node" style="cursor:none;">
     <p class="node-num">03</p>
     <h2 class="node-name">What Is<br>Running</h2>
     <p class="node-desc">Name what is active in you right now. The field listens.</p>
     <span class="node-action">Observe →</span>
   </div>
+
 </div>
+
 <!-- PORTAL SIGNATURE -->
 <div class="portal-sig inner-reveal" style="transition-delay:0.4s;">
   <span class="sig-text">State shapes perception</span>
@@ -588,9 +686,12 @@ width: 60px; height: 1px;
   <span class="sig-text">The work begins here</span>
 </div>
 ```
+
   </div>
 </div>
+
 <!-- AWARENESS OVERLAY -->
+
 <div id="awareness-overlay">
   <span class="overlay-close" id="overlay-close">Close</span>
   <p class="overlay-label">What Is Active</p>
@@ -608,16 +709,19 @@ width: 60px; height: 1px;
     <a href="study-yourself-v2.html" class="overlay-btn overlay-btn-secondary">Begin the Study</a>
   </div>
 </div>
+
 <script>
 // ── CURSOR ──────────────────────────────────────────────────────────────────
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
 let mx = -100, my = -100, rx = -100, ry = -100;
+
 document.addEventListener('mousemove', e => {
   mx = e.clientX; my = e.clientY;
   cursor.style.left = mx + 'px';
   cursor.style.top = my + 'px';
 });
+
 function animRing() {
   rx += (mx - rx) * 0.12;
   ry += (my - ry) * 0.12;
@@ -626,29 +730,37 @@ function animRing() {
   requestAnimationFrame(animRing);
 }
 animRing();
+
 // ── PARTICLE FIELD ───────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
 let W, H, particles = [], mouse = { x: -1000, y: -1000 };
+
 function resize() {
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener('resize', () => { resize(); initParticles(); });
+
 window.addEventListener('mousemove', e => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
+
 window.addEventListener('touchmove', e => {
   mouse.x = e.touches[0].clientX;
   mouse.y = e.touches[0].clientY;
 }, { passive: true });
+
 window.addEventListener('touchend', () => {
   setTimeout(() => { mouse.x = -1000; mouse.y = -1000; }, 1200);
 });
+
 class Particle {
   constructor() { this.reset(true); }
+
   reset(init) {
     this.x = Math.random() * W;
     this.y = init ? Math.random() * H : -10;
@@ -662,14 +774,17 @@ class Particle {
     this.pulseSpeed = 0.008 + Math.random() * 0.012;
     this.gold = Math.random() > 0.72;
   }
+
   update() {
     this.pulse += this.pulseSpeed;
     const pulseFactor = 0.85 + Math.sin(this.pulse) * 0.15;
+
     // Mouse repulsion
     const dx = this.x - mouse.x;
     const dy = this.y - mouse.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     const repelRadius = 120;
+
     if (dist < repelRadius) {
       const force = (repelRadius - dist) / repelRadius;
       this.x += (dx / dist) * force * 2.8;
@@ -679,26 +794,33 @@ class Particle {
       this.x += (this.ox - this.x) * 0.008;
       this.y += (this.oy - this.y) * 0.008;
     }
+
     this.ox += this.speedX;
     this.oy += this.speedY;
+
     if (this.oy > H + 20) this.reset(false);
+
     return pulseFactor;
   }
+
   draw() {
     const pf = this.update();
     ctx.save();
     ctx.globalAlpha = this.opacity * pf;
+
     if (this.gold) {
       ctx.fillStyle = `rgba(201, 169, 110, ${this.opacity * pf})`;
     } else {
       ctx.fillStyle = `rgba(237, 232, 224, ${this.opacity * pf * 0.6})`;
     }
+
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size * pf, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 }
+
 // Connection lines between close particles
 function drawConnections() {
   const maxDist = 90;
@@ -719,23 +841,28 @@ function drawConnections() {
     }
   }
 }
+
 function initParticles() {
   const count = Math.min(Math.floor((W * H) / 9000), 140);
   particles = Array.from({ length: count }, () => new Particle());
 }
+
 // ── SHOOTING STARS ───────────────────────────────────────────────────────────
 class ShootingStar {
   constructor() { this.reset(); }
+
   reset() {
     // Start from random point along top or left edge
     const edge = Math.random() > 0.5;
     this.x = edge ? Math.random() * W : Math.random() * W * 0.3;
     this.y = edge ? Math.random() * H * 0.3 : Math.random() * H * 0.2;
+
     // Angle — always moving down-right at varying degrees
     const angle = (Math.PI / 4) + (Math.random() - 0.5) * (Math.PI / 5);
     const speed = 6 + Math.random() * 10;
     this.vx = Math.cos(angle) * speed;
     this.vy = Math.sin(angle) * speed;
+
     this.length = 80 + Math.random() * 160;
     this.opacity = 0;
     this.maxOpacity = 0.5 + Math.random() * 0.4;
@@ -746,18 +873,23 @@ class ShootingStar {
     this.active = false;
     this.tail = [];
   }
+
   activate() {
     this.reset();
     this.active = true;
   }
+
   update() {
     if (!this.active) return;
+
     this.life++;
     this.x += this.vx;
     this.y += this.vy;
+
     // Store tail positions
     this.tail.unshift({ x: this.x, y: this.y });
     if (this.tail.length > 12) this.tail.pop();
+
     // Fade in then out
     const progress = this.life / this.maxLife;
     if (progress < 0.15) {
@@ -767,19 +899,25 @@ class ShootingStar {
     } else {
       this.opacity = this.maxOpacity;
     }
+
     if (this.life >= this.maxLife || this.x > W + 100 || this.y > H + 100) {
       this.active = false;
     }
   }
+
   draw() {
     if (!this.active || this.opacity <= 0) return;
+
     const tailX = this.x - (this.vx / Math.hypot(this.vx, this.vy)) * this.length;
     const tailY = this.y - (this.vy / Math.hypot(this.vx, this.vy)) * this.length;
+
     const color = this.gold ? '201, 169, 110' : '237, 232, 224';
+
     const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
     grad.addColorStop(0, `rgba(${color}, ${this.opacity})`);
     grad.addColorStop(0.3, `rgba(${color}, ${this.opacity * 0.4})`);
     grad.addColorStop(1, `rgba(${color}, 0)`);
+
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
@@ -788,19 +926,24 @@ class ShootingStar {
     ctx.lineWidth = this.width;
     ctx.lineCap = 'round';
     ctx.stroke();
+
     // Head glow
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.width * 1.5, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${color}, ${this.opacity * 0.8})`;
     ctx.fill();
+
     ctx.restore();
   }
 }
+
 const shootingStars = Array.from({ length: 6 }, () => new ShootingStar());
+
 function spawnShootingStar() {
   const inactive = shootingStars.find(s => !s.active);
   if (inactive) inactive.activate();
 }
+
 // Spawn at random intervals — 2 to 7 seconds
 function scheduleShootingStar() {
   const delay = 2000 + Math.random() * 5000;
@@ -809,45 +952,58 @@ function scheduleShootingStar() {
     scheduleShootingStar();
   }, delay);
 }
+
 // First one fires quickly on load
 setTimeout(spawnShootingStar, 1200);
 setTimeout(spawnShootingStar, 3400);
 scheduleShootingStar();
+
 function animate() {
   ctx.clearRect(0, 0, W, H);
+
   // Subtle radial vignette
   const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H) * 0.7);
   grad.addColorStop(0, 'rgba(201,169,110,0.012)');
   grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
+
   shootingStars.forEach(s => { s.update(); s.draw(); });
   drawConnections();
   particles.forEach(p => p.draw());
   requestAnimationFrame(animate);
 }
+
 initParticles();
 animate();
+
 // ── FRAMEWORK PULSE ──────────────────────────────────────────────────────────
 const fwWords = ['fw-state','fw-perception','fw-formation','fw-decision','fw-experience','fw-reality'];
 let fwIndex = 0;
+
 function pulseFramework() {
   fwWords.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.color = '';
   });
+
   const el = document.getElementById(fwWords[fwIndex]);
   if (el) el.style.color = 'rgba(201,169,110,0.7)';
+
   fwIndex = (fwIndex + 1) % fwWords.length;
 }
+
 // ── ENTRY → INNER ────────────────────────────────────────────────────────────
 document.getElementById('enter-btn').addEventListener('click', () => {
   const entry = document.getElementById('entry');
   const inner = document.getElementById('inner');
+
   entry.classList.add('dissolve');
+
   setTimeout(() => {
     entry.style.display = 'none';
     inner.classList.add('active');
+
     setTimeout(() => {
       document.querySelectorAll('.inner-reveal').forEach((el, i) => {
         setTimeout(() => el.classList.add('show'), i * 200);
@@ -860,21 +1016,23 @@ document.getElementById('enter-btn').addEventListener('click', () => {
     }, 100);
   }, 1200);
 });
+
 // ── AWARENESS NODE ───────────────────────────────────────────────────────────
 document.getElementById('awareness-node').addEventListener('click', () => {
   document.getElementById('awareness-overlay').classList.add('open');
   setTimeout(() => document.getElementById('awareness-input').focus(), 400);
 });
+
 document.getElementById('overlay-close').addEventListener('click', () => {
   document.getElementById('awareness-overlay').classList.remove('open');
 });
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.getElementById('awareness-overlay').classList.remove('open');
   }
 });
 </script>
+
 </body>
 </html>
-
-
