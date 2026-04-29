@@ -120,7 +120,7 @@ margin-bottom: 8px;
 animation: fadeIn 2.4s ease forwards;
 }
 
-.entry-mark span { color: var(–gold); }
+.entry-mark span { color: #c9a96e !important; }
 
 .entry-sub {
 font-family: ‘Syne’, sans-serif;
@@ -261,8 +261,121 @@ text-transform: uppercase;
 color: var(–text-faint);
 }
 
-/* DEFINITION PANEL */
-#def-panel {
+/* PAYWALL GATE */
+#paywall-gate {
+position: fixed;
+inset: 0;
+z-index: 300;
+background: rgba(6,6,6,0.97);
+display: flex;
+align-items: center;
+justify-content: center;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.5s ease;
+padding: 40px;
+}
+
+#paywall-gate.open {
+opacity: 1;
+pointer-events: all;
+}
+
+.paywall-inner {
+text-align: center;
+max-width: 480px;
+}
+
+.paywall-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 8px;
+letter-spacing: 0.5em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.5);
+margin-bottom: 24px;
+}
+
+.paywall-heading {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(28px, 5vw, 44px);
+font-weight: 200;
+font-style: italic;
+color: #ede8e0;
+line-height: 1.2;
+margin-bottom: 20px;
+}
+
+.paywall-body {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: clamp(15px, 2vw, 18px);
+font-weight: 300;
+font-style: italic;
+color: rgba(237,232,224,0.45);
+line-height: 1.75;
+margin-bottom: 36px;
+}
+
+.paywall-price {
+display: flex;
+align-items: baseline;
+justify-content: center;
+gap: 12px;
+margin-bottom: 32px;
+}
+
+.paywall-amount {
+font-family: ‘Cormorant Garamond’, Georgia, serif;
+font-size: 52px;
+font-weight: 200;
+color: #c9a96e;
+line-height: 1;
+}
+
+.paywall-note {
+font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: rgba(237,232,224,0.25);
+}
+
+.paywall-btn {
+display: inline-block;
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: #060606;
+background: #c9a96e;
+border: 1px solid #c9a96e;
+padding: 18px 48px;
+text-decoration: none;
+cursor: none;
+transition: background 0.3s;
+margin-bottom: 16px;
+display: block;
+width: fit-content;
+margin: 0 auto 16px;
+}
+
+.paywall-btn:hover { background: #d4b47a; }
+
+.paywall-close {
+font-family: ‘Syne’, sans-serif;
+font-size: 9px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: rgba(237,232,224,0.2);
+background: none;
+border: none;
+cursor: none;
+transition: color 0.3s;
+margin-top: 16px;
+display: block;
+margin: 16px auto 0;
+}
+
+.paywall-close:hover { color: rgba(237,232,224,0.45); }
 position: fixed;
 bottom: 0;
 left: 50%;
@@ -720,13 +833,13 @@ width: 60px; height: 1px;
 <!-- NODES -->
 <div class="nodes inner-reveal" style="transition-delay: 0.2s;">
 
-  <a href="study-yourself-v2.html" class="node">
-    <span class="node-tag">$25</span>
+  <div class="node" id="study-node" style="cursor:none;">
+    <span class="node-tag">$97</span>
     <p class="node-num">01</p>
     <h2 class="node-name">Study<br>Yourself</h2>
     <p class="node-desc">A guided course through your own patterns. Your answers build a complete map.</p>
     <span class="node-action">Begin →</span>
-  </a>
+  </div>
 
   <div class="node-divider"></div>
 
@@ -1164,10 +1277,23 @@ document.getElementById('overlay-close').addEventListener('click', () => {
   document.getElementById('awareness-overlay').classList.remove('open');
 });
 
+// ── PAYWALL GATE ─────────────────────────────────────────────────────────────
+const paywallGate = document.getElementById('paywall-gate');
+const paywallClose = document.getElementById('paywall-close');
+
+document.getElementById('study-node').addEventListener('click', () => {
+  paywallGate.classList.add('open');
+});
+
+paywallClose.addEventListener('click', () => {
+  paywallGate.classList.remove('open');
+});
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.getElementById('awareness-overlay').classList.remove('open');
     document.getElementById('def-panel').classList.remove('open');
+    paywallGate.classList.remove('open');
   }
 });
 
@@ -1235,6 +1361,22 @@ document.addEventListener('click', e => {
   <p class="def-word" id="def-word-label"></p>
   <p class="def-text" id="def-word-text"></p>
   <button class="def-close" id="def-close">Close</button>
+</div>
+
+<!-- PAYWALL GATE -->
+
+<div id="paywall-gate">
+  <div class="paywall-inner">
+    <p class="paywall-label">Study Yourself</p>
+    <h2 class="paywall-heading">A guided course through<br>your own patterns.</h2>
+    <p class="paywall-body">Ten sections. Your answers build a complete personal pattern map — emailed to you when you finish. Move at your own pace. No time limit.</p>
+    <div class="paywall-price">
+      <span class="paywall-amount">$97</span>
+      <span class="paywall-note">one time — yours to keep</span>
+    </div>
+    <a href="https://buy.stripe.com/dRmcMYeYQbC20sKf7BbQY02" class="paywall-btn" id="paywall-btn">Begin the Study →</a>
+    <button class="paywall-close" id="paywall-close">Not now</button>
+  </div>
 </div>
 
 </body>
