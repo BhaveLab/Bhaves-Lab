@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Reprogramming — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --obsidian: #080808;
+  --deep: #0d0d0d;
+  --charcoal: #1a1a1a;
+  --gold: #c9a96e;
+  --gold-dim: #8a6e3e;
+  --ash: #888888;
+  --white: #f5f3ef;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--obsidian);
+  color: var(--white);
+  font-family: 'Tenor Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-back {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.6);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-back:hover { color: var(--gold); }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(160,130,200,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 9vw, 96px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  max-width: 540px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.divider-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4), transparent);
+  margin: 0 auto;
+}
+
+.section {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.section-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.body-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(245,243,239,0.65);
+  margin-bottom: 24px;
+}
+
+/* MYTH / REALITY GRID */
+.contrast-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin: 48px 0;
+}
+
+.contrast-cell {
+  padding: 32px 28px;
+}
+
+.contrast-cell.myth { background: rgba(255,255,255,0.02); }
+.contrast-cell.reality { background: rgba(201,169,110,0.05); }
+
+.contrast-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.contrast-cell.myth .contrast-label { color: rgba(245,243,239,0.3); }
+.contrast-cell.reality .contrast-label { color: var(--gold); opacity: 0.7; }
+
+.contrast-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 2vw, 17px);
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(245,243,239,0.6);
+}
+
+.contrast-cell.reality .contrast-text { color: rgba(245,243,239,0.75); }
+
+/* WHAT HAPPENS */
+.what-happens {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 48px 80px;
+}
+
+.wh-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.phase {
+  border-left: 1px solid rgba(201,169,110,0.15);
+  padding: 0 0 48px 32px;
+  margin-left: 8px;
+  position: relative;
+}
+
+.phase::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(201,169,110,0.4);
+}
+
+.phase:last-child { border-left-color: transparent; }
+
+.phase-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
+.phase-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2.8vw, 24px);
+  font-weight: 300;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.phase-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 2vw, 17px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(245,243,239,0.5);
+}
+
+.sep {
+  width: 80px;
+  height: 1px;
+  background: rgba(201,169,110,0.2);
+  margin: 0 auto 80px;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 80px 48px 120px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.04), transparent);
+}
+
+.cta-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.cta-heading em { font-style: italic; color: var(--gold); }
+
+.cta-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  margin-bottom: 40px;
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(201,169,110,0.4);
+  padding: 20px 52px;
+  text-decoration: none;
+  transition: all 0.4s;
+}
+
+.cta-btn:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .section, .what-happens { padding-left: 24px; padding-right: 24px; }
+  .cta-section { padding: 60px 24px 80px; }
+  .contrast-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Bhavé's Lab</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div>
+    <p class="hero-label">Modality · Hypnosis</p>
+    <h1 class="hero-title">Deep<br><em>Reprogramming</em></h1>
+    <p class="hero-sub">What actually happens during a hypnosis session — and why it works where other approaches stop.</p>
+    <div class="divider-line"></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">What This Is</p>
+  <h2 class="section-heading">Not sleep.<br>Not suggestion.<br><em>Direct access.</em></h2>
+  <p class="body-text">Hypnosis is not a performance. It's a naturally occurring state — the same one you're in right before sleep, right after waking, right in the middle of being absorbed in something. The nervous system already knows how to go there. A session is just a deliberate entry.</p>
+  <p class="body-text">In that state, the analytical mind steps aside long enough for the subconscious to receive something different. Not an override. A conversation — between where you've been and where you're pointing.</p>
+
+  <div class="contrast-grid">
+    <div class="contrast-cell myth">
+      <p class="contrast-label">The myth</p>
+      <p class="contrast-text">You hand over control. Someone talks you into things. You wake up changed without knowing why.</p>
+    </div>
+    <div class="contrast-cell reality">
+      <p class="contrast-label">What's actually true</p>
+      <p class="contrast-text">You are aware the entire time. You cannot be made to do or believe anything against your actual nature. The state removes resistance — it doesn't remove you.</p>
+    </div>
+    <div class="contrast-cell myth">
+      <p class="contrast-label">The myth</p>
+      <p class="contrast-text">It works by brute-force repetition — the same suggestion over and over until something shifts.</p>
+    </div>
+    <div class="contrast-cell reality">
+      <p class="contrast-label">What's actually true</p>
+      <p class="contrast-text">It works because the subconscious is specific. A session built from your actual pattern mapping — your words, your origin point, your specific belief — lands differently than a generic script.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="what-happens">
+  <p class="wh-label">Inside a Session</p>
+
+  <div class="phase">
+    <p class="phase-name">Before</p>
+    <h3 class="phase-title">The map comes first</h3>
+    <p class="phase-desc">A hypnosis session at Bhavé's Lab isn't a standalone event. It follows the pattern mapping. What was identified — the belief, the origin, the specific logic of the pattern — becomes the material the session is built from. Generic scripts are not used here.</p>
+  </div>
+
+  <div class="phase">
+    <p class="phase-name">Induction</p>
+    <h3 class="phase-title">The analytical mind quiets</h3>
+    <p class="phase-desc">A guided induction brings the nervous system into a state of focused relaxation. Brain activity slows from beta to alpha and then theta — the same range as deep meditation and pre-sleep. In that state, the habitual defenses that keep patterns in place relax.</p>
+  </div>
+
+  <div class="phase">
+    <p class="phase-name">The Session</p>
+    <h3 class="phase-title">A different conclusion is offered</h3>
+    <p class="phase-desc">The part of you that formed the pattern — usually at a much younger age — gets to hear something new. Not "you're fine now." Something specific: that the original response made sense then, and that a different response is available now. The subconscious responds to precision and safety. Both are present.</p>
+  </div>
+
+  <div class="phase">
+    <p class="phase-name">Return</p>
+    <h3 class="phase-title">Awareness comes back gradually</h3>
+    <p class="phase-desc">You return to full awareness slowly, the way you wake from a good sleep. Most people describe feeling lighter — not transformed, but as if something that was braced has released. The biofeedback tools in the follow-up session confirm what shifted.</p>
+  </div>
+
+  <div class="phase">
+    <p class="phase-name">After</p>
+    <h3 class="phase-title">The pattern behaves differently</h3>
+    <p class="phase-desc">Not always immediately. Sometimes within days. The trigger that used to produce the automatic response still arrives — but the pull is different. You notice a pause where there wasn't one before. That pause is the work.</p>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<div class="cta-section">
+  <h2 class="cta-heading">The pattern has<br><em>a specific location.</em></h2>
+  <p class="cta-sub">A session starts with finding it. Book a Study Session to begin the map.</p>
+  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
+</div>
+
+</body>
+</html>

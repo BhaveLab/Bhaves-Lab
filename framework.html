@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Map — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --obsidian: #080808;
+  --deep: #0d0d0d;
+  --charcoal: #1a1a1a;
+  --gold: #c9a96e;
+  --gold-light: #e8c98a;
+  --gold-dim: #8a6e3e;
+  --ash: #888888;
+  --mist: #cccccc;
+  --white: #f5f3ef;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--obsidian);
+  color: var(--white);
+  font-family: 'Tenor Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-back {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.6);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-back:hover { color: var(--gold); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(201,169,110,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 9vw, 96px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  max-width: 540px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.divider-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4), transparent);
+  margin: 0 auto;
+}
+
+/* SECTIONS */
+.section {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.section-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.body-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(245,243,239,0.65);
+  margin-bottom: 24px;
+}
+
+/* SEQUENCE */
+.sequence {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 48px 80px;
+}
+
+.sequence-intro {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 56px;
+  text-align: center;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 32px;
+  margin-bottom: 56px;
+  position: relative;
+}
+
+.step::before {
+  content: '';
+  position: absolute;
+  left: 23px;
+  top: 48px;
+  bottom: -56px;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(201,169,110,0.2), transparent);
+}
+
+.step:last-child::before { display: none; }
+
+.step-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  opacity: 0.5;
+  padding-top: 4px;
+}
+
+.step-body {}
+
+.step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 300;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.step-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(245,243,239,0.55);
+}
+
+/* SEPARATOR */
+.sep {
+  width: 80px;
+  height: 1px;
+  background: rgba(201,169,110,0.2);
+  margin: 0 auto 80px;
+}
+
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 80px 48px 120px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.04), transparent);
+}
+
+.cta-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.cta-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.cta-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  margin-bottom: 40px;
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(201,169,110,0.4);
+  padding: 20px 52px;
+  text-decoration: none;
+  transition: all 0.4s;
+}
+
+.cta-btn:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .section, .sequence { padding-left: 24px; padding-right: 24px; }
+  .cta-section { padding: 60px 24px 80px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Bhavé's Lab</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div>
+    <p class="hero-label">Modality · The Framework</p>
+    <h1 class="hero-title">The Pattern<br><em>Map</em></h1>
+    <p class="hero-sub">A structured method for locating where a pattern begins — before trying to change it.</p>
+    <div class="divider-line"></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">What This Is</p>
+  <h2 class="section-heading">Not therapy.<br><em>Not coaching.</em><br>Cartography.</h2>
+  <p class="body-text">Most methods start by trying to change the pattern. This one starts by finding it. You can't move something you haven't located. The Pattern Map is a framework for tracing what you're carrying — a belief, a behavior, a recurring result — back to the moment it was formed.</p>
+  <p class="body-text">Once it's located, it stops running automatically. That is the work. Everything else — the hypnosis, the biofeedback, the coherence training — builds on what this mapping reveals.</p>
+</div>
+
+<div class="sep"></div>
+
+<div class="sequence">
+  <p class="sequence-intro">The Full Sequence</p>
+
+  <div class="step">
+    <span class="step-number">01</span>
+    <div class="step-body">
+      <h3 class="step-title">Name the pattern</h3>
+      <p class="step-desc">Not the symptom — the pattern. "I keep picking the wrong jobs" is a symptom. The pattern underneath it is something older. We start by articulating what you actually notice repeating, in your language, without interpretation.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-number">02</span>
+    <div class="step-body">
+      <h3 class="step-title">Trace the logic</h3>
+      <p class="step-desc">Every pattern has a logic that made sense at some point. We map the original context — the age, the environment, the relationship — where this response was the right response. Understanding why it formed is not the same as excusing it. It's how you stop being surprised by it.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-number">03</span>
+    <div class="step-body">
+      <h3 class="step-title">Locate the belief</h3>
+      <p class="step-desc">Beneath every pattern is a premise — something the nervous system concluded and filed as fact. "Safety requires control." "Being seen leads to rejection." "I have to earn the right to rest." We identify the specific belief that's running the pattern, not a generic one.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-number">04</span>
+    <div class="step-body">
+      <h3 class="step-title">Observe without collapsing</h3>
+      <p class="step-desc">This is the part most methods skip. Before doing anything to the pattern, you learn to look at it without fusing with it. That distance — between you and the thing you're carrying — is where change becomes possible. The biofeedback tools make that distance visible in real time.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-number">05</span>
+    <div class="step-body">
+      <h3 class="step-title">Introduce a different input</h3>
+      <p class="step-desc">Once the origin is clear and the belief is named, the nervous system can receive something new. This is where hypnosis enters — not to overwrite the pattern, but to offer the part of you that formed it a different conclusion. Not forced. Not scripted. Specific to what the mapping revealed.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-number">06</span>
+    <div class="step-body">
+      <h3 class="step-title">Measure the shift</h3>
+      <p class="step-desc">Coherence changes. Brainwave states shift. The Bio-Well scan before and after a sequence is rarely identical. We track what's actually moving — not because you need proof, but because seeing the data closes the gap between believing something changed and knowing it did.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<div class="cta-section">
+  <h2 class="cta-heading">Ready to see<br><em>your map</em>?</h2>
+  <p class="cta-sub">A Study Session starts here. One session, one pattern, one clear picture of where it lives.</p>
+  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainwave & Energy Mapping — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --obsidian: #080808;
+  --charcoal: #1a1a1a;
+  --gold: #c9a96e;
+  --white: #f5f3ef;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--obsidian);
+  color: var(--white);
+  font-family: 'Tenor Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-back {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.6);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-back:hover { color: var(--gold); }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 40%, rgba(80,120,200,0.05) 0%, transparent 55%),
+              radial-gradient(ellipse at 70% 60%, rgba(200,80,150,0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(44px, 8vw, 88px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  max-width: 560px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.divider-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4), transparent);
+  margin: 0 auto;
+}
+
+/* TWO TOOLS */
+.tools {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.tools-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 56px;
+  text-align: center;
+}
+
+.tool-block {
+  margin-bottom: 80px;
+}
+
+.tool-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.tool-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.tool-name em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.tool-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.4);
+  margin-bottom: 28px;
+}
+
+.body-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(245,243,239,0.65);
+  margin-bottom: 24px;
+}
+
+/* READS */
+.reads {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.read-card {
+  background: rgba(255,255,255,0.025);
+  padding: 24px 20px;
+}
+
+.read-state {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.read-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(245,243,239,0.55);
+}
+
+.tool-divider {
+  width: 80px;
+  height: 1px;
+  background: rgba(201,169,110,0.15);
+  margin: 0 0 80px;
+}
+
+/* WHAT YOU SEE */
+.section {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 48px 80px;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.section-heading em { font-style: italic; color: var(--gold); }
+
+.insight-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.insight-list li {
+  padding-left: 20px;
+  border-left: 1px solid rgba(201,169,110,0.2);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(245,243,239,0.6);
+}
+
+.insight-list li strong {
+  font-weight: 400;
+  color: rgba(245,243,239,0.85);
+  font-style: italic;
+}
+
+.sep {
+  width: 80px;
+  height: 1px;
+  background: rgba(201,169,110,0.2);
+  margin: 0 auto 80px;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 80px 48px 120px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.04), transparent);
+}
+
+.cta-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.cta-heading em { font-style: italic; color: var(--gold); }
+
+.cta-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  margin-bottom: 40px;
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(201,169,110,0.4);
+  padding: 20px 52px;
+  text-decoration: none;
+  transition: all 0.4s;
+}
+
+.cta-btn:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .tools, .section { padding-left: 24px; padding-right: 24px; }
+  .cta-section { padding: 60px 24px 80px; }
+  .reads { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Bhavé's Lab</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div>
+    <p class="hero-label">Modality · Muse EEG · Bio-Well GDV</p>
+    <h1 class="hero-title">Brainwave &amp;<br><em>Energy Mapping</em></h1>
+    <p class="hero-sub">Two instruments. One purpose: making the invisible state of your nervous system visible, in real time.</p>
+    <div class="divider-line"></div>
+  </div>
+</div>
+
+<div class="tools">
+  <p class="tools-label">Two Instruments</p>
+
+  <div class="tool-block">
+    <p class="tool-tag">Tool One</p>
+    <h2 class="tool-name">Muse <em>EEG Headband</em></h2>
+    <p class="tool-subtitle">Consumer-grade EEG. Real brainwave data, in the room, during the session.</p>
+    <p class="body-text">The Muse headband picks up electrical activity across four regions of the brain and translates it into readable data in real time. You see the actual brainwave state — not estimated, not inferred. The shift from beta (active thinking, defense, analysis) toward alpha and theta (receptive, calm, associative) is visible as it happens.</p>
+    <p class="body-text">Used during meditation, breathwork, or before a hypnosis session, the Muse data shows whether your nervous system is actually entering the intended state — or whether it's performing calm while running the same loops underneath.</p>
+
+    <div class="reads">
+      <div class="read-card">
+        <p class="read-state">Beta (13–30 Hz)</p>
+        <p class="read-desc">Active thinking, stress, analysis, problem-solving. Where most people spend most of their time.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Alpha (8–13 Hz)</p>
+        <p class="read-desc">Relaxed awareness. The bridge state — calm but present. Where learning becomes possible.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Theta (4–8 Hz)</p>
+        <p class="read-desc">Deep relaxation, hypnagogic state, creative access. Where subconscious material surfaces.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Delta (0.5–4 Hz)</p>
+        <p class="read-desc">Deep sleep, restorative processing. Rarely visible in waking sessions without deep practice.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-divider"></div>
+
+  <div class="tool-block">
+    <p class="tool-tag">Tool Two</p>
+    <h2 class="tool-name">Bio-Well <em>GDV Camera</em></h2>
+    <p class="tool-subtitle">Gas Discharge Visualization. The energy field of the body, photographed and quantified.</p>
+    <p class="body-text">The Bio-Well uses a weak electrical field to stimulate biophoton emissions from the fingertips — a phenomenon called Gas Discharge Visualization, based on 25 years of research by Dr. Konstantin Korotkov. The result is a mapped image of the body's energy distribution, chakra alignment, and stress load — expressed as quantifiable data, not as interpretation.</p>
+    <p class="body-text">A scan before and after a session is rarely identical. The Bio-Well doesn't tell you what changed — it shows you. The data becomes a record: baseline vs. shifted state, across multiple sessions.</p>
+
+    <div class="reads">
+      <div class="read-card">
+        <p class="read-state">Energy Field</p>
+        <p class="read-desc">Total biofield size and symmetry. Larger, more even fields correlate with vitality and regulation.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Stress Index</p>
+        <p class="read-desc">A quantified measure of overall activation. Tracks change across sessions more reliably than self-report.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Organ Mapping</p>
+        <p class="read-desc">Each fingertip corresponds to organ systems via meridian theory. Pattern disruptions become visible.</p>
+      </div>
+      <div class="read-card">
+        <p class="read-state">Chakra Alignment</p>
+        <p class="read-desc">Energy center activation and coherence — shown as a structural map, not a color chart.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<div class="section">
+  <p class="section-label">Why Both</p>
+  <h2 class="section-heading">Brain state. Energy field.<br><em>Same person. Same moment.</em></h2>
+  <p class="body-text">Neither tool is the point on its own. What's interesting is the overlap — when the Muse shows a shift into theta and the Bio-Well shows an expanded, more symmetric field at the same time, you're not interpreting data. You're watching coherence emerge across multiple systems simultaneously.</p>
+
+  <ul class="insight-list">
+    <li><strong>Before a hypnosis session:</strong> Muse baseline shows current state. Bio-Well shows stress load. Together, they establish a starting point that's specific — not assumed.</li>
+    <li><strong>During coherence training:</strong> Muse confirms the brainwave shift as it happens. The data closes the gap between "I think this is working" and "I can see it."</li>
+    <li><strong>After a session:</strong> Bio-Well rescan shows what moved. Not what you think moved — what actually did. Some shifts are visible within a single session. Others appear across multiple weeks of data.</li>
+    <li><strong>Across a program:</strong> Tracking both instruments over 4–6 weeks produces a longitudinal picture of change that no subjective self-report can replicate.</li>
+  </ul>
+</div>
+
+<div class="sep"></div>
+
+<div class="cta-section">
+  <h2 class="cta-heading">Your state has<br><em>a readable signal.</em></h2>
+  <p class="cta-sub">Bio-Well and Muse demos are part of every Lab Workshop. Full sessions available one-on-one.</p>
+  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
+</div>
+
+</body>
+</html>

@@ -307,6 +307,20 @@ color: rgba(232,224,212,0.5);
 line-height: 1.6;
 }
 
+.path-link {
+display: inline-block;
+margin-top: 14px;
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: #c9a96e;
+opacity: 0.65;
+text-decoration: none;
+transition: opacity 0.3s;
+}
+.path-link:hover { opacity: 1; }
+
 .session-cta {
 text-align: center;
 padding: 40px 0 20px;
@@ -771,6 +785,20 @@ color: var(–text-dim);
 line-height: 1.6;
 }
 
+.path-link {
+display: inline-block;
+margin-top: 14px;
+font-family: ‘Syne’, sans-serif;
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: #c9a96e;
+opacity: 0.65;
+text-decoration: none;
+transition: opacity 0.3s;
+}
+.path-link:hover { opacity: 1; }
+
 .session-cta {
 text-align: center;
 padding: 48px 0 24px;
@@ -1020,19 +1048,22 @@ const questions = [
 
 const sessionPaths = {
   innerMining: {
-    name: "Inner Mining",
+    name: "The Pattern Map",
     class: "inner-mining",
-    desc: "There is something beneath the surface that hasn't been located yet. This path goes to the origin — not to fix it, but to finally see it clearly."
+    href: "/framework",
+    desc: "There is something beneath the surface that hasn't been located yet. This path traces a pattern back to its origin — not to fix it, but to finally see where it started."
   },
   auracle: {
-    name: "Auracle Session",
+    name: "Brainwave & Energy Mapping",
     class: "auracle",
-    desc: "Your inner state has a pattern that can be observed in real time. This path uses biofeedback tools to make visible what you already sense but can't quite name."
+    href: "/muse-biowell",
+    desc: "Your inner state has a signal that can be read in real time. This path uses Muse EEG and Bio-Well GDV to make visible what you already sense but can't quite name."
   },
   frequency: {
-    name: "Frequency Alignment",
+    name: "Coherence Training",
     class: "frequency",
-    desc: "There is something you are ready to shift. Not because something is wrong — but because you can feel a different state is available to you."
+    href: "/heartmath",
+    desc: "There is something you are ready to shift. Not because something is wrong — but because you can feel a different state is available. This path trains the nervous system to access it."
   }
 };
 
@@ -1203,7 +1234,7 @@ function renderReflection() {
       const path = sessionPaths[key];
       const card = document.createElement('div');
       card.className = `path-card ${path.class}${idx === 0 ? ' highlighted' : ''}`;
-      card.innerHTML = `<p class="path-name">${path.name}</p><p class="path-desc">${path.desc}</p>`;
+      card.innerHTML = `<p class="path-name">${path.name}</p><p class="path-desc">${path.desc}</p><a class="path-link" href="${path.href}">Learn more →</a>`;
       container.appendChild(card);
     });
 }

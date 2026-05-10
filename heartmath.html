@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coherence Training — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --obsidian: #080808;
+  --charcoal: #1a1a1a;
+  --gold: #c9a96e;
+  --white: #f5f3ef;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--obsidian);
+  color: var(--white);
+  font-family: 'Tenor Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-back {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(201,169,110,0.6);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-back:hover { color: var(--gold); }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 35%, rgba(100,200,180,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 9vw, 96px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  max-width: 540px;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+.divider-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4), transparent);
+  margin: 0 auto;
+}
+
+.section {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.section-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.body-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(245,243,239,0.65);
+  margin-bottom: 24px;
+}
+
+/* DATA CARDS */
+.data-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px;
+  margin: 48px 0;
+}
+
+.data-card {
+  background: rgba(255,255,255,0.025);
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.data-number {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(28px, 4vw, 40px);
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.data-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(245,243,239,0.45);
+  line-height: 1.5;
+}
+
+/* HRV EXPLAINER */
+.hrv-block {
+  background: rgba(201,169,110,0.04);
+  border: 1px solid rgba(201,169,110,0.1);
+  padding: 40px;
+  margin: 48px 0;
+}
+
+.hrv-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.hrv-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(245,243,239,0.7);
+}
+
+/* TRAINING STEPS */
+.training {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 48px 80px;
+}
+
+.training-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.training-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 48px;
+  align-items: flex-start;
+}
+
+.training-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  opacity: 0.4;
+  min-width: 28px;
+  padding-top: 4px;
+}
+
+.training-body {}
+
+.training-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2.8vw, 24px);
+  font-weight: 300;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.training-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 2vw, 17px);
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(245,243,239,0.5);
+}
+
+.sep {
+  width: 80px;
+  height: 1px;
+  background: rgba(201,169,110,0.2);
+  margin: 0 auto 80px;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 80px 48px 120px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.04), transparent);
+}
+
+.cta-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.3;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.cta-heading em { font-style: italic; color: var(--gold); }
+
+.cta-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(245,243,239,0.45);
+  margin-bottom: 40px;
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(201,169,110,0.4);
+  padding: 20px 52px;
+  text-decoration: none;
+  transition: all 0.4s;
+}
+
+.cta-btn:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .section, .training { padding-left: 24px; padding-right: 24px; }
+  .cta-section { padding: 60px 24px 80px; }
+  .data-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Bhavé's Lab</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div>
+    <p class="hero-label">Modality · HeartMath</p>
+    <h1 class="hero-title">Coherence<br><em>Training</em></h1>
+    <p class="hero-sub">Your heart is transmitting data constantly. This is what that data reveals — and how to work with it.</p>
+    <div class="divider-line"></div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="section-label">The Science</p>
+  <h2 class="section-heading">The heart is not<br>a pump with <em>feelings.</em></h2>
+  <p class="body-text">The heart generates the largest electromagnetic field in the body — 60 times greater in amplitude than the brain. It sends more signals up to the brain than it receives down from it. It has its own nervous system. It is not responding to your emotional state. It is participating in creating it.</p>
+  <p class="body-text">Heart Rate Variability — the variation in time between each heartbeat — is the clearest window into nervous system regulation we currently have. High HRV indicates flexibility, resilience, and the capacity to self-regulate. Low HRV indicates chronic stress and a system running on override.</p>
+
+  <div class="data-row">
+    <div class="data-card">
+      <p class="data-number">60×</p>
+      <p class="data-label">Greater EM amplitude than the brain</p>
+    </div>
+    <div class="data-card">
+      <p class="data-number">40k+</p>
+      <p class="data-label">Neurons in the heart's intrinsic nervous system</p>
+    </div>
+    <div class="data-card">
+      <p class="data-number">5:1</p>
+      <p class="data-label">Ratio of signals traveling heart → brain vs. brain → heart</p>
+    </div>
+  </div>
+
+  <div class="hrv-block">
+    <p class="hrv-title">What HRV actually measures</p>
+    <p class="hrv-text">A perfectly metronomic heartbeat is not a sign of health — it's a sign of rigidity. The variation between beats reflects your autonomic nervous system making real-time adjustments. Wide, rhythmic variation (coherence) means your system is adaptable. Erratic or suppressed variation means something is running on override. Coherence training makes that pattern visible, then teachable.</p>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="training">
+  <p class="training-label">What Training Looks Like</p>
+
+  <div class="training-row">
+    <span class="training-num">01</span>
+    <div class="training-body">
+      <h3 class="training-title">Baseline reading</h3>
+      <p class="training-desc">A pulse sensor connects to the HeartMath device. Within seconds, your HRV pattern appears on screen — the actual rhythm your heart has been running. Not estimated. Not averaged from a week of data. Right now, in this moment, in this room.</p>
+    </div>
+  </div>
+
+  <div class="training-row">
+    <span class="training-num">02</span>
+    <div class="training-body">
+      <h3 class="training-title">Observe the incoherence</h3>
+      <p class="training-desc">Before training begins, you see what stress, rumination, or suppression actually looks like as data. Jagged, irregular patterns. The nervous system doing what it's been doing — usually for years. Seeing it reflected back is often its own kind of shift.</p>
+    </div>
+  </div>
+
+  <div class="training-row">
+    <span class="training-num">03</span>
+    <div class="training-body">
+      <h3 class="training-title">The coherence technique</h3>
+      <p class="training-desc">A specific breathing rhythm combined with a focused positive emotion (not performed — recalled) produces coherence: smooth, sine-wave-like HRV patterns that indicate the heart and brain are synchronizing. The device shows the shift in real time as it happens. You learn what coherence feels like in your body by watching it appear on the screen.</p>
+    </div>
+  </div>
+
+  <div class="training-row">
+    <span class="training-num">04</span>
+    <div class="training-body">
+      <h3 class="training-title">Practice builds the skill</h3>
+      <p class="training-desc">Coherence is not a permanent state — it's a skill. The more you enter it deliberately, the more accessible it becomes under pressure. Over sessions, the baseline HRV pattern shifts. The system that was running on override starts to have more range.</p>
+    </div>
+  </div>
+
+  <div class="training-row">
+    <span class="training-num">05</span>
+    <div class="training-body">
+      <h3 class="training-title">Integration with pattern work</h3>
+      <p class="training-desc">A coherent state makes the nervous system receptive rather than defended. Entering coherence before a hypnosis session — or after framework mapping — changes the quality of what's possible in that work. The tools are designed to be used together.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<div class="cta-section">
+  <h2 class="cta-heading">See your nervous system<br><em>in real time.</em></h2>
+  <p class="cta-sub">A demo is included in every Lab Workshop. Or book a Study Session for focused work.</p>
+  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
+</div>
+
+</body>
+</html>
