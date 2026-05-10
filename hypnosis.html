@@ -4,408 +4,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deep Reprogramming — Bhavé's Lab</title>
+<title>Inner Mining — Bhavé's Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --obsidian: #080808;
-  --deep: #0d0d0d;
-  --charcoal: #1a1a1a;
-  --gold: #c9a96e;
-  --gold-dim: #8a6e3e;
-  --ash: #888888;
-  --white: #f5f3ef;
-}
-
+:root { --obsidian: #080808; --deep: #0d0d0d; --charcoal: #1a1a1a; --gold: #c9a96e; --gold-light: #e8c98a; --gold-dim: #8a6e3e; --ash: #888888; --white: #f5f3ef; }
 html { scroll-behavior: smooth; }
-
-body {
-  background: var(--obsidian);
-  color: var(--white);
-  font-family: 'Tenor Sans', sans-serif;
-  overflow-x: hidden;
-}
-
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 28px 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
-}
-
-.nav-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  color: var(--white);
-  text-decoration: none;
-}
-
-.nav-back {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(201,169,110,0.6);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
+body { background: var(--obsidian); color: var(--white); font-family: 'Tenor Sans', sans-serif; overflow-x: hidden; cursor: none; }
+.cursor { position: fixed; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: difference; }
+.cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(201,169,110,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transition: width 0.3s, height 0.3s; }
+.cursor-ring.hovering { width: 60px; height: 60px; border-color: var(--gold); }
+#cosmos { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.grain { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 128px; mix-blend-mode: overlay; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; }
+nav::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%); pointer-events: none; }
+.nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 300; letter-spacing: 0.3em; color: var(--white); text-transform: uppercase; position: relative; z-index: 1; text-decoration: none; }
+.nav-logo span { color: var(--gold); }
+.nav-back { position: relative; z-index: 1; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--ash); text-decoration: none; text-transform: uppercase; transition: color 0.3s; cursor: none; }
 .nav-back:hover { color: var(--gold); }
-
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 120px 48px 80px;
-  text-align: center;
-  position: relative;
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 40%, rgba(160,130,200,0.06) 0%, transparent 65%);
-  pointer-events: none;
-}
-
-.hero-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.7;
-  margin-bottom: 32px;
-}
-
-.hero-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(52px, 9vw, 96px);
-  font-weight: 300;
-  line-height: 1.0;
-  letter-spacing: -0.02em;
-  color: var(--white);
-  margin-bottom: 12px;
-}
-
-.hero-title em {
-  font-style: italic;
-  color: var(--gold);
-}
-
-.hero-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(16px, 2.5vw, 22px);
-  font-weight: 300;
-  font-style: italic;
-  color: rgba(245,243,239,0.45);
-  max-width: 540px;
-  margin: 0 auto 48px;
-  line-height: 1.6;
-}
-
-.divider-line {
-  width: 1px;
-  height: 48px;
-  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.4), transparent);
-  margin: 0 auto;
-}
-
-.section {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 80px 48px;
-}
-
-.section-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.7;
-  margin-bottom: 24px;
-}
-
-.section-heading {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(30px, 5vw, 48px);
-  font-weight: 300;
-  line-height: 1.2;
-  color: var(--white);
-  margin-bottom: 28px;
-}
-
-.section-heading em {
-  font-style: italic;
-  color: var(--gold);
-}
-
-.body-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(16px, 2.2vw, 20px);
-  font-weight: 300;
-  line-height: 1.8;
-  color: rgba(245,243,239,0.65);
-  margin-bottom: 24px;
-}
-
-/* MYTH / REALITY GRID */
-.contrast-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  margin: 48px 0;
-}
-
-.contrast-cell {
-  padding: 32px 28px;
-}
-
-.contrast-cell.myth { background: rgba(255,255,255,0.02); }
-.contrast-cell.reality { background: rgba(201,169,110,0.05); }
-
-.contrast-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.contrast-cell.myth .contrast-label { color: rgba(245,243,239,0.3); }
-.contrast-cell.reality .contrast-label { color: var(--gold); opacity: 0.7; }
-
-.contrast-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(14px, 2vw, 17px);
-  font-weight: 300;
-  line-height: 1.7;
-  color: rgba(245,243,239,0.6);
-}
-
-.contrast-cell.reality .contrast-text { color: rgba(245,243,239,0.75); }
-
-/* WHAT HAPPENS */
-.what-happens {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 0 48px 80px;
-}
-
-.wh-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.7;
-  margin-bottom: 48px;
-  text-align: center;
-}
-
-.phase {
-  border-left: 1px solid rgba(201,169,110,0.15);
-  padding: 0 0 48px 32px;
-  margin-left: 8px;
-  position: relative;
-}
-
-.phase::before {
-  content: '';
-  position: absolute;
-  left: -4px;
-  top: 6px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(201,169,110,0.4);
-}
-
-.phase:last-child { border-left-color: transparent; }
-
-.phase-name {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.6;
-  margin-bottom: 10px;
-}
-
-.phase-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(18px, 2.8vw, 24px);
-  font-weight: 300;
-  color: var(--white);
-  margin-bottom: 10px;
-}
-
-.phase-desc {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(14px, 2vw, 17px);
-  font-weight: 300;
-  line-height: 1.75;
-  color: rgba(245,243,239,0.5);
-}
-
-.sep {
-  width: 80px;
-  height: 1px;
-  background: rgba(201,169,110,0.2);
-  margin: 0 auto 80px;
-}
-
-.cta-section {
-  text-align: center;
-  padding: 80px 48px 120px;
-  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.04), transparent);
-}
-
-.cta-heading {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(28px, 4.5vw, 44px);
-  font-weight: 300;
-  line-height: 1.3;
-  color: var(--white);
-  margin-bottom: 16px;
-}
-
-.cta-heading em { font-style: italic; color: var(--gold); }
-
-.cta-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(15px, 2vw, 18px);
-  font-weight: 300;
-  font-style: italic;
-  color: rgba(245,243,239,0.45);
-  margin-bottom: 40px;
-}
-
-.cta-btn {
-  display: inline-block;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gold);
-  border: 1px solid rgba(201,169,110,0.4);
-  padding: 20px 52px;
-  text-decoration: none;
-  transition: all 0.4s;
-}
-
-.cta-btn:hover {
-  background: rgba(201,169,110,0.1);
-  border-color: var(--gold);
-}
-
-@media (max-width: 640px) {
-  nav { padding: 20px 24px; }
-  .hero { padding: 100px 24px 60px; }
-  .section, .what-happens { padding-left: 24px; padding-right: 24px; }
-  .cta-section { padding: 60px 24px 80px; }
-  .contrast-grid { grid-template-columns: 1fr; }
-}
+.nav-cta { position: relative; z-index: 1; }
+.nav-cta a { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--gold); text-decoration: none; text-transform: uppercase; border: 1px solid rgba(201,169,110,0.4); padding: 0.6rem 1.4rem; transition: all 0.3s; cursor: none; }
+.nav-cta a:hover { background: var(--gold); color: var(--obsidian); }
+.hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; z-index: 2; padding: 8rem 4rem 6rem; }
+.hero-tag { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; margin-bottom: 2rem; opacity: 0; animation: fadeUp 1s ease 0.5s forwards; }
+.hero-tag::before, .hero-tag::after { content: '—'; margin: 0 1rem; color: var(--gold-dim); }
+.hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 300; line-height: 1.0; color: var(--white); opacity: 0; animation: fadeUp 1.2s ease 0.7s forwards; }
+.hero-title em { font-style: italic; color: var(--gold-light); }
+.hero-sub { font-family: 'Cormorant Garamond', serif; font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 300; font-style: italic; color: var(--ash); margin-top: 2rem; max-width: 560px; line-height: 1.9; opacity: 0; animation: fadeUp 1s ease 1s forwards; }
+.hero-divider { width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent); margin: 3rem auto 0; opacity: 0; animation: fadeUp 1s ease 1.2s forwards; }
+.section { position: relative; z-index: 2; padding: 8rem 4rem; max-width: 1100px; margin: 0 auto; }
+.section-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 1rem; }
+.section-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300; line-height: 1.15; color: var(--white); margin-bottom: 2rem; }
+.section-heading em { font-style: italic; color: var(--gold-light); }
+.section-body { font-size: 0.9rem; color: var(--ash); line-height: 2; max-width: 640px; }
+.clarify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 4rem; }
+.clarify-item { background: var(--obsidian); padding: 3rem; }
+.clarify-item:hover { background: rgba(201,169,110,0.03); }
+.clarify-label { font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.3em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 1rem; }
+.clarify-heading { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--white); margin-bottom: 0.8rem; }
+.clarify-body { font-size: 0.82rem; color: var(--ash); line-height: 1.9; }
+.what-happens { display: flex; flex-direction: column; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 4rem; }
+.step { background: var(--obsidian); padding: 2.5rem 3rem; display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: start; transition: background 0.4s; }
+.step:hover { background: rgba(201,169,110,0.03); }
+.step-num { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; padding-top: 0.3rem; }
+.step-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--white); margin-bottom: 0.6rem; }
+.step-desc { font-size: 0.82rem; color: var(--ash); line-height: 1.9; }
+.cta-section { position: relative; z-index: 2; padding: 8rem 4rem; text-align: center; background: var(--deep); }
+.cta-inner { max-width: 600px; margin: 0 auto; }
+.cta-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 1.5rem; }
+.cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300; font-style: italic; color: var(--white); margin-bottom: 1.5rem; }
+.cta-body { font-size: 0.85rem; color: var(--ash); line-height: 2; margin-bottom: 3rem; }
+.btn-primary { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--obsidian); background: var(--gold); padding: 1rem 2.5rem; text-decoration: none; display: inline-block; transition: all 0.4s; position: relative; overflow: hidden; cursor: none; }
+.btn-primary::before { content: ''; position: absolute; inset: 0; background: var(--gold-light); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); }
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px solid rgba(201,169,110,0.1); display: flex; justify-content: space-between; align-items: center; }
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.3em; color: var(--ash); }
+.footer-logo span { color: var(--gold); }
+.footer-copy { font-family: 'Space Mono', monospace; font-size: 0.55rem; color: #2a2a2a; letter-spacing: 0.15em; }
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .section { padding: 5rem 2rem; } .clarify-grid { grid-template-columns: 1fr; } .step { grid-template-columns: 1fr; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
 </style>
 </head>
 <body>
+<div class="grain"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<canvas id="cosmos"></canvas>
 
 <nav>
-  <a href="/" class="nav-logo">Bhavé's Lab</a>
-  <a href="/" class="nav-back">← Back</a>
+  <a href="index.html" class="nav-logo">Bhav<span>é</span>'s Lab</a>
+  <a href="index.html#work" class="nav-back">← The Console</a>
+  <div class="nav-cta"><a href="https://calendly.com/bhaveslab/30min" target="_blank">Book a Session</a></div>
 </nav>
 
-<div class="hero">
-  <div class="hero-bg"></div>
-  <div>
-    <p class="hero-label">Modality · Hypnosis</p>
-    <h1 class="hero-title">Deep<br><em>Reprogramming</em></h1>
-    <p class="hero-sub">What actually happens during a hypnosis session — and why it works where other approaches stop.</p>
-    <div class="divider-line"></div>
-  </div>
-</div>
+<section class="hero">
+  <p class="hero-tag">Inner Mining</p>
+  <h1 class="hero-title">Where the pattern<br>was <em>written.</em></h1>
+  <p class="hero-sub">The patterns you carry were not formed at the conscious level. They were installed deeper — in states of high emotion, early experience, repeated reinforcement. Inner Mining goes to that layer. Where it was written is where it must be rewritten.</p>
+  <div class="hero-divider"></div>
+</section>
 
-<div class="section">
-  <p class="section-label">What This Is</p>
-  <h2 class="section-heading">Not sleep.<br>Not suggestion.<br><em>Direct access.</em></h2>
-  <p class="body-text">Hypnosis is not a performance. It's a naturally occurring state — the same one you're in right before sleep, right after waking, right in the middle of being absorbed in something. The nervous system already knows how to go there. A session is just a deliberate entry.</p>
-  <p class="body-text">In that state, the analytical mind steps aside long enough for the subconscious to receive something different. Not an override. A conversation — between where you've been and where you're pointing.</p>
+<section class="section">
+  <p class="section-label reveal">What It Is</p>
+  <h2 class="section-heading reveal">Not analysis.<br>Not from <em>above.</em></h2>
+  <p class="section-body reveal">Inner Mining is a precise process that accesses the substructure beneath conscious thought. The patterns you carry were not formed at the conscious level — they were installed deeper, in states of high emotion, early experience, or repeated reinforcement. Inner Mining reaches that layer directly. It works through a state of focused inward awareness — not sleep, not performance — where the critical filter between conscious and subconscious becomes temporarily permeable. That permeability is where the work happens.</p>
 
-  <div class="contrast-grid">
-    <div class="contrast-cell myth">
-      <p class="contrast-label">The myth</p>
-      <p class="contrast-text">You hand over control. Someone talks you into things. You wake up changed without knowing why.</p>
+  <div class="clarify-grid reveal">
+    <div class="clarify-item">
+      <p class="clarify-label">What it is not</p>
+      <h3 class="clarify-heading">You are not passive.</h3>
+      <p class="clarify-body">You remain fully aware throughout. You can hear everything, respond to everything, and remember everything. This is not something done to you. You are in a specific state of heightened internal focus — less like sleep, more like the moment just before sleep when the signal inside gets unusually clear.</p>
     </div>
-    <div class="contrast-cell reality">
-      <p class="contrast-label">What's actually true</p>
-      <p class="contrast-text">You are aware the entire time. You cannot be made to do or believe anything against your actual nature. The state removes resistance — it doesn't remove you.</p>
-    </div>
-    <div class="contrast-cell myth">
-      <p class="contrast-label">The myth</p>
-      <p class="contrast-text">It works by brute-force repetition — the same suggestion over and over until something shifts.</p>
-    </div>
-    <div class="contrast-cell reality">
-      <p class="contrast-label">What's actually true</p>
-      <p class="contrast-text">It works because the subconscious is specific. A session built from your actual pattern mapping — your words, your origin point, your specific belief — lands differently than a generic script.</p>
+    <div class="clarify-item">
+      <p class="clarify-label">What it is</p>
+      <h3 class="clarify-heading">You are at the source.</h3>
+      <p class="clarify-body">The subconscious is where patterns are stored, maintained, and executed. Inner Mining goes to the level where the pattern actually lives. Where it was written is where it must be rewritten.</p>
     </div>
   </div>
-</div>
+</section>
 
-<div class="sep"></div>
-
-<div class="what-happens">
-  <p class="wh-label">Inside a Session</p>
-
-  <div class="phase">
-    <p class="phase-name">Before</p>
-    <h3 class="phase-title">The map comes first</h3>
-    <p class="phase-desc">A hypnosis session at Bhavé's Lab isn't a standalone event. It follows the pattern mapping. What was identified — the belief, the origin, the specific logic of the pattern — becomes the material the session is built from. Generic scripts are not used here.</p>
+<section class="section" style="background: var(--deep); max-width: 100%; padding: 8rem 4rem;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <p class="section-label reveal">In the Session</p>
+    <h2 class="section-heading reveal">What actually <em>happens.</em></h2>
+    <div class="what-happens reveal">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div>
+          <p class="step-title">Pattern location</p>
+          <p class="step-desc">Before Inner Mining begins, the session locates where in the framework sequence the loop is running. The work targets that specific layer — not the general experience of the pattern, but the precise point of origin.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div>
+          <p class="step-title">Descent</p>
+          <p class="step-desc">A guided process moves you from normal waking awareness into a deeper internal state. This is not dramatic. The body stills, the external noise quiets, and awareness turns inward with unusual clarity. You are fully present — just present at a different depth.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div>
+          <p class="step-title">Source access</p>
+          <p class="step-desc">At the subconscious level, the original context for the pattern becomes accessible. The experience that installed the loop. The belief that formed around it. The decision that got made. You encounter this — not as memory, but as present-moment observation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <div>
+          <p class="step-title">Rewrite</p>
+          <p class="step-desc">With the source pattern visible and accessible, new information is introduced at the same level it was originally installed. This is not suggestion. It is structural replacement — the old script updated at the layer where it actually runs.</p>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <div class="phase">
-    <p class="phase-name">Induction</p>
-    <h3 class="phase-title">The analytical mind quiets</h3>
-    <p class="phase-desc">A guided induction brings the nervous system into a state of focused relaxation. Brain activity slows from beta to alpha and then theta — the same range as deep meditation and pre-sleep. In that state, the habitual defenses that keep patterns in place relax.</p>
+<section class="cta-section">
+  <div class="cta-inner reveal">
+    <p class="cta-label">Begin Here</p>
+    <h2 class="cta-title">Go to the source.</h2>
+    <p class="cta-body">Inner Mining in the Lab is always combined with the framework sequence — so the session targets the precise layer where your pattern is running, not the general experience of it.</p>
+    <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary"><span>Book a Study Session</span></a>
   </div>
+</section>
 
-  <div class="phase">
-    <p class="phase-name">The Session</p>
-    <h3 class="phase-title">A different conclusion is offered</h3>
-    <p class="phase-desc">The part of you that formed the pattern — usually at a much younger age — gets to hear something new. Not "you're fine now." Something specific: that the original response made sense then, and that a different response is available now. The subconscious responds to precision and safety. Both are present.</p>
-  </div>
+<footer>
+  <div class="footer-logo">Bhav<span>é</span>'s Lab</div>
+  <p class="footer-copy">© 2026 Bhavé's Lab LLC</p>
+</footer>
 
-  <div class="phase">
-    <p class="phase-name">Return</p>
-    <h3 class="phase-title">Awareness comes back gradually</h3>
-    <p class="phase-desc">You return to full awareness slowly, the way you wake from a good sleep. Most people describe feeling lighter — not transformed, but as if something that was braced has released. The biofeedback tools in the follow-up session confirm what shifted.</p>
-  </div>
-
-  <div class="phase">
-    <p class="phase-name">After</p>
-    <h3 class="phase-title">The pattern behaves differently</h3>
-    <p class="phase-desc">Not always immediately. Sometimes within days. The trigger that used to produce the automatic response still arrives — but the pull is different. You notice a pause where there wasn't one before. That pause is the work.</p>
-  </div>
-
-</div>
-
-<div class="sep"></div>
-
-<div class="cta-section">
-  <h2 class="cta-heading">The pattern has<br><em>a specific location.</em></h2>
-  <p class="cta-sub">A session starts with finding it. Book a Study Session to begin the map.</p>
-  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
-</div>
+<script>
+const cursor = document.getElementById('cursor'); const ring = document.getElementById('cursorRing'); let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
+(function loop(){rx+=(mx-rx-18)*0.12;ry+=(my-ry-18)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.step,.clarify-item').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hovering'));el.addEventListener('mouseleave',()=>ring.classList.remove('hovering'));});
+const canvas=document.getElementById('cosmos');const ctx=canvas.getContext('2d');let W,H,stars=[],shooters=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;stars=[];const n=Math.floor(W*H/6000);for(let i=0;i<n;i++){const g=Math.random()<0.18;stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+0.2,b:Math.random()*0.5+0.1,p:Math.random()*Math.PI*2,ps:Math.random()*0.8+0.3,t:Math.random()*0.4+0.3,gold:g});}}resize();window.addEventListener('resize',resize);
+function spawnShooter(){const a=(Math.random()*30+15)*Math.PI/180;const g=Math.random()<0.3;shooters.push({x:Math.random()*W*0.7,y:Math.random()*H*0.4,vx:Math.cos(a)*(Math.random()*6+5),vy:Math.sin(a)*(Math.random()*6+5),trail:[],gold:g,life:1,decay:Math.random()*0.015+0.012});}
+setInterval(()=>{if(Math.random()<0.7)spawnShooter();},2200);
+function draw(t){ctx.clearRect(0,0,W,H);stars.forEach(s=>{s.p+=0.008;const a=Math.max(0.02,Math.min(1,s.b+Math.sin(s.p)*s.t*0.4));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.gold?`rgba(201,169,110,${a})`:`rgba(237,232,224,${a*0.7})`;if(s.gold&&a>0.5&&s.r>0.9){ctx.shadowBlur=6;ctx.shadowColor='rgba(201,169,110,0.5)';}ctx.fill();ctx.shadowBlur=0;});shooters=shooters.filter(s=>s.life>0);shooters.forEach(s=>{s.trail.push({x:s.x,y:s.y});if(s.trail.length>22)s.trail.shift();s.x+=s.vx;s.y+=s.vy;s.life-=s.decay;if(s.trail.length<2)return;const c=s.gold?'201,169,110':'237,232,224';for(let i=1;i<s.trail.length;i++){const p=i/s.trail.length;ctx.beginPath();ctx.moveTo(s.trail[i-1].x,s.trail[i-1].y);ctx.lineTo(s.trail[i].x,s.trail[i].y);ctx.strokeStyle=`rgba(${c},${p*s.life*(s.gold?0.9:0.6)})`;ctx.lineWidth=p*2.2;ctx.lineCap='round';ctx.stroke();}});requestAnimationFrame(ts=>draw(ts/1000));}
+draw(0);setTimeout(spawnShooter,800);setTimeout(spawnShooter,2200);
+document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+</script>
 
 </body>
 </html>
