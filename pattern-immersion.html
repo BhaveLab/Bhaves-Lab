@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Study Session — Bhavé's Lab</title>
+<title>Pattern Immersion — Bhavé's Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,7 +33,7 @@ nav::before { content: ''; position: absolute; inset: 0; background: linear-grad
 .hero-sub { font-family: 'Cormorant Garamond', serif; font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 300; font-style: italic; color: var(--ash); margin-top: 2rem; max-width: 520px; line-height: 1.9; opacity: 0; animation: fadeUp 1s ease 1s forwards; }
 .hero-divider { width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent); margin: 3rem auto 0; opacity: 0; animation: fadeUp 1s ease 1.2s forwards; }
 
-.specs-bar { position: relative; z-index: 2; background: var(--deep); padding: 0; }
+.specs-bar { position: relative; z-index: 2; background: var(--deep); }
 .specs-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(201,169,110,0.1); }
 .spec { background: var(--deep); padding: 2.5rem 2rem; }
 .spec-label { font-family: 'Space Mono', monospace; font-size: 0.48rem; letter-spacing: 0.28em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 0.7rem; }
@@ -46,32 +46,37 @@ nav::before { content: ''; position: absolute; inset: 0; background: linear-grad
 .section-heading em { font-style: italic; color: var(--gold-light); }
 .section-body { font-size: 0.9rem; color: var(--ash); line-height: 2; max-width: 640px; }
 
-.flow { display: flex; flex-direction: column; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 4rem; }
-.flow-step { background: var(--obsidian); padding: 2.5rem 3rem; display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: start; transition: background 0.4s; position: relative; overflow: hidden; }
-.flow-step::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: linear-gradient(to bottom, var(--gold), transparent); transform: scaleY(0); transform-origin: top; transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); }
-.flow-step:hover::before { transform: scaleY(1); }
-.flow-step:hover { background: rgba(201,169,110,0.03); }
-.flow-num { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; padding-top: 0.3rem; }
-.flow-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--white); margin-bottom: 0.6rem; }
-.flow-desc { font-size: 0.82rem; color: var(--ash); line-height: 1.9; }
+.tools-included { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 4rem; }
+.tool-item { background: var(--obsidian); padding: 3rem; position: relative; overflow: hidden; transition: background 0.4s; }
+.tool-item::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); }
+.tool-item:hover::before { transform: scaleX(1); }
+.tool-item:hover { background: rgba(201,169,110,0.03); }
+.tool-num { font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.25em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 1rem; }
+.tool-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: var(--white); margin-bottom: 0.6rem; }
+.tool-name em { font-style: italic; color: var(--gold-light); }
+.tool-desc { font-size: 0.82rem; color: var(--ash); line-height: 1.9; }
 
-.right-for { position: relative; z-index: 2; padding: 8rem 4rem; background: var(--deep); }
-.right-inner { max-width: 1100px; margin: 0 auto; }
-.check-list { display: flex; flex-direction: column; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 3rem; }
-.check-item { background: var(--deep); padding: 2rem 2.5rem; display: flex; gap: 1.5rem; align-items: start; }
-.check-mark { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--gold); padding-top: 0.15rem; flex-shrink: 0; }
-.check-text { font-size: 0.85rem; color: var(--ash); line-height: 1.85; }
+.phases { display: flex; flex-direction: column; gap: 1px; background: rgba(201,169,110,0.1); margin-top: 4rem; }
+.phase { background: var(--obsidian); padding: 2.5rem 3rem; display: grid; grid-template-columns: 120px 1fr; gap: 2rem; align-items: start; transition: background 0.4s; }
+.phase:hover { background: rgba(201,169,110,0.03); }
+.phase-label { font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.22em; color: var(--gold); text-transform: uppercase; padding-top: 0.3rem; }
+.phase-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--white); margin-bottom: 0.6rem; }
+.phase-desc { font-size: 0.82rem; color: var(--ash); line-height: 1.9; }
 
-.cta-section { position: relative; z-index: 2; padding: 8rem 4rem; text-align: center; }
-.cta-inner { max-width: 560px; margin: 0 auto; }
-.cta-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 1.5rem; }
-.cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300; font-style: italic; color: var(--white); margin-bottom: 1rem; }
-.cta-price { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--gold-light); font-style: italic; margin-bottom: 2.5rem; }
+.apply-section { position: relative; z-index: 2; padding: 8rem 4rem; background: var(--deep); }
+.apply-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+.apply-left h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; font-style: italic; color: var(--white); margin-bottom: 1.5rem; line-height: 1.2; }
+.apply-left p { font-size: 0.85rem; color: var(--ash); line-height: 2; margin-bottom: 2rem; }
+.apply-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--gold-light); font-style: italic; margin-bottom: 0.5rem; }
+.apply-price-note { font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.15em; color: var(--ash); margin-bottom: 2.5rem; }
 .btn-primary { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--obsidian); background: var(--gold); padding: 1rem 2.5rem; text-decoration: none; display: inline-block; transition: all 0.4s; position: relative; overflow: hidden; cursor: none; }
 .btn-primary::before { content: ''; position: absolute; inset: 0; background: var(--gold-light); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); }
 .btn-primary:hover::before { transform: translateX(0); }
 .btn-primary span { position: relative; z-index: 1; }
-.cta-note { font-family: 'Space Mono', monospace; font-size: 0.5rem; letter-spacing: 0.15em; color: var(--ash); margin-top: 1.2rem; }
+.apply-right { display: flex; flex-direction: column; gap: 1px; background: rgba(201,169,110,0.1); }
+.apply-detail { background: var(--charcoal); padding: 1.8rem 2rem; }
+.apply-detail-label { font-family: 'Space Mono', monospace; font-size: 0.45rem; letter-spacing: 0.25em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 0.4rem; }
+.apply-detail-value { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; color: var(--white); }
 
 footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px solid rgba(201,169,110,0.1); display: flex; justify-content: space-between; align-items: center; }
 .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.3em; color: var(--ash); }
@@ -80,7 +85,7 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .specs-inner { grid-template-columns: 1fr 1fr; } .section { padding: 5rem 2rem; } .flow-step { grid-template-columns: 1fr; } .right-for { padding: 5rem 2rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
+@media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .specs-inner { grid-template-columns: 1fr 1fr; } .section { padding: 5rem 2rem; } .tools-included { grid-template-columns: 1fr; } .phase { grid-template-columns: 1fr; } .apply-section { padding: 5rem 2rem; } .apply-inner { grid-template-columns: 1fr; gap: 3rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
 </style>
 </head>
 <body>
@@ -92,82 +97,100 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 <nav>
   <a href="index.html" class="nav-logo">Bhav<span>é</span>'s Lab</a>
   <a href="index.html#session" class="nav-back">← Where to Begin</a>
-  <div class="nav-cta"><a href="https://calendly.com/bhaveslab/30min" target="_blank">Book Now</a></div>
+  <div class="nav-cta"><a href="https://calendly.com/bhaveslab/30min" target="_blank">Apply</a></div>
 </nav>
 
 <section class="hero">
-  <p class="hero-tag">Entry — The Study Session</p>
-  <h1 class="hero-title">90 minutes.<br>One <em>pattern.</em></h1>
-  <p class="hero-sub">You leave knowing exactly what is driving the experience you keep having — and what the next true move is.</p>
+  <p class="hero-tag">Core Program — Pattern Immersion</p>
+  <h1 class="hero-title">Not understanding<br>a pattern. <em>Moving</em><br>through it.</h1>
+  <p class="hero-sub">4–6 weeks. Framework mapping, Inner Mining, and live biofeedback working as one continuous process.</p>
   <div class="hero-divider"></div>
 </section>
 
 <div class="specs-bar">
   <div class="specs-inner reveal">
-    <div class="spec"><p class="spec-label">Duration</p><p class="spec-value">90 <em>minutes</em></p></div>
-    <div class="spec"><p class="spec-label">Format</p><p class="spec-value">1:1 <em>Session</em></p></div>
-    <div class="spec"><p class="spec-label">Location</p><p class="spec-value">In Person <em>or Remote</em></p></div>
-    <div class="spec"><p class="spec-label">Investment</p><p class="spec-value">From <em>$150</em></p></div>
+    <div class="spec"><p class="spec-label">Duration</p><p class="spec-value">4–6 <em>Weeks</em></p></div>
+    <div class="spec"><p class="spec-label">Format</p><p class="spec-value">1:1 <em>Ongoing</em></p></div>
+    <div class="spec"><p class="spec-label">Tools</p><p class="spec-value">Full <em>Console</em></p></div>
+    <div class="spec"><p class="spec-label">Investment</p><p class="spec-value">From <em>$1,200</em></p></div>
   </div>
 </div>
 
 <section class="section">
-  <p class="section-label reveal">What Happens</p>
-  <h2 class="section-heading reveal">One session.<br>One pattern.<br><em>Precise work.</em></h2>
-  <p class="section-body reveal">The Study Session is not a consultation. It is not an intake. It is a working session — from the first minute, you are in the material. The framework sequence is the lens. Your actual situation is the content.</p>
+  <p class="section-label reveal">The Full Console</p>
+  <h2 class="section-heading reveal">Every tool.<br>One <em>continuous process.</em></h2>
+  <p class="section-body reveal">Pattern Immersion is not a series of separate sessions. It is one extended process — where each tool deepens the work of the last. The framework sequence is the map. Inner Mining accesses the source. HeartMath and biofeedback make State visible throughout. Everything runs together.</p>
 
-  <div class="flow reveal">
-    <div class="flow-step">
-      <span class="flow-num">01</span>
-      <div>
-        <p class="flow-title">What's active</p>
-        <p class="flow-desc">The session opens with one question: what is active right now. Not your history. Not your goals. What is present, running, unresolved. That is where the work begins.</p>
-      </div>
+  <div class="tools-included reveal">
+    <div class="tool-item">
+      <p class="tool-num">01 — Framework</p>
+      <h3 class="tool-name">The <em>Sequence</em></h3>
+      <p class="tool-desc">The full framework sequence maps where in the chain the pattern is operating. This becomes the ongoing lens — updated session by session as the work goes deeper.</p>
     </div>
-    <div class="flow-step">
-      <span class="flow-num">02</span>
-      <div>
-        <p class="flow-title">Locating the pattern</p>
-        <p class="flow-desc">Using the framework sequence, the session identifies where in the chain the pattern is operating. State, Perception, Formation, Decision — the entry point is different for every person and every situation.</p>
-      </div>
+    <div class="tool-item">
+      <p class="tool-num">02 — Inner Mining</p>
+      <h3 class="tool-name">Source <em>Access</em></h3>
+      <p class="tool-desc">Deep subconscious work targeting the layer where the pattern was originally installed. The rewrite happens at the source — not the surface expression of it.</p>
     </div>
-    <div class="flow-step">
-      <span class="flow-num">03</span>
-      <div>
-        <p class="flow-title">Working the layer</p>
-        <p class="flow-desc">Once the layer is located, the session goes there directly. This is not talking about the pattern. It is observing the pattern in motion — which is what makes it workable.</p>
-      </div>
+    <div class="tool-item">
+      <p class="tool-num">03 — HeartMath</p>
+      <h3 class="tool-name">Coherence <em>Training</em></h3>
+      <p class="tool-desc">Real-time HRV data shows the State layer directly. Coherence is trained as a skill — accessible on demand, not dependent on the device.</p>
     </div>
-    <div class="flow-step">
-      <span class="flow-num">04</span>
-      <div>
-        <p class="flow-title">What you leave with</p>
-        <p class="flow-desc">Clarity on what is actually driving the loop. Not a prescription — a precise observation you can work from. Most people leave knowing something they knew but couldn't see.</p>
+    <div class="tool-item">
+      <p class="tool-num">04 — Muse + Bio-Well</p>
+      <h3 class="tool-name">Live <em>Data</em></h3>
+      <p class="tool-desc">Brainwave states and energy field mapping during session. What is happening internally becomes visible — not self-reported, measured.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--deep); max-width: 100%; padding: 8rem 4rem;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <p class="section-label reveal">How It Unfolds</p>
+    <h2 class="section-heading reveal">The shape of <em>the process.</em></h2>
+    <div class="phases reveal">
+      <div class="phase">
+        <span class="phase-label">Weeks 1–2</span>
+        <div>
+          <p class="phase-title">Mapping</p>
+          <p class="phase-desc">The pattern is located precisely in the framework sequence. Biofeedback establishes a State baseline. The first Inner Mining session goes to the source layer.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <span class="phase-label">Weeks 2–4</span>
+        <div>
+          <p class="phase-title">Working the layer</p>
+          <p class="phase-desc">Sessions go deeper into the identified layer. Each one builds on what the last revealed. Inner Mining targets the rewrite. Coherence training runs alongside as the State layer stabilizes.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <span class="phase-label">Weeks 4–6</span>
+        <div>
+          <p class="phase-title">Integration</p>
+          <p class="phase-desc">The pattern is not removed — it becomes visible and workable. Sessions in this phase confirm the shift is structural, not situational. The tools become yours to use independently.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="right-for">
-  <div class="right-inner">
-    <p class="section-label reveal">Who This Is For</p>
-    <h2 class="section-heading reveal">You are <em>ready</em> if —</h2>
-    <div class="check-list reveal">
-      <div class="check-item"><span class="check-mark">—</span><p class="check-text">There is a specific situation, pattern, or loop you keep encountering and you want to know what is actually driving it.</p></div>
-      <div class="check-item"><span class="check-mark">—</span><p class="check-text">You have done enough self-reflection to know that thinking about it more is not going to move it.</p></div>
-      <div class="check-item"><span class="check-mark">—</span><p class="check-text">You can sit with what comes up without needing to be managed through it.</p></div>
-      <div class="check-item"><span class="check-mark">—</span><p class="check-text">You want precision, not comfort. Observation, not reassurance.</p></div>
+<section class="apply-section">
+  <div class="apply-inner reveal">
+    <div class="apply-left">
+      <h2>This is applied for, not booked.</h2>
+      <p>Pattern Immersion is a significant commitment — in time, depth, and investment. The application call confirms that the fit is right before anything is scheduled. No pressure, no pitch. A conversation to see if this is the right next move.</p>
+      <p class="apply-price">From $1,200</p>
+      <p class="apply-price-note">Exact investment confirmed on the application call based on scope and duration.</p>
+      <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary"><span>Apply Now</span></a>
     </div>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="cta-inner reveal">
-    <p class="cta-label">Book a Study Session</p>
-    <h2 class="cta-title">One session changes the frame.</h2>
-    <p class="cta-price">From $150 · 90 minutes · In person or remote</p>
-    <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary"><span>Book Now</span></a>
-    <p class="cta-note">The booking call confirms fit and availability before the session is scheduled.</p>
+    <div class="apply-right">
+      <div class="apply-detail"><p class="apply-detail-label">Duration</p><p class="apply-detail-value">4–6 weeks, confirmed on call</p></div>
+      <div class="apply-detail"><p class="apply-detail-label">Session Frequency</p><p class="apply-detail-value">Weekly, sometimes twice weekly</p></div>
+      <div class="apply-detail"><p class="apply-detail-label">Format</p><p class="apply-detail-value">In person preferred, remote available</p></div>
+      <div class="apply-detail"><p class="apply-detail-label">Tools Used</p><p class="apply-detail-value">Full console — all four modalities</p></div>
+      <div class="apply-detail"><p class="apply-detail-label">Entry Requirement</p><p class="apply-detail-value">Application call — no prerequisite session required</p></div>
+    </div>
   </div>
 </section>
 
@@ -180,7 +203,7 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 const cursor=document.getElementById('cursor');const ring=document.getElementById('cursorRing');let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-4+'px';cursor.style.top=my-4+'px';});
 (function loop(){rx+=(mx-rx-18)*0.12;ry+=(my-ry-18)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
-document.querySelectorAll('a,button,.flow-step,.check-item').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hovering'));el.addEventListener('mouseleave',()=>ring.classList.remove('hovering'));});
+document.querySelectorAll('a,button,.tool-item,.phase').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hovering'));el.addEventListener('mouseleave',()=>ring.classList.remove('hovering'));});
 const canvas=document.getElementById('cosmos');const ctx=canvas.getContext('2d');let W,H,stars=[],shooters=[];
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;stars=[];const n=Math.floor(W*H/6000);for(let i=0;i<n;i++){const g=Math.random()<0.18;stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+0.2,b:Math.random()*0.5+0.1,p:Math.random()*Math.PI*2,ps:Math.random()*0.8+0.3,t:Math.random()*0.4+0.3,gold:g});}}resize();window.addEventListener('resize',resize);
 function spawnShooter(){const a=(Math.random()*30+15)*Math.PI/180;const g=Math.random()<0.3;shooters.push({x:Math.random()*W*0.7,y:Math.random()*H*0.4,vx:Math.cos(a)*(Math.random()*6+5),vy:Math.sin(a)*(Math.random()*6+5),trail:[],gold:g,life:1,decay:Math.random()*0.015+0.012});}
