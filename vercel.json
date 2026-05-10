@@ -14,6 +14,7 @@
     { "source": "/heartmath",          "destination": "/heartmath.html" },
     { "source": "/muse-biowell",       "destination": "/muse-biowell.html" },
     { "source": "/pattern-immersion",  "destination": "/pattern-immersion.html" },
-    { "source": "/events",             "destination": "/events.html" }
+    { "source": "/events",             "destination": "/events.html" },
+    { "source": "/tools",              "destination": "/tools.html" }
   ]
 }
