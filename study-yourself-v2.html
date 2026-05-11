@@ -627,7 +627,7 @@ function renderQuestion(sIndex, qIndex) {
       <div class="reflection-tag">[ REFLECTED ]</div>
       <div class="reflection-text" id="claude-text"></div>
     </div>
-    <div class="advance-block" id="advance-block">
+    <div class="advance-block" id="advance-block" style="display:none">
       <button class="btn-advance" id="next-btn">${
         qIndex < totalQuestions - 1
           ? 'NEXT QUESTION'
@@ -649,17 +649,15 @@ function renderQuestion(sIndex, qIndex) {
     const answer = answerInput.value.trim();
     if (answer.length < 15) { answerInput.style.borderColor = 'rgba(201,169,110,0.5)'; answerInput.focus(); return; }
 
-    submitBtn.disabled = true;
+    submitBtn.style.display = 'none';
     loading.style.display = 'block';
     sitPanel.style.display = 'none';
     claudePanel.style.display = 'none';
-    advanceBlock.style.display = 'none';
 
     try {
       const sysPrompt = `${BASE_PROMPT}\n\nSection: ${s.num} — ${s.title} (${s.layer})\nQuestion: ${q.text}`;
       const result = await callClaude(sysPrompt, answer);
       loading.style.display = 'none';
-      submitBtn.style.display = 'none';
 
       if (result.surface) {
         sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SURFACE' });
@@ -691,6 +689,7 @@ function renderQuestion(sIndex, qIndex) {
 
     } catch (err) {
       loading.style.display = 'none';
+      submitBtn.style.display = 'inline-block';
       submitBtn.disabled = false;
       recordAnswer(sIndex, qIndex, answer, '', false);
       advanceBlock.style.display = 'block';
