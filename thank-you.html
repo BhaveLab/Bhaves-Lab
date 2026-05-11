@@ -114,7 +114,12 @@ from { opacity: 0; transform: translateY(20px); }
 to { opacity: 1; transform: translateY(0); }
 }
 </style>
-
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 <div class="inner">
@@ -129,6 +134,28 @@ to { opacity: 1; transform: translateY(0); }
   </p>
   <a href="/" class="back-link">Return to the Lab</a>
 </div>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    set('.lab-label', t('thankYou.labLabel'));
+    set('.heading', t('thankYou.h1'), true);
+    set('.subheading', t('thankYou.subheading'));
+    set('.body-text', t('thankYou.body'));
+    set('.back-link', t('thankYou.backLink'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
+</script>
 </body>
 </html>
 

@@ -996,7 +996,12 @@ footer { flex-direction: column; gap: 2rem; text-align: center; }
 .node-connector { width: 20px; }
 }
 </style>
-
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -1455,6 +1460,50 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.1 });
 reveals.forEach(el => observer.observe(el));
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-cta a', t('nav.bookSession'));
+
+    // hero
+    set('.hero-eyebrow', t('home.heroEyebrow'));
+    set('.hero-title', t('home.heroH1'), true);
+    set('.hero-subtitle', t('home.heroSubtitle'));
+    set('.btn-primary span', t('home.ctaPrimary'));
+    set('.btn-ghost', t('home.ctaGhost'));
+
+    // console
+    set('.section-console .section-label', t('home.consoleLabel'));
+    set('.section-console .section-heading', t('home.consoleH2'), true);
+    var consoleItems = document.querySelectorAll('.console-item');
+    if(consoleItems[0]){ consoleItems[0].querySelector('.console-num').textContent=t('home.console01Num'); consoleItems[0].querySelector('.console-title').textContent=t('home.console01Title'); consoleItems[0].querySelector('.console-desc').textContent=t('home.console01Desc'); }
+    if(consoleItems[1]){ consoleItems[1].querySelector('.console-num').textContent=t('home.console02Num'); consoleItems[1].querySelector('.console-title').textContent=t('home.console02Title'); consoleItems[1].querySelector('.console-desc').textContent=t('home.console02Desc'); }
+    if(consoleItems[2]){ consoleItems[2].querySelector('.console-num').textContent=t('home.console03Num'); consoleItems[2].querySelector('.console-title').textContent=t('home.console03Title'); consoleItems[2].querySelector('.console-desc').textContent=t('home.console03Desc'); }
+    if(consoleItems[3]){ consoleItems[3].querySelector('.console-num').textContent=t('home.console04Num'); consoleItems[3].querySelector('.console-title').textContent=t('home.console04Title'); consoleItems[3].querySelector('.console-desc').textContent=t('home.console04Desc'); }
+
+    // framework
+    set('.section-framework .section-label', t('home.frameworkLabel'));
+    set('.section-framework .section-heading', t('home.frameworkH2'), true);
+    set('.section-framework p[style]', t('home.frameworkSub'));
+
+    // offers
+    set('.section-offers .section-label', t('home.offersLabel'));
+    set('.section-offers .section-heading', t('home.offersH2'), true);
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
 </script>
 
 </body>

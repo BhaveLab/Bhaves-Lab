@@ -663,6 +663,12 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
   .seq-node { font-size: 0.85rem; padding: 0.4rem 0.7rem; }
 }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -992,6 +998,86 @@ document.addEventListener('click', e => {
   const node = e.target.closest('.seq-node[data-node]');
   if (node) openFwDrawer(node.dataset.node);
 });
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var qq = function(sel) { return Array.from(document.querySelectorAll(sel)); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    var navLinks = qq('.nav-link');
+    if(navLinks[0]) navLinks[0].textContent = t('nav.tools');
+    if(navLinks[1]) navLinks[1].textContent = t('nav.mirror');
+    var navCta = q('.nav-cta'); if(navCta) navCta.textContent = t('nav.bookSession');
+
+    // hero
+    set('.hero-label', t('studyYourself.heroLabel'));
+    set('section.hero h1', t('studyYourself.heroH1'), true);
+    set('.hero-desc', t('studyYourself.heroDesc'));
+    set('.price-tag', t('studyYourself.priceLabel'));
+    set('.btn-enter', t('studyYourself.btnEnter'));
+    set('.hero-note', t('studyYourself.heroNote'));
+
+    // what
+    set('.what-left h2', t('studyYourself.whatH2'), true);
+    var bodyPs = qq('.what-left p');
+    if(bodyPs[0]) bodyPs[0].textContent = t('studyYourself.whatP1');
+    if(bodyPs[1]) bodyPs[1].textContent = t('studyYourself.whatP2');
+    if(bodyPs[2]) bodyPs[2].textContent = t('studyYourself.whatP3');
+
+    // thisIsNot / thisIs labels
+    var monoLabels = qq('[style*="font-family:var(--mono)"]');
+    if(monoLabels[0]) monoLabels[0].textContent = t('studyYourself.thisIsNot');
+    if(monoLabels[1]) monoLabels[1].textContent = t('studyYourself.thisIs');
+
+    // framework
+    set('.section-label', t('studyYourself.frameworkLabel'));
+    set('.framework-desc', t('studyYourself.frameworkDesc'));
+
+    // sections
+    set('.sections-block h2', t('studyYourself.sectionsH2'));
+    set('.sections-block .sub', t('studyYourself.sectionsSub'));
+
+    // how
+    set('.how-block h2', t('studyYourself.howH2'));
+    var howSteps = qq('.how-step .step-content');
+    if(howSteps[0]){ howSteps[0].querySelector('h3').textContent=t('studyYourself.how1H3'); howSteps[0].querySelector('p').textContent=t('studyYourself.how1P'); }
+    if(howSteps[1]){ howSteps[1].querySelector('h3').textContent=t('studyYourself.how2H3'); howSteps[1].querySelector('p').textContent=t('studyYourself.how2P'); }
+    if(howSteps[2]){ howSteps[2].querySelector('h3').textContent=t('studyYourself.how3H3'); howSteps[2].querySelector('p').textContent=t('studyYourself.how3P'); }
+    if(howSteps[3]){ howSteps[3].querySelector('h3').textContent=t('studyYourself.how4H3'); howSteps[3].querySelector('p').textContent=t('studyYourself.how4P'); }
+
+    // output
+    set('.output-block h2', t('studyYourself.outputH2'));
+    set('.output-block .sub', t('studyYourself.outputSub'));
+    var outCards = qq('.output-card');
+    if(outCards[0]){ outCards[0].querySelector('.output-icon').textContent=t('studyYourself.out1Label'); outCards[0].querySelector('h3').textContent=t('studyYourself.out1H3'); outCards[0].querySelector('p').textContent=t('studyYourself.out1P'); }
+    if(outCards[1]){ outCards[1].querySelector('.output-icon').textContent=t('studyYourself.out2Label'); outCards[1].querySelector('h3').textContent=t('studyYourself.out2H3'); outCards[1].querySelector('p').textContent=t('studyYourself.out2P'); }
+    if(outCards[2]){ outCards[2].querySelector('.output-icon').textContent=t('studyYourself.out3Label'); outCards[2].querySelector('h3').textContent=t('studyYourself.out3H3'); outCards[2].querySelector('p').textContent=t('studyYourself.out3P'); }
+
+    // quote
+    set('.quote-text', t('studyYourself.quoteText'));
+    set('.quote-attr', t('studyYourself.quoteAttr'));
+
+    // cta
+    set('.cta-block .label', t('studyYourself.ctaLabel'));
+    set('.cta-block h2', t('studyYourself.ctaH2'), true);
+    set('.cta-block > p', t('studyYourself.ctaP'));
+    set('.cta-price-label', t('studyYourself.ctaPriceLabel'));
+    set('.cta-price-sub', t('studyYourself.ctaPriceSub'));
+    set('.btn-enter-large', t('studyYourself.ctaBtn'));
+    set('.cta-note', t('studyYourself.ctaNote'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
 </script>
 
 </body>

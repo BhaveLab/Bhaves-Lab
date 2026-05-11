@@ -329,6 +329,12 @@ nav {
   .reads { grid-template-columns: 1fr; }
 }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -430,6 +436,53 @@ nav {
   <p class="cta-sub">Bio-Well and Muse demos are part of every Lab Workshop. Full sessions available one-on-one.</p>
   <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
 </div>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var qq = function(sel) { return Array.from(document.querySelectorAll(sel)); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-back', t('nav.back'));
+
+    // hero
+    set('.hero-label', t('museBiowell.heroLabel'));
+    set('.hero-title', t('museBiowell.heroH1'), true);
+    set('.hero-sub', t('museBiowell.heroSub'));
+
+    // tools
+    set('.tools-label', t('museBiowell.toolsLabel'));
+    var toolBlocks = qq('.tool-block');
+    if(toolBlocks[0]){
+      toolBlocks[0].querySelector('.tool-tag').textContent = t('museBiowell.tool1Tag');
+      toolBlocks[0].querySelector('.tool-name').innerHTML = t('museBiowell.tool1Name');
+      toolBlocks[0].querySelector('.tool-subtitle').textContent = t('museBiowell.tool1Sub');
+    }
+    if(toolBlocks[1]){
+      toolBlocks[1].querySelector('.tool-tag').textContent = t('museBiowell.tool2Tag');
+      toolBlocks[1].querySelector('.tool-name').innerHTML = t('museBiowell.tool2Name');
+      toolBlocks[1].querySelector('.tool-subtitle').textContent = t('museBiowell.tool2Sub');
+    }
+
+    // why both
+    set('.section-label', t('museBiowell.whyLabel'));
+    set('.section-heading', t('museBiowell.whyH2'), true);
+
+    // cta
+    set('.cta-heading', t('museBiowell.whyH2'), true);
+    set('.cta-btn', t('nav.bookSession'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
+</script>
 
 </body>
 </html>

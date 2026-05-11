@@ -905,7 +905,12 @@ to { opacity: 1; transform: translateY(0); }
 .option-btn { padding: 18px 20px; }
 }
 </style>
-
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -1277,6 +1282,44 @@ function restartMirror() {
   document.getElementById('reflection-screen').style.display = 'none';
   document.getElementById('intro').style.display = 'block';
 }
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // intro screen
+    set('.mirror-title', t('mirror.introH1'), true);
+    set('.mirror-subtitle', t('mirror.introSubtitle'), true);
+    set('.intro-body', t('mirror.introBody'));
+    set('.begin-btn span', t('mirror.beginBtn'));
+
+    // loading
+    set('.loading-text', t('mirror.loadingText'));
+
+    // email screen
+    set('#email-screen .lab-label', t('mirror.emailLabel'));
+    set('#email-screen h2', t('mirror.emailH2'));
+    set('#email-screen p[style*="color:rgba"]', t('mirror.emailSub'));
+    set('#email-screen button', t('mirror.emailBtn'));
+    set('#email-screen p[style*="0.2"]', t('mirror.emailPrivacy'));
+
+    // reflection
+    set('.reflection-label', t('mirror.reflectionLabel'));
+    set('.paths-label', t('mirror.pathsLabel'));
+    set('.cta-btn span', t('mirror.ctaBtn'));
+    set('.restart-link', t('mirror.restartBtn'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
 </script>
 
 </body>

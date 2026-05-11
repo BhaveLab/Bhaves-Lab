@@ -292,6 +292,12 @@ nav {
   .cta-section { padding: 60px 24px 80px; }
 }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -379,6 +385,55 @@ nav {
   <p class="cta-sub">A Study Session starts here. One session, one pattern, one clear picture of where it lives.</p>
   <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
 </div>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-back', t('nav.back'));
+
+    // hero
+    set('.hero-label', t('framework.heroLabel'));
+    set('.hero-title', t('framework.heroH1'), true);
+    set('.hero-sub', t('framework.heroSub'));
+
+    // what
+    set('.section-label', t('framework.whatLabel'));
+    set('.section-heading', t('framework.whatH2'), true);
+    var bodyTexts = document.querySelectorAll('.body-text');
+    if(bodyTexts[0]) bodyTexts[0].textContent = t('framework.whatP1');
+    if(bodyTexts[1]) bodyTexts[1].textContent = t('framework.whatP2');
+
+    // sequence
+    set('.sequence-intro', t('framework.sequenceIntro'));
+    var steps = document.querySelectorAll('.step');
+    var stepKeys = ['step1','step2','step3','step4','step5','step6'];
+    steps.forEach(function(step, i) {
+      if(stepKeys[i]) {
+        var titleEl = step.querySelector('.step-title');
+        var descEl = step.querySelector('.step-desc');
+        if(titleEl) titleEl.textContent = t('framework.' + stepKeys[i] + 'Title');
+        if(descEl) descEl.textContent = t('framework.' + stepKeys[i] + 'Desc');
+      }
+    });
+
+    // cta
+    set('.cta-heading', t('framework.ctaH2'), true);
+    set('.cta-sub', t('framework.ctaSub'));
+    set('.cta-btn', t('framework.ctaBtn'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
+</script>
 
 </body>
 </html>

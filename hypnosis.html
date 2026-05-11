@@ -67,6 +67,12 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .section { padding: 5rem 2rem; } .clarify-grid { grid-template-columns: 1fr; } .step { grid-template-columns: 1fr; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -169,6 +175,60 @@ setInterval(()=>{if(Math.random()<0.7)spawnShooter();},2200);
 function draw(t){ctx.clearRect(0,0,W,H);stars.forEach(s=>{s.p+=0.008;const a=Math.max(0.02,Math.min(1,s.b+Math.sin(s.p)*s.t*0.4));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.gold?`rgba(201,169,110,${a})`:`rgba(237,232,224,${a*0.7})`;if(s.gold&&a>0.5&&s.r>0.9){ctx.shadowBlur=6;ctx.shadowColor='rgba(201,169,110,0.5)';}ctx.fill();ctx.shadowBlur=0;});shooters=shooters.filter(s=>s.life>0);shooters.forEach(s=>{s.trail.push({x:s.x,y:s.y});if(s.trail.length>22)s.trail.shift();s.x+=s.vx;s.y+=s.vy;s.life-=s.decay;if(s.trail.length<2)return;const c=s.gold?'201,169,110':'237,232,224';for(let i=1;i<s.trail.length;i++){const p=i/s.trail.length;ctx.beginPath();ctx.moveTo(s.trail[i-1].x,s.trail[i-1].y);ctx.lineTo(s.trail[i].x,s.trail[i].y);ctx.strokeStyle=`rgba(${c},${p*s.life*(s.gold?0.9:0.6)})`;ctx.lineWidth=p*2.2;ctx.lineCap='round';ctx.stroke();}});requestAnimationFrame(ts=>draw(ts/1000));}
 draw(0);setTimeout(spawnShooter,800);setTimeout(spawnShooter,2200);
 document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var qq = function(sel) { return Array.from(document.querySelectorAll(sel)); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-back', t('nav.theConsole'));
+    set('.nav-cta a', t('nav.bookSession'));
+
+    // hero
+    set('.hero-tag', t('innerMining.heroTag'));
+    set('.hero-title', t('innerMining.heroH1'), true);
+    set('.hero-sub', t('innerMining.heroSub'));
+
+    // what
+    set('.section .section-label', t('innerMining.whatLabel'));
+    set('.section .section-heading', t('innerMining.whatH2'), true);
+    set('.section-body', t('innerMining.whatBody'));
+
+    // clarify grid
+    var clarifyItems = qq('.clarify-item');
+    if(clarifyItems[0]){ clarifyItems[0].querySelector('.clarify-label').textContent=t('innerMining.notLabel'); clarifyItems[0].querySelector('.clarify-heading').textContent=t('innerMining.notH3'); }
+    if(clarifyItems[1]){ clarifyItems[1].querySelector('.clarify-label').textContent=t('innerMining.isLabel'); clarifyItems[1].querySelector('.clarify-heading').textContent=t('innerMining.isH3'); }
+
+    // session
+    var sectionLabels = qq('.section-label');
+    if(sectionLabels[1]) sectionLabels[1].textContent = t('innerMining.sessionLabel');
+    var sectionHeadings = qq('.section-heading');
+    if(sectionHeadings[1]) sectionHeadings[1].innerHTML = t('innerMining.sessionH2');
+
+    var stepTitles = qq('.step-title');
+    if(stepTitles[0]) stepTitles[0].textContent = t('innerMining.step1Title');
+    if(stepTitles[1]) stepTitles[1].textContent = t('innerMining.step2Title');
+    if(stepTitles[2]) stepTitles[2].textContent = t('innerMining.step3Title');
+    if(stepTitles[3]) stepTitles[3].textContent = t('innerMining.step4Title');
+
+    // cta
+    set('.cta-label', t('innerMining.ctaLabel'));
+    set('.cta-title', t('innerMining.ctaH2'));
+    set('.cta-body', t('innerMining.ctaBody'));
+    set('.cta-section .btn-primary span', t('innerMining.ctaBtn'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
 </script>
 
 </body>

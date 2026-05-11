@@ -159,6 +159,12 @@ nav::before { content: ''; position: absolute; inset: 0; background: linear-grad
   .panel-actions { padding: 1.5rem 2rem; flex-direction: column; align-items: flex-start; }
 }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -470,6 +476,29 @@ panel.addEventListener('click', e => { if (e.target === panel) closePanel(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 panelClose.addEventListener('mouseenter', () => ring.classList.add('hovering'));
 panelClose.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-back', t('nav.back'));
+
+    // hint
+    var hintEl = q('.hint span');
+    if(hintEl) hintEl.textContent = t('tools.hint');
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
 </script>
 
 </body>

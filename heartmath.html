@@ -323,6 +323,12 @@ nav {
   .data-row { grid-template-columns: 1fr; }
 }
 </style>
+<script src="/i18n/i18n.js"></script>
+<script src="/i18n/strings.en.js"></script>
+<script src="/i18n/strings.es.js"></script>
+<script src="/i18n/strings.pt.js"></script>
+<script src="/i18n/strings.fr.js"></script>
+<script src="/lang-switcher.js"></script>
 </head>
 <body>
 
@@ -422,6 +428,51 @@ nav {
   <p class="cta-sub">A demo is included in every Lab Workshop. Or book a Study Session for focused work.</p>
   <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="cta-btn">Book a Session</a>
 </div>
+<script>
+(function() {
+  function applyI18n() {
+    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    var q = function(sel) { return document.querySelector(sel); };
+    var qq = function(sel) { return Array.from(document.querySelectorAll(sel)); };
+    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-back', t('nav.back'));
+
+    // hero
+    set('.hero-label', t('heartmath.heroLabel'));
+    set('.hero-title', t('heartmath.heroH1'), true);
+    set('.hero-sub', t('heartmath.heroSub'));
+
+    // science
+    set('.section-label', t('heartmath.scienceLabel'));
+    set('.section-heading', t('heartmath.scienceH2'), true);
+    var bodyTexts = qq('.body-text');
+    if(bodyTexts[0]) bodyTexts[0].textContent = t('heartmath.scienceP1');
+    if(bodyTexts[1]) bodyTexts[1].textContent = t('heartmath.scienceP2');
+
+    // training
+    set('.training-label', t('heartmath.trainingLabel'));
+    var trainingTitles = qq('.training-title');
+    if(trainingTitles[0]) trainingTitles[0].textContent = t('heartmath.train1Title');
+    if(trainingTitles[1]) trainingTitles[1].textContent = t('heartmath.train2Title');
+    if(trainingTitles[2]) trainingTitles[2].textContent = t('heartmath.train3Title');
+    if(trainingTitles[3]) trainingTitles[3].textContent = t('heartmath.train4Title');
+    if(trainingTitles[4]) trainingTitles[4].textContent = t('heartmath.train5Title');
+
+    // cta
+    set('.cta-heading', t('heartmath.ctaH2'), true);
+    set('.cta-btn', t('heartmath.ctaBtn'));
+  }
+  window.__i18nPatch = applyI18n;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyI18n);
+  } else {
+    applyI18n();
+  }
+  document.addEventListener('bhave:languageChanged', applyI18n);
+})();
+</script>
 
 </body>
 </html>
