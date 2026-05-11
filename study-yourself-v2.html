@@ -14,6 +14,7 @@
     --border: rgba(201,169,110,0.15);
     --gold: #C9A96E;
     --gold-dim: rgba(201,169,110,0.4);
+    --gold-faint: rgba(201,169,110,0.08);
     --ash: #6b6b6b;
     --smoke: #9a9a9a;
     --light: #e8e4dc;
@@ -31,129 +32,36 @@
     overflow-x: hidden;
   }
 
-  /* ── PARTICLE FIELD ── */
-  #cosmos {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+  #cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
   /* ── NAV ── */
   nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100; display: flex; align-items: center; justify-content: space-between;
     padding: 1.25rem 2.5rem;
     border-bottom: 1px solid var(--border);
     background: rgba(8,8,8,0.85);
     backdrop-filter: blur(12px);
   }
-
-  .nav-logo {
-    font-family: var(--serif);
-    font-size: 1.1rem;
-    font-weight: 300;
-    color: var(--light);
-    text-decoration: none;
-    letter-spacing: 0.02em;
-  }
-
+  .nav-logo { font-family: var(--serif); font-size: 1.1rem; font-weight: 300; color: var(--light); text-decoration: none; letter-spacing: 0.02em; }
   .nav-logo em { color: var(--gold); font-style: italic; }
-
-  nav a.book {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    color: var(--gold);
-    text-decoration: none;
-    border: 1px solid var(--gold-dim);
-    padding: 0.45rem 1rem;
-    transition: all 0.3s;
-  }
-
-  nav a.book:hover {
-    background: rgba(201,169,110,0.08);
-    border-color: var(--gold);
-  }
+  nav a.book { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; color: var(--gold); text-decoration: none; border: 1px solid var(--gold-dim); padding: 0.45rem 1rem; transition: all 0.3s; }
+  nav a.book:hover { background: rgba(201,169,110,0.08); border-color: var(--gold); }
 
   /* ── WRAPPER ── */
-  .wrapper {
-    position: relative;
-    z-index: 10;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 7rem 2rem 6rem;
-  }
+  .wrapper { position: relative; z-index: 10; max-width: 720px; margin: 0 auto; padding: 7rem 2rem 6rem; }
 
   /* ── INTRO SCREEN ── */
-  #intro {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 7rem 2rem 4rem;
-    max-width: 720px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 10;
-  }
-
-  .label {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    margin-bottom: 2rem;
-  }
-
-  #intro h1 {
-    font-family: var(--serif);
-    font-size: clamp(2.4rem, 6vw, 4rem);
-    font-weight: 300;
-    line-height: 1.1;
-    color: var(--light);
-    margin-bottom: 1.5rem;
-  }
-
-  #intro h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  #intro .sub {
-    font-size: 1.15rem;
-    font-weight: 300;
-    color: var(--smoke);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    max-width: 560px;
-  }
-
-  .divider {
-    width: 40px;
-    height: 1px;
-    background: var(--gold-dim);
-    margin: 2rem 0;
-  }
+  #intro { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 7rem 2rem 4rem; max-width: 720px; margin: 0 auto; position: relative; z-index: 10; }
+  .label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 2rem; }
+  #intro h1 { font-family: var(--serif); font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 300; line-height: 1.1; color: var(--light); margin-bottom: 1.5rem; }
+  #intro h1 em { font-style: italic; color: var(--gold); }
+  #intro .sub { font-size: 1.15rem; font-weight: 300; color: var(--smoke); line-height: 1.7; margin-bottom: 1.5rem; max-width: 560px; }
+  .divider { width: 40px; height: 1px; background: var(--gold-dim); margin: 2rem 0; }
 
   /* ── SECTION LIST ── */
   .section-list { margin-bottom: 3rem; }
-
-  .section-item {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(201,169,110,0.08);
-    opacity: 0;
-    transform: translateY(12px);
-    animation: fadeUp 0.5s forwards;
-  }
-
+  .section-item { display: flex; align-items: baseline; gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid rgba(201,169,110,0.08); opacity: 0; transform: translateY(12px); animation: fadeUp 0.5s forwards; }
   .section-item:nth-child(1)  { animation-delay: 0.1s; }
   .section-item:nth-child(2)  { animation-delay: 0.15s; }
   .section-item:nth-child(3)  { animation-delay: 0.2s; }
@@ -164,63 +72,20 @@
   .section-item:nth-child(8)  { animation-delay: 0.45s; }
   .section-item:nth-child(9)  { animation-delay: 0.5s; }
   .section-item:nth-child(10) { animation-delay: 0.55s; }
-
   @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-
-  .section-num {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--gold);
-    letter-spacing: 0.1em;
-    min-width: 24px;
-  }
-
+  .section-num { font-family: var(--mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.1em; min-width: 24px; }
   .section-name { font-size: 1rem; font-weight: 300; color: var(--light); }
-  .section-sub  { font-size: 0.85rem; font-style: italic; color: var(--ash); margin-left: auto; }
+  .section-sub { font-size: 0.85rem; font-style: italic; color: var(--ash); margin-left: auto; }
 
   /* ── EMAIL INPUT ── */
   .email-block { margin-bottom: 2rem; }
-
-  .email-block label {
-    display: block;
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.14em;
-    color: var(--gold);
-    margin-bottom: 0.75rem;
-  }
-
-  .email-block input {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--light);
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    padding: 0.85rem 1.1rem;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-
+  .email-block label { display: block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; color: var(--gold); margin-bottom: 0.75rem; }
+  .email-block input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--light); font-family: var(--mono); font-size: 0.85rem; padding: 0.85rem 1.1rem; outline: none; transition: border-color 0.3s; }
   .email-block input:focus { border-color: var(--gold-dim); }
   .email-block input::placeholder { color: var(--ash); }
 
   /* ── BUTTONS ── */
-  .btn-primary {
-    display: inline-block;
-    width: 100%;
-    background: var(--gold);
-    color: var(--void);
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    padding: 1.1rem 2rem;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    transition: opacity 0.3s;
-  }
-
+  .btn-primary { display: inline-block; width: 100%; background: var(--gold); color: var(--void); font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; padding: 1.1rem 2rem; border: none; cursor: pointer; text-align: center; transition: opacity 0.3s; }
   .btn-primary:hover { opacity: 0.88; }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -228,367 +93,124 @@
   #course { display: none; }
 
   /* ── PROGRESS BAR ── */
-  .progress-track {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: rgba(201,169,110,0.1);
-    z-index: 200;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--gold);
-    transition: width 0.6s ease;
-  }
+  .progress-track { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: rgba(201,169,110,0.1); z-index: 200; }
+  .progress-fill { height: 100%; background: var(--gold); transition: width 0.6s ease; }
 
   /* ── SECTION HEADER ── */
   .section-header { margin-bottom: 3rem; }
-
-  .section-tag {
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-
-  .section-title {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 300;
-    line-height: 1.15;
-    margin-bottom: 0.5rem;
-  }
-
+  .section-tag { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 1rem; }
+  .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 300; line-height: 1.15; margin-bottom: 0.5rem; }
   .section-subtitle { font-size: 1rem; font-style: italic; color: var(--ash); }
 
   /* ── SEQUENCE DISPLAY ── */
-  .sequence-display {
-    margin-bottom: 2rem;
-    padding: 1.25rem 1.5rem;
-    background: rgba(201,169,110,0.03);
-    border: 1px solid rgba(201,169,110,0.1);
-  }
-
-  .seq-label {
-    font-family: var(--mono);
-    font-size: 0.52rem;
-    letter-spacing: 0.16em;
-    color: var(--ash);
-    margin-bottom: 0.9rem;
-  }
-
-  .seq-nodes {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0;
-    row-gap: 0.4rem;
-  }
-
-  .seq-node {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.08em;
-    color: var(--ash);
-    padding: 0.3rem 0.6rem;
-    border: 1px solid rgba(107,107,107,0.2);
-    transition: all 0.4s;
-  }
-
-  .seq-node.active {
-    color: var(--gold);
-    border-color: rgba(201,169,110,0.5);
-    background: rgba(201,169,110,0.06);
-  }
-
-  .seq-arrow {
-    font-family: var(--mono);
-    font-size: 0.5rem;
-    color: rgba(107,107,107,0.3);
-    padding: 0 0.3rem;
-  }
+  .sequence-display { margin-bottom: 2rem; padding: 1.25rem 1.5rem; background: rgba(201,169,110,0.03); border: 1px solid rgba(201,169,110,0.1); }
+  .seq-label { font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.16em; color: var(--ash); margin-bottom: 0.9rem; }
+  .seq-nodes { display: flex; align-items: center; flex-wrap: wrap; gap: 0; row-gap: 0.4rem; }
+  .seq-node { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--ash); padding: 0.3rem 0.6rem; border: 1px solid rgba(107,107,107,0.2); transition: all 0.25s; cursor: pointer; user-select: none; }
+  .seq-node.active { color: var(--gold); border-color: rgba(201,169,110,0.5); background: rgba(201,169,110,0.06); }
+  .seq-node:hover { border-color: var(--gold-dim); color: var(--light); }
+  .seq-arrow { font-family: var(--mono); font-size: 0.5rem; color: rgba(107,107,107,0.3); padding: 0 0.3rem; }
 
   /* ── CONTEXT BLOCK ── */
-  .context-block {
-    background: var(--surface);
-    border-left: 2px solid var(--gold-dim);
-    padding: 1.5rem 1.75rem;
-    margin-bottom: 2.5rem;
-    font-size: 1rem;
-    font-weight: 300;
-    line-height: 1.8;
-    color: var(--smoke);
-  }
+  .context-block { background: var(--surface); border-left: 2px solid var(--gold-dim); padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; font-size: 1rem; font-weight: 300; line-height: 1.8; color: var(--smoke); }
 
   /* ── QUESTION ── */
   .question-block { margin-bottom: 1.5rem; }
-
-  .question-label {
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.16em;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-
-  .question-text {
-    font-size: 1.25rem;
-    font-weight: 300;
-    line-height: 1.6;
-    color: var(--light);
-    margin-bottom: 1.5rem;
-  }
-
-  textarea {
-    width: 100%;
-    min-height: 160px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--light);
-    font-family: var(--serif);
-    font-size: 1rem;
-    font-weight: 300;
-    line-height: 1.7;
-    padding: 1.25rem 1.4rem;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-
+  .question-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; color: var(--gold); margin-bottom: 1rem; }
+  .question-text { font-size: 1.25rem; font-weight: 300; line-height: 1.6; color: var(--light); margin-bottom: 1.5rem; }
+  textarea { width: 100%; min-height: 160px; background: var(--surface); border: 1px solid var(--border); color: var(--light); font-family: var(--serif); font-size: 1rem; font-weight: 300; line-height: 1.7; padding: 1.25rem 1.4rem; resize: vertical; outline: none; transition: border-color 0.3s; }
   textarea:focus { border-color: var(--gold-dim); }
   textarea::placeholder { color: var(--ash); font-style: italic; }
 
   /* ── REFLECTION PANEL ── */
-  .reflection-panel {
-    display: none;
-    margin: 1.5rem 0;
-    padding: 1.5rem 1.75rem;
-    border: 1px solid rgba(201,169,110,0.2);
-    background: rgba(201,169,110,0.03);
-    animation: panelIn 0.5s ease;
-  }
-
-  @keyframes panelIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .reflection-panel.sit-with-it {
-    border-color: rgba(201,169,110,0.3);
-    background: rgba(201,169,110,0.05);
-  }
-
-  .reflection-tag {
-    font-family: var(--mono);
-    font-size: 0.56rem;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    margin-bottom: 0.75rem;
-  }
-
-  .reflection-text {
-    font-size: 1rem;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--smoke);
-    line-height: 1.75;
-  }
-
-  .sit-action {
-    margin-top: 1.25rem;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .btn-sit {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    padding: 0.6rem 1.2rem;
-    border: 1px solid var(--gold-dim);
-    background: transparent;
-    color: var(--gold);
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
+  .reflection-panel { display: none; margin: 1.5rem 0; padding: 1.5rem 1.75rem; border: 1px solid rgba(201,169,110,0.2); background: rgba(201,169,110,0.03); animation: panelIn 0.5s ease; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .reflection-panel.sit-with-it { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.05); }
+  .reflection-tag { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 0.75rem; }
+  .reflection-text { font-size: 1rem; font-weight: 300; font-style: italic; color: var(--smoke); line-height: 1.75; }
+  .sit-action { margin-top: 1.25rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-sit { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; padding: 0.6rem 1.2rem; border: 1px solid var(--gold-dim); background: transparent; color: var(--gold); cursor: pointer; transition: all 0.3s; }
   .btn-sit:hover { background: rgba(201,169,110,0.08); }
   .btn-sit.advance { color: var(--ash); border-color: rgba(107,107,107,0.3); }
 
   /* ── CLAUDE REFLECTION ── */
-  .claude-reflection {
-    display: none;
-    margin: 1.5rem 0;
-    padding: 1.5rem 1.75rem;
-    border-left: 2px solid var(--gold-dim);
-    background: var(--surface);
-    animation: panelIn 0.5s ease;
-  }
-
+  .claude-reflection { display: none; margin: 1.5rem 0; padding: 1.5rem 1.75rem; border-left: 2px solid var(--gold-dim); background: var(--surface); animation: panelIn 0.5s ease; }
   .claude-reflection .reflection-tag { color: var(--ash); }
 
   /* ── ADVANCE BUTTON ── */
-  .advance-block {
-    display: none;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .btn-advance {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    color: var(--gold);
-    background: transparent;
-    border: 1px solid var(--gold-dim);
-    padding: 0.85rem 2rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-  }
-
+  .advance-block { display: none; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .btn-advance { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--gold); background: transparent; border: 1px solid var(--gold-dim); padding: 0.85rem 2rem; cursor: pointer; transition: all 0.3s; width: 100%; }
   .btn-advance:hover { background: rgba(201,169,110,0.06); border-color: var(--gold); }
 
   /* ── SUBMIT ── */
-  .btn-submit {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    color: var(--void);
-    background: var(--gold);
-    border: none;
-    padding: 0.85rem 2rem;
-    cursor: pointer;
-    transition: opacity 0.3s;
-    margin-top: 1rem;
-  }
-
+  .btn-submit { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--void); background: var(--gold); border: none; padding: 0.85rem 2rem; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; }
   .btn-submit:hover { opacity: 0.88; }
   .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* ── LOADING ── */
-  .loading-text {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    color: var(--ash);
-    padding: 1rem 0;
-    display: none;
-  }
-
+  .loading-text { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; color: var(--ash); padding: 1rem 0; display: none; }
   .loading-text::after { content: ''; animation: dots 1.4s infinite; }
-
-  @keyframes dots {
-    0%   { content: '.'; }
-    33%  { content: '..'; }
-    66%  { content: '...'; }
-  }
+  @keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
 
   /* ── COMPLETION ── */
   #completion { display: none; }
-
   .completion-header { margin-bottom: 3rem; }
-
-  .completion-header h2 {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 300;
-    line-height: 1.2;
-    margin-bottom: 0.75rem;
-  }
-
+  .completion-header h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 300; line-height: 1.2; margin-bottom: 0.75rem; }
   .completion-header p { font-size: 1rem; color: var(--smoke); font-style: italic; }
 
   /* ── WEB VISUALIZATION ── */
-  #web-canvas {
-    width: 100%;
-    height: 500px;
-    margin: 2rem 0;
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-
+  #web-canvas { width: 100%; height: 500px; margin: 2rem 0; position: relative; background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
   #web-svg { width: 100%; height: 100%; }
-
-  .web-label {
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.14em;
-    color: var(--gold);
-    margin-bottom: 0.75rem;
-  }
+  .web-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; color: var(--gold); margin-bottom: 0.75rem; }
 
   /* ── NODE TOOLTIP ── */
-  #node-tooltip {
-    position: fixed;
-    background: var(--deep);
-    border: 1px solid var(--border);
-    padding: 1rem 1.25rem;
-    max-width: 300px;
-    z-index: 500;
-    display: none;
-    pointer-events: none;
-  }
-
-  #node-tooltip .tt-title {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--gold);
-    letter-spacing: 0.12em;
-    margin-bottom: 0.5rem;
-  }
-
-  #node-tooltip .tt-text {
-    font-size: 0.85rem;
-    color: var(--smoke);
-    line-height: 1.6;
-    font-family: var(--serif);
-    font-weight: 300;
-  }
+  #node-tooltip { position: fixed; background: var(--deep); border: 1px solid var(--border); padding: 1rem 1.25rem; max-width: 300px; z-index: 500; display: none; pointer-events: none; }
+  #node-tooltip .tt-title { font-family: var(--mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.12em; margin-bottom: 0.5rem; }
+  #node-tooltip .tt-text { font-size: 0.85rem; color: var(--smoke); line-height: 1.6; font-family: var(--serif); font-weight: 300; }
 
   /* ── DELIVERY BLOCK ── */
-  .delivery-block {
-    margin-top: 2rem;
-    padding: 2rem;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .delivery-block p {
-    font-size: 0.95rem;
-    color: var(--smoke);
-    line-height: 1.7;
-    margin-bottom: 1.25rem;
-    font-style: italic;
-  }
+  .delivery-block { margin-top: 2rem; padding: 2rem; border: 1px solid var(--border); background: var(--surface); }
+  .delivery-block p { font-size: 0.95rem; color: var(--smoke); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
 
   /* ── PATTERN FLAGS ── */
   .pattern-flags { margin: 2rem 0; }
-
-  .flag-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(201,169,110,0.08);
-  }
-
-  .flag-icon {
-    font-family: var(--mono);
-    font-size: 0.55rem;
-    color: var(--gold);
-    letter-spacing: 0.1em;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--gold-dim);
-    white-space: nowrap;
-    margin-top: 0.1rem;
-  }
-
+  .flag-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(201,169,110,0.08); }
+  .flag-icon { font-family: var(--mono); font-size: 0.55rem; color: var(--gold); letter-spacing: 0.1em; padding: 0.25rem 0.5rem; border: 1px solid var(--gold-dim); white-space: nowrap; margin-top: 0.1rem; }
   .flag-text { font-size: 0.9rem; color: var(--smoke); line-height: 1.6; font-weight: 300; }
+
+  /* ── FRAMEWORK DRAWER ── */
+  .fw-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw; height: 100vh; background: var(--deep); border-left: 1px solid var(--border); z-index: 500; overflow-y: auto; transition: right 0.35s cubic-bezier(0.23, 1, 0.32, 1); padding: 3rem 2rem 4rem; }
+  .fw-drawer.open { right: 0; }
+  .fw-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 499; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+  .fw-overlay.open { opacity: 1; pointer-events: all; }
+  .fw-drawer-close { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; color: var(--ash); background: none; border: none; cursor: pointer; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 0.5rem; padding: 0; transition: color 0.2s; }
+  .fw-drawer-close:hover { color: var(--gold); }
+  .fw-node-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 0.75rem; }
+  .fw-node-title { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 300; color: var(--light); margin-bottom: 1.5rem; line-height: 1.1; }
+  .fw-definition { font-size: 1rem; line-height: 1.85; color: var(--smoke); font-weight: 300; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  .fw-example-label { font-family: var(--mono); font-size: 0.54rem; letter-spacing: 0.16em; color: var(--ash); margin-bottom: 1rem; }
+  .fw-example { font-size: 0.95rem; line-height: 1.85; color: var(--smoke); font-weight: 300; font-style: italic; border-left: 2px solid rgba(201,169,110,0.25); padding-left: 1.25rem; }
+
+  /* ── SETTLING SCREEN ── */
+  #settling { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+  #settling.active { display: flex; }
+  .settling-text { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 300; color: var(--smoke); line-height: 2; letter-spacing: 0.03em; max-width: 480px; opacity: 0; animation: fadeUp 1.2s 0.8s forwards; }
+  .settling-text span { display: block; }
+  .settling-continue { margin-top: 4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--ash); background: none; border: 1px solid rgba(107,107,107,0.2); padding: 0.85rem 2rem; cursor: pointer; transition: all 0.4s; opacity: 0; animation: fadeUp 0.8s 2.5s forwards; }
+  .settling-continue:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* ── STATE CHECK SCREEN ── */
+  #state-check { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+  #state-check.active { display: flex; }
+  .state-check-inner { width: 100%; max-width: 560px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .state-check-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 2rem; text-align: center; }
+  .state-check-q { font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 300; line-height: 1.5; color: var(--light); margin-bottom: 2rem; text-align: center; }
+  .state-check-sub { font-size: 0.9rem; font-style: italic; color: var(--ash); text-align: center; margin-bottom: 2.5rem; line-height: 1.6; }
+  #state-input { width: 100%; min-height: 120px; background: var(--surface); border: 1px solid var(--border); color: var(--light); font-family: var(--serif); font-size: 1rem; font-weight: 300; line-height: 1.7; padding: 1.25rem 1.4rem; resize: none; outline: none; transition: border-color 0.3s; }
+  #state-input:focus { border-color: var(--gold-dim); }
+  #state-input::placeholder { color: var(--ash); font-style: italic; }
+  .btn-state-submit { width: 100%; margin-top: 1rem; background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.16em; padding: 0.9rem 2rem; cursor: pointer; transition: all 0.3s; }
+  .btn-state-submit:hover { background: var(--gold-faint); border-color: var(--gold); }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 640px) {
@@ -610,6 +232,28 @@
 
 <div class="progress-track">
   <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+</div>
+
+<!-- ── SETTLING SCREEN ── -->
+<div id="settling">
+  <div class="settling-text">
+    <span>Before you begin.</span>
+    <span>Settle where you are.</span>
+    <span>Notice what is present.</span>
+    <span>Take whatever time you need.</span>
+  </div>
+  <button class="settling-continue" id="settling-continue">I AM READY</button>
+</div>
+
+<!-- ── STATE CHECK ── -->
+<div id="state-check">
+  <div class="state-check-inner">
+    <div class="state-check-label">[ INITIAL STATE CHECK ]</div>
+    <div class="state-check-q">What is your actual operating condition right now — before this session begins?</div>
+    <div class="state-check-sub">Not what you think about it. Not why.<br>Just what is physically and energetically present.</div>
+    <textarea id="state-input" placeholder="Describe what is actually here right now..." rows="4"></textarea>
+    <button class="btn-state-submit" id="state-submit">LOG STATE — BEGIN</button>
+  </div>
 </div>
 
 <!-- ── INTRO ── -->
@@ -636,7 +280,6 @@
     <label>YOUR EMAIL — THE PATTERN MAP DELIVERS HERE</label>
     <input type="email" id="user-email" placeholder="your@email.com" autocomplete="email">
   </div>
-
   <button class="btn-primary" id="begin-btn">BEGIN THE STUDY</button>
 </div>
 
@@ -655,6 +298,8 @@
       <h2>Your Pattern Map</h2>
       <p>Everything that surfaced — mapped across the full sequence.</p>
     </div>
+
+    <div id="opening-state-display"></div>
 
     <div class="web-label">[ PATTERN WEB — PULL ANY NODE TO SEE WHAT SURFACED THERE ]</div>
     <div id="web-canvas"><svg id="web-svg"></svg></div>
@@ -678,57 +323,52 @@
   <div class="tt-text" id="tt-text"></div>
 </div>
 
+<!-- ── FRAMEWORK DRAWER ── -->
+<div class="fw-overlay" id="fw-overlay"></div>
+<div class="fw-drawer" id="fw-drawer">
+  <button class="fw-drawer-close" id="fw-close"><span>✕</span><span>CLOSE</span></button>
+  <div class="fw-node-label">[ FRAMEWORK LAYER ]</div>
+  <div class="fw-node-title" id="fw-node-title"></div>
+  <div class="fw-definition" id="fw-definition"></div>
+  <div class="fw-example-label">[ EXAMPLE ]</div>
+  <div class="fw-example" id="fw-example"></div>
+</div>
+
 <script>
 // ── COSMOS ──────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('cosmos');
 const ctx = canvas.getContext('2d');
 let W, H, stars = [], shooters = [];
 
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 resize();
 window.addEventListener('resize', resize);
 
 for (let i = 0; i < 180; i++) {
-  stars.push({
-    x: Math.random(), y: Math.random(),
-    r: Math.random() * 0.9 + 0.2,
-    a: Math.random() * 0.5 + 0.1,
-    blink: Math.random() * 4 + 2,
-    gold: Math.random() < 0.08,
-    phase: Math.random() * Math.PI * 2
-  });
+  stars.push({ x: Math.random(), y: Math.random(), r: Math.random()*0.9+0.2, a: Math.random()*0.5+0.1, blink: Math.random()*4+2, gold: Math.random()<0.08, phase: Math.random()*Math.PI*2 });
 }
 
 function spawnShooter() {
-  shooters.push({ x: Math.random() * W * 0.6, y: Math.random() * H * 0.4, vx: 3 + Math.random() * 4, vy: 1.5 + Math.random() * 2, life: 1, decay: 0.012 + Math.random() * 0.01, trail: [], gold: Math.random() < 0.3 });
-  setTimeout(spawnShooter, 3000 + Math.random() * 5000);
+  shooters.push({ x: Math.random()*W*0.6, y: Math.random()*H*0.4, vx: 3+Math.random()*4, vy: 1.5+Math.random()*2, life: 1, decay: 0.012+Math.random()*0.01, trail: [], gold: Math.random()<0.3 });
+  setTimeout(spawnShooter, 3000+Math.random()*5000);
 }
 
 function drawCosmos(t) {
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0,0,W,H);
   stars.forEach(s => {
-    const a = s.a * (0.6 + 0.4 * Math.sin(t * (1 / s.blink) + s.phase));
-    ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = s.gold ? `rgba(201,169,110,${a})` : `rgba(237,232,224,${a * 0.7})`;
-    ctx.fill();
+    const a = s.a*(0.6+0.4*Math.sin(t*(1/s.blink)+s.phase));
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+    ctx.fillStyle = s.gold ? `rgba(201,169,110,${a})` : `rgba(237,232,224,${a*0.7})`; ctx.fill();
   });
   shooters = shooters.filter(s => s.life > 0);
   shooters.forEach(s => {
-    s.trail.push({x: s.x, y: s.y});
-    if (s.trail.length > 20) s.trail.shift();
-    s.x += s.vx; s.y += s.vy; s.life -= s.decay;
-    if (s.trail.length < 2) return;
-    const c = s.gold ? '201,169,110' : '237,232,224';
-    for (let i = 1; i < s.trail.length; i++) {
-      const p = i / s.trail.length;
-      ctx.beginPath(); ctx.moveTo(s.trail[i-1].x, s.trail[i-1].y); ctx.lineTo(s.trail[i].x, s.trail[i].y);
-      ctx.strokeStyle = `rgba(${c},${p * s.life * 0.7})`; ctx.lineWidth = p * 1.5; ctx.stroke();
-    }
+    s.trail.push({x:s.x,y:s.y}); if(s.trail.length>20) s.trail.shift();
+    s.x+=s.vx; s.y+=s.vy; s.life-=s.decay;
+    if(s.trail.length<2) return;
+    const c = s.gold?'201,169,110':'237,232,224';
+    for(let i=1;i<s.trail.length;i++){const p=i/s.trail.length;ctx.beginPath();ctx.moveTo(s.trail[i-1].x,s.trail[i-1].y);ctx.lineTo(s.trail[i].x,s.trail[i].y);ctx.strokeStyle=`rgba(${c},${p*s.life*0.7})`;ctx.lineWidth=p*1.5;ctx.stroke();}
   });
-  requestAnimationFrame(ts => drawCosmos(ts / 1000));
+  requestAnimationFrame(ts => drawCosmos(ts/1000));
 }
 drawCosmos(0);
 setTimeout(spawnShooter, 1000);
@@ -751,11 +391,8 @@ Return ONLY valid JSON. No preamble, no markdown.`;
 // ── SECTIONS DATA ────────────────────────────────────────────────────────────
 const SECTIONS = [
   {
-    num: '01',
-    title: 'The Unstudied System',
-    subtitle: 'What is already running',
-    layer: 'ENTRY LAYER',
-    activeNodes: [],
+    num: '01', title: 'The Unstudied System', subtitle: 'What is already running',
+    layer: 'ENTRY LAYER', activeNodes: [],
     context: 'Before anything can be studied, something has to be noticed. Most of what runs your experience has never been looked at directly. Not because it is hidden — because looking at it directly has never been the instruction. This section begins there.',
     questions: [
       { text: 'What is one thing about how you operate — a pattern, a reaction, a way of moving through situations — that you have noticed but never fully examined?', placeholder: 'Write what actually comes up, not what sounds right.' },
@@ -766,11 +403,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '02',
-    title: 'State',
-    subtitle: 'The ground everything builds on',
-    layer: 'STATE LAYER',
-    activeNodes: ['State'],
+    num: '02', title: 'State', subtitle: 'The ground everything builds on',
+    layer: 'STATE LAYER', activeNodes: ['State'],
     context: 'State is the actual operating condition of your system before any interpretation happens. Not your mood. Not your story about what is happening. The raw condition — body, nervous system, energy — that everything else runs on top of. Most people skip this entirely and go straight to meaning. The sequence does not work that way.',
     questions: [
       { text: 'Describe your current state right now — not what you think about it, not why it is the way it is. Just what is actually present in your body and energy at this moment.', placeholder: 'Physical and energetic reality. Not the reason for it — just what is.' },
@@ -782,11 +416,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '03',
-    title: 'The Sequence',
-    subtitle: 'State to Reality',
-    layer: 'SEQUENCE LAYER',
-    activeNodes: ['State','Perception','Formation','Decision','Experience','Reality'],
+    num: '03', title: 'The Sequence', subtitle: 'State to Reality',
+    layer: 'SEQUENCE LAYER', activeNodes: ['State','Perception','Formation','Decision','Experience','Reality'],
     context: 'State — Perception — Formation — Decision — Experience — Reality. This is the actual sequence through which every experience you have is generated. Not a model. The operating architecture. Each layer runs on top of the one before it. This section walks you through it using a real situation from your own life.',
     questions: [
       { text: 'Think of a situation in your life right now that feels unresolved or stuck. What is your actual State when you think about it — physically, energetically, right now?', placeholder: 'The body-level condition when this situation enters your awareness.' },
@@ -798,11 +429,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '04',
-    title: 'Automatic Living',
-    subtitle: 'The program running without you',
-    layer: 'FORMATION LAYER',
-    activeNodes: ['Formation'],
+    num: '04', title: 'Automatic Living', subtitle: 'The program running without you',
+    layer: 'FORMATION LAYER', activeNodes: ['Formation'],
     context: 'Formation is where patterns begin before they become conscious. Before you decide, before you react — something is already organizing. Familiar loops are attempting to run. Most people only ever experience the output: the decision, the reaction, the feeling. Formation is the layer before that. The place where the pattern initiates.',
     questions: [
       { text: 'Identify one automatic pattern — something you do, feel, or think that happens before you consciously choose it.', placeholder: 'A reaction, a behavior, a way you move toward or away from something.' },
@@ -814,11 +442,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '05',
-    title: 'The Observer',
-    subtitle: 'Seeing without becoming',
-    layer: 'PERCEPTION LAYER',
-    activeNodes: ['Perception'],
+    num: '05', title: 'The Observer', subtitle: 'Seeing without becoming',
+    layer: 'PERCEPTION LAYER', activeNodes: ['Perception'],
     context: 'The Observer is the part of awareness that can watch what is happening without merging with it. Most people are inside their patterns — living them, driven by them, identified with them. The Observer is not a different self. It is the same awareness turned toward itself. The moment you notice you are in a pattern is already the Observer working.',
     questions: [
       { text: 'Describe a recent moment when you caught yourself in a pattern while it was happening — not after, but during. What was happening?', placeholder: 'The situation. The pattern. The moment of recognition while inside it.' },
@@ -830,11 +455,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '06',
-    title: 'Pattern Recognition',
-    subtitle: 'The structure underneath everything',
-    layer: 'PERCEPTION TO FORMATION',
-    activeNodes: ['Perception','Formation'],
+    num: '06', title: 'Pattern Recognition', subtitle: 'The structure underneath everything',
+    layer: 'PERCEPTION TO FORMATION', activeNodes: ['Perception','Formation'],
     context: 'Patterns are not random. They have structure. The same core pattern often runs underneath very different surface situations — relationships, work, money, conflict — wearing different costumes. Recognizing the structure underneath the content is the shift from reacting to observing. The pattern is not the problem. Not seeing it is.',
     questions: [
       { text: 'What is one pattern that has appeared in multiple areas of your life — different circumstances, different people, different contexts — but with a recognizable structure underneath?', placeholder: 'Name the pattern and at least two different areas it appears.' },
@@ -847,11 +469,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '07',
-    title: 'Loop vs Spiral',
-    subtitle: 'Where are you in this right now',
-    layer: 'DECISION LAYER',
-    activeNodes: ['Decision'],
+    num: '07', title: 'Loop vs Spiral', subtitle: 'Where are you in this right now',
+    layer: 'DECISION LAYER', activeNodes: ['Decision'],
     context: 'A loop returns to the same point. A spiral returns to the same position but at a different depth — same territory, different layer of understanding. Most people cannot tell the difference from the inside. The loop feels like movement. The spiral feels like being stuck. The question is not which one is happening — it is whether you can see which one is happening.',
     questions: [
       { text: 'Pick something you have been working on, thinking about, or moving through for a long time. Describe what the territory looks like from where you currently stand.', placeholder: 'The situation as it actually appears right now. Not the history — the present position.' },
@@ -863,11 +482,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '08',
-    title: 'Live Observation',
-    subtitle: 'Watching the system while it runs',
-    layer: 'EXPERIENCE LAYER',
-    activeNodes: ['Experience'],
+    num: '08', title: 'Live Observation', subtitle: 'Watching the system while it runs',
+    layer: 'EXPERIENCE LAYER', activeNodes: ['Experience'],
     context: 'This section does not introduce a new concept. It asks you to apply everything from the previous seven sections to something happening right now. Not a memory. Not a hypothetical. What is actually active in your experience at this moment — and can you watch it as it runs?',
     questions: [
       { text: 'What is most active in your awareness right now — in this moment, doing this work?', placeholder: 'Real-time. What is present right now, not what you think should be.' },
@@ -879,11 +495,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '09',
-    title: 'The Interruption Point',
-    subtitle: 'Where choice actually lives',
-    layer: 'DECISION TO EXPERIENCE',
-    activeNodes: ['Decision','Experience'],
+    num: '09', title: 'The Interruption Point', subtitle: 'Where choice actually lives',
+    layer: 'DECISION TO EXPERIENCE', activeNodes: ['Decision','Experience'],
     context: 'Between the pattern initiating and the behavior executing, there is a gap. Most of the time that gap is invisible — the pattern runs before there is any awareness of it. But the gap exists. The Interruption Point is not about willpower or stopping the pattern. It is about finding the gap — the moment before the automatic becomes complete — and recognizing it as the actual location of choice.',
     questions: [
       { text: 'In one of the patterns you identified in this session — can you locate the Interruption Point? The moment between the trigger and the automatic response where something else is possible?', placeholder: 'Describe that moment as specifically as you can. What is present there?' },
@@ -895,11 +508,8 @@ const SECTIONS = [
     ]
   },
   {
-    num: '10',
-    title: 'Integration',
-    subtitle: 'You are where the work begins',
-    layer: 'REALITY LAYER',
-    activeNodes: ['Reality'],
+    num: '10', title: 'Integration', subtitle: 'You are where the work begins',
+    layer: 'REALITY LAYER', activeNodes: ['Reality'],
     context: 'The sequence completes and begins again. Reality is not the end — it is the feedback that informs the next State. Integration is not a conclusion. It is a recognition: what you have observed across this work is now part of the system that is observing. The map has changed because you looked at it.',
     questions: [
       { text: 'What is the most significant thing that surfaced across this entire session — not the most comfortable, not the most conceptually interesting, but the thing with the most actual weight for how you operate?', placeholder: 'The thing with the most charge. Not the easiest insight — the most significant one.' },
@@ -918,9 +528,9 @@ let currentSection = 0;
 let currentQuestion = 0;
 let sessionData = [];
 let sectionFlags = [];
+let openingState = '';
 
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
-
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 
 // ── BEGIN ────────────────────────────────────────────────────────────────────
@@ -933,6 +543,25 @@ document.getElementById('begin-btn').addEventListener('click', () => {
   }
   userEmail = email;
   document.getElementById('intro').style.display = 'none';
+  document.getElementById('settling').classList.add('active');
+});
+
+// ── SETTLING → STATE CHECK ────────────────────────────────────────────────────
+document.getElementById('settling-continue').addEventListener('click', () => {
+  document.getElementById('settling').classList.remove('active');
+  document.getElementById('state-check').classList.add('active');
+});
+
+// ── STATE CHECK → COURSE ──────────────────────────────────────────────────────
+document.getElementById('state-submit').addEventListener('click', () => {
+  const state = document.getElementById('state-input').value.trim();
+  if (state.length < 5) {
+    document.getElementById('state-input').style.borderColor = 'rgba(201,169,110,0.5)';
+    document.getElementById('state-input').focus();
+    return;
+  }
+  openingState = state;
+  document.getElementById('state-check').classList.remove('active');
   document.getElementById('course').style.display = 'block';
   renderQuestion(0, 0);
 });
@@ -953,10 +582,10 @@ function renderQuestion(sIndex, qIndex) {
 
   const seqHtml = s.activeNodes.length > 0 ? `
     <div class="sequence-display">
-      <div class="seq-label">[ THE SEQUENCE — ACTIVE LAYER HIGHLIGHTED ]</div>
+      <div class="seq-label">[ THE SEQUENCE — TAP A NODE TO EXPLORE ITS LAYER ]</div>
       <div class="seq-nodes">
         ${ALL_NODES.map((n, i) => `
-          <div class="seq-node ${s.activeNodes.includes(n) ? 'active' : ''}">${n}</div>
+          <div class="seq-node ${s.activeNodes.includes(n) ? 'active' : ''}" data-node="${n}">${n}</div>
           ${i < ALL_NODES.length - 1 ? '<div class="seq-arrow">→</div>' : ''}
         `).join('')}
       </div>
@@ -1091,17 +720,7 @@ function advance(sIndex, qIndex) {
 function recordAnswer(sIndex, qIndex, answer, reflection, movedThrough) {
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
-  sessionData[sIndex][qIndex] = {
-    section: s.title,
-    num: s.num,
-    layer: s.layer,
-    questionNum: qIndex + 1,
-    question: q.text,
-    answer,
-    reflection,
-    movedThrough,
-    timestamp: new Date().toISOString()
-  };
+  sessionData[sIndex][qIndex] = { section: s.title, num: s.num, layer: s.layer, questionNum: qIndex + 1, question: q.text, answer, reflection, movedThrough, timestamp: new Date().toISOString() };
 }
 
 // ── CALL CLAUDE ──────────────────────────────────────────────────────────────
@@ -1130,6 +749,15 @@ async function showCompletion() {
   document.getElementById('completion').style.display = 'block';
   document.getElementById('delivery-email').textContent = userEmail;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (openingState) {
+    document.getElementById('opening-state-display').innerHTML = `
+      <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border-left:2px solid rgba(201,169,110,0.4);background:rgba(201,169,110,0.03);">
+        <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:0.75rem;">[ OPENING STATE — WHAT YOU BROUGHT IN ]</div>
+        <div style="font-size:1rem;font-style:italic;color:var(--smoke);line-height:1.75;">${openingState}</div>
+      </div>`;
+  }
+
   renderWeb();
   renderFlags();
   try { await sendPatternMap(); } catch(e) { console.log('Email error:', e); }
@@ -1139,78 +767,53 @@ async function showCompletion() {
 function renderWeb() {
   const svg = document.getElementById('web-svg');
   const container = document.getElementById('web-canvas');
-  const W = container.offsetWidth;
-  const H = container.offsetHeight;
+  const W = container.offsetWidth, H = container.offsetHeight;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-
-  const cx = W / 2, cy = H / 2;
+  const cx = W/2, cy = H/2;
   const nodes = SECTIONS.map((s, i) => {
-    const angle = (i / 10) * Math.PI * 2 - Math.PI / 2;
-    const r = Math.min(W, H) * 0.35;
-    const jitter = (i % 2 === 0) ? r : r * 0.72;
+    const angle = (i/10)*Math.PI*2 - Math.PI/2;
+    const r = Math.min(W,H)*0.35;
+    const jitter = (i%2===0) ? r : r*0.72;
     const flagCount = sectionFlags.filter(f => f.num === s.num).length;
-    return { x: cx + Math.cos(angle) * jitter, y: cy + Math.sin(angle) * jitter, section: s, flagCount, index: i };
+    return { x: cx+Math.cos(angle)*jitter, y: cy+Math.sin(angle)*jitter, section: s, flagCount, index: i };
   });
 
   nodes.forEach((a, i) => {
     nodes.forEach((b, j) => {
-      if (j <= i) return;
-      const dist = Math.hypot(a.x - b.x, a.y - b.y);
-      if (dist < Math.min(W, H) * 0.45) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
-        line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
-        const op = (a.flagCount > 0 || b.flagCount > 0) ? 0.06 : 0.18;
-        line.setAttribute('stroke', `rgba(201,169,110,${op})`);
-        line.setAttribute('stroke-width', '0.5');
+      if (j<=i) return;
+      const dist = Math.hypot(a.x-b.x, a.y-b.y);
+      if (dist < Math.min(W,H)*0.45) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',a.x); line.setAttribute('y1',a.y); line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+        const op = (a.flagCount>0||b.flagCount>0) ? 0.06 : 0.18;
+        line.setAttribute('stroke',`rgba(201,169,110,${op})`); line.setAttribute('stroke-width','0.5');
         svg.appendChild(line);
       }
     });
   });
 
   nodes.forEach(n => {
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.style.cursor = 'pointer';
-    const r = n.flagCount > 0 ? 5 : 8;
-    const fillOp = n.flagCount > 0 ? 0.12 : 0.55;
-
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', n.x); circle.setAttribute('cy', n.y); circle.setAttribute('r', r);
-    circle.setAttribute('fill', `rgba(201,169,110,${fillOp})`);
-    circle.setAttribute('stroke', 'rgba(201,169,110,0.7)'); circle.setAttribute('stroke-width', '1');
-
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', n.x); label.setAttribute('y', n.y - 14);
-    label.setAttribute('text-anchor', 'middle'); label.setAttribute('fill', 'rgba(201,169,110,0.7)');
-    label.setAttribute('font-family', 'Share Tech Mono, monospace'); label.setAttribute('font-size', '9');
-    label.textContent = n.section.num;
-
-    const name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    name.setAttribute('x', n.x); name.setAttribute('y', n.y + 20);
-    name.setAttribute('text-anchor', 'middle'); name.setAttribute('fill', 'rgba(180,170,155,0.45)');
-    name.setAttribute('font-family', 'Cormorant Garamond, serif'); name.setAttribute('font-size', '9');
-    name.textContent = n.section.title;
-
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.style.cursor='pointer';
+    const r = n.flagCount>0 ? 5 : 8, fillOp = n.flagCount>0 ? 0.12 : 0.55;
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',n.x); circle.setAttribute('cy',n.y); circle.setAttribute('r',r);
+    circle.setAttribute('fill',`rgba(201,169,110,${fillOp})`); circle.setAttribute('stroke','rgba(201,169,110,0.7)'); circle.setAttribute('stroke-width','1');
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',n.x); lbl.setAttribute('y',n.y-14); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('fill','rgba(201,169,110,0.7)'); lbl.setAttribute('font-family','Share Tech Mono, monospace'); lbl.setAttribute('font-size','9'); lbl.textContent=n.section.num;
+    const name = document.createElementNS('http://www.w3.org/2000/svg','text');
+    name.setAttribute('x',n.x); name.setAttribute('y',n.y+20); name.setAttribute('text-anchor','middle'); name.setAttribute('fill','rgba(180,170,155,0.45)'); name.setAttribute('font-family','Cormorant Garamond, serif'); name.setAttribute('font-size','9'); name.textContent=n.section.title;
     const tooltip = document.getElementById('node-tooltip');
     g.addEventListener('mouseenter', e => {
-      tooltip.style.display = 'block';
-      document.getElementById('tt-title').textContent = `${n.section.num} — ${n.section.title}`;
+      tooltip.style.display='block';
+      document.getElementById('tt-title').textContent=`${n.section.num} — ${n.section.title}`;
       const answers = sessionData[n.index].filter(Boolean);
-      const preview = answers.length > 0
-        ? answers[0].answer.substring(0, 160) + (answers[0].answer.length > 160 ? '...' : '')
-        : 'No answers recorded.';
-      document.getElementById('tt-text').textContent = preview;
-      tooltip.style.left = (e.clientX + 16) + 'px';
-      tooltip.style.top = (e.clientY - 20) + 'px';
+      const preview = answers.length>0 ? answers[0].answer.substring(0,160)+(answers[0].answer.length>160?'...':'') : 'No answers recorded.';
+      document.getElementById('tt-text').textContent=preview;
+      tooltip.style.left=(e.clientX+16)+'px'; tooltip.style.top=(e.clientY-20)+'px';
     });
-    g.addEventListener('mousemove', e => {
-      tooltip.style.left = (e.clientX + 16) + 'px';
-      tooltip.style.top = (e.clientY - 20) + 'px';
-    });
-    g.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
-
-    g.appendChild(circle); g.appendChild(label); g.appendChild(name);
-    svg.appendChild(g);
+    g.addEventListener('mousemove', e => { tooltip.style.left=(e.clientX+16)+'px'; tooltip.style.top=(e.clientY-20)+'px'; });
+    g.addEventListener('mouseleave', () => { tooltip.style.display='none'; });
+    g.appendChild(circle); g.appendChild(lbl); g.appendChild(name); svg.appendChild(g);
   });
 }
 
@@ -1233,12 +836,7 @@ async function sendPatternMap() {
   await fetch(`${BACKEND}/api/send-pattern-map`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      to: userEmail,
-      from: 'info@bhaveslab.com',
-      subject: 'Your Pattern Map — Study Yourself Session Complete',
-      html: buildEmailBody()
-    })
+    body: JSON.stringify({ to: userEmail, from: 'info@bhaveslab.com', subject: 'Your Pattern Map — Study Yourself Session Complete', html: buildEmailBody() })
   });
 }
 
@@ -1246,6 +844,7 @@ async function sendPatternMap() {
 function buildEmailBody() {
   const totalAnswers = sessionData.flat().filter(Boolean).length;
   const flagCount = sectionFlags.length;
+  const stateBlock = openingState ? `<div style="margin-bottom:32px;padding:20px;background:#0a0a0a;border-left:2px solid rgba(201,169,110,0.4);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">OPENING STATE</p><p style="font-size:15px;color:#e8e4dc;line-height:1.8;font-style:italic;">${openingState}</p></div>` : '';
 
   const sectionBlocks = SECTIONS.map((s, si) => {
     const answers = sessionData[si].filter(Boolean);
@@ -1258,35 +857,66 @@ function buildEmailBody() {
         ${d.reflection ? `<p style="font-size:13px;color:#9a9a9a;line-height:1.7;padding-left:14px;border-left:2px solid rgba(201,169,110,0.25);">${d.reflection}</p>` : ''}
         ${d.movedThrough ? `<p style="font-family:monospace;font-size:9px;color:#C9A96E;letter-spacing:1px;margin-top:6px;">[ SURFACE — ADVANCED THROUGH ]</p>` : ''}
       </div>`).join('');
-
-    return `
-      <div style="margin-bottom:36px;padding-bottom:36px;border-bottom:2px solid rgba(201,169,110,0.12);">
-        <p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:16px;">${s.num} — ${s.title.toUpperCase()} / ${s.layer}</p>
-        ${qBlocks}
-      </div>`;
+    return `<div style="margin-bottom:36px;padding-bottom:36px;border-bottom:2px solid rgba(201,169,110,0.12);"><p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:16px;">${s.num} — ${s.title.toUpperCase()} / ${s.layer}</p>${qBlocks}</div>`;
   }).join('');
 
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
-    <body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;">
-      <p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p>
-      <h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1>
-      <p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p>
-      <div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);">
-        <p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p>
-        <p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' surface flags logged.' : 'Full engagement — no surface flags.'}</p>
-      </div>
-      <div style="margin-bottom:40px;">
-        <p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>
-        ${sectionBlocks}
-      </div>
-      <div style="padding:24px;border:1px solid rgba(201,169,110,0.2);">
-        <p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p>
-        <a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a>
-      </div>
-      <p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p>
-    </body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' surface flags logged.' : 'Full engagement — no surface flags.'}</p></div>${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
 }
-</script>
 
+// ── FRAMEWORK DRAWER ─────────────────────────────────────────────────────────
+const FRAMEWORK = {
+  State: {
+    definition: 'The actual condition your system is operating in before you have interpreted anything. Not how you feel about something — what is actually running underneath. Body, nervous system, energy level — before meaning gets applied. Most people skip State entirely and go straight to the story. The story runs on top of whatever State is actually present.',
+    example: 'You wake up at 3am after bad sleep. Your phone shows a message from someone you have tension with. Before you have read a single word — your system is already in a specific State. Tight. Guarded. Slightly elevated. That State is going to read that message before your conscious mind does. Whatever the message actually says is almost irrelevant — your State is already deciding what it means.'
+  },
+  Perception: {
+    definition: 'How your current State is reading what is in front of you. Not what is actually happening — what your system is registering as happening. Two people in different States will perceive the same situation as two different realities. Perception is the filter. Most people experience it as fact.',
+    example: 'You are in a meeting, presenting an idea you are uncertain about. Someone shifts in their chair and looks at their phone. From inside a low-confidence State, you perceive that as disinterest. Someone in a grounded State perceives the same movement as irrelevant. Same room, same gesture. Two completely different realities — both generated by the perceiver, not the situation.'
+  },
+  Formation: {
+    definition: 'Where meaning begins to organize before it becomes a conscious thought. Patterns initiate here. Familiar interpretations take shape. The mind begins moving toward a conclusion before you have decided to. Most people only become aware of Formation after it has already run — when the thought or reaction is already there.',
+    example: 'You send an important email and do not hear back for two days. Before you have consciously decided what it means — something is already forming. A familiar story is organizing: they are ignoring you, you said something wrong. You did not choose that interpretation. It arrived. That is Formation — where meaning assembles itself before you get to weigh in.'
+  },
+  Decision: {
+    definition: 'What gets chosen from inside the position your State, Perception, and Formation have already created. Most decisions feel like free choices — they are actually the only choices visible from where you currently stand. A different State produces different decisions from the same situation.',
+    example: 'After two days of silence, you have formed the story that something is wrong. From that position, your available decisions are: send a slightly defensive follow-up, say nothing and stew, or surface the tension. A different State — one that did not form that story — would see completely different options. The decision did not change. The position it was made from did.'
+  },
+  Experience: {
+    definition: 'The output your decision generates in contact with reality. What actually happens — not what you planned or expected. Where the system produces its result. Also where most people begin their analysis — working backward from what happened rather than forward from what was running underneath.',
+    example: 'You send the slightly defensive follow-up. The person responds warmly — they had just been traveling and had not checked email. The Experience does not match the story Formation built. Most people file this as it worked out and move on. They do not go back to examine what State they were in, what formed. The Experience is data. Most people do not read it that way.'
+  },
+  Reality: {
+    definition: 'The feedback that Experience produces — which immediately becomes the input for the next State. Reality is not the end of the sequence. It is the beginning of the next cycle. What you take from an experience shapes the State you enter the next one with.',
+    example: 'That interaction leaves something behind. A slight residue of reacting again. That residue becomes part of your State the next time you send an important message and do not hear back. Reality does not just happen to you. It writes back into the system. The question is whether you are reading what it is writing — or just living the next cycle of the same sequence.'
+  }
+};
+
+const fwDrawer  = document.getElementById('fw-drawer');
+const fwOverlay = document.getElementById('fw-overlay');
+
+function openFwDrawer(node) {
+  const data = FRAMEWORK[node];
+  if (!data) return;
+  document.getElementById('fw-node-title').textContent  = node;
+  document.getElementById('fw-definition').textContent  = data.definition;
+  document.getElementById('fw-example').textContent     = data.example;
+  fwDrawer.classList.add('open');
+  fwOverlay.classList.add('open');
+}
+
+function closeFwDrawer() {
+  fwDrawer.classList.remove('open');
+  fwOverlay.classList.remove('open');
+}
+
+document.getElementById('fw-close').addEventListener('click', closeFwDrawer);
+fwOverlay.addEventListener('click', closeFwDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFwDrawer(); });
+
+document.addEventListener('click', e => {
+  const node = e.target.closest('.seq-node[data-node]');
+  if (node) openFwDrawer(node.dataset.node);
+});
+</script>
 </body>
 </html>

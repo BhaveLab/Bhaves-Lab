@@ -630,6 +630,23 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
   margin-top: 1.25rem;
 }
 
+/* ── FRAMEWORK DRAWER ── */
+.fw-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw; height: 100vh; background: var(--deep); border-left: 1px solid var(--border); z-index: 500; overflow-y: auto; transition: right 0.35s cubic-bezier(0.23, 1, 0.32, 1); padding: 3rem 2rem 4rem; }
+.fw-drawer.open { right: 0; }
+.fw-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 499; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+.fw-overlay.open { opacity: 1; pointer-events: all; }
+.fw-drawer-close { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; color: var(--ash); background: none; border: none; cursor: pointer; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 0.5rem; padding: 0; transition: color 0.2s; }
+.fw-drawer-close:hover { color: var(--gold); }
+.fw-node-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 0.75rem; }
+.fw-node-title { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 300; color: var(--light); margin-bottom: 1.5rem; line-height: 1.1; }
+.fw-definition { font-size: 1rem; line-height: 1.85; color: var(--smoke); font-weight: 300; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.fw-example-label { font-family: var(--mono); font-size: 0.54rem; letter-spacing: 0.16em; color: var(--ash); margin-bottom: 1rem; }
+.fw-example { font-size: 0.95rem; line-height: 1.85; color: var(--smoke); font-weight: 300; font-style: italic; border-left: 2px solid rgba(201,169,110,0.25); padding-left: 1.25rem; }
+
+.seq-node { cursor: pointer; }
+.seq-node:hover { border-color: var(--gold-dim); color: var(--gold); }
+.seq-node-hint { font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.12em; color: var(--ash); margin-top: 1rem; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
   nav { padding: 1rem 1.25rem; }
@@ -707,19 +724,20 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
   <section class="framework-block">
     <div class="section-label">[ THE OPERATING FRAMEWORK ]</div>
     <div class="framework-sequence">
-      <div class="seq-node active">State</div>
+      <div class="seq-node active" data-node="State">State</div>
       <div class="seq-arrow">→</div>
-      <div class="seq-node">Perception</div>
+      <div class="seq-node" data-node="Perception">Perception</div>
       <div class="seq-arrow">→</div>
-      <div class="seq-node">Formation</div>
+      <div class="seq-node" data-node="Formation">Formation</div>
       <div class="seq-arrow">→</div>
-      <div class="seq-node">Decision</div>
+      <div class="seq-node" data-node="Decision">Decision</div>
       <div class="seq-arrow">→</div>
-      <div class="seq-node">Experience</div>
+      <div class="seq-node" data-node="Experience">Experience</div>
       <div class="seq-arrow">→</div>
-      <div class="seq-node">Reality</div>
+      <div class="seq-node" data-node="Reality">Reality</div>
     </div>
-    <p class="framework-desc">This is the sequence through which every experience you have is generated. The ten sections move through it — not as theory to understand, but as territory to walk through using your own life as the material. By the end, you've encountered each layer directly.</p>
+    <div class="seq-node-hint">[ TAP ANY NODE TO SEE WHAT IT MEANS ]</div>
+    <p class="framework-desc" style="margin-top:1.5rem;">This is the sequence through which every experience you have is generated. The ten sections move through it — not as theory to understand, but as territory to walk through using your own life as the material. By the end, you've encountered each layer directly.</p>
   </section>
 
   <!-- ── THE 10 SECTIONS ── -->
@@ -872,6 +890,17 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
 
 </div>
 
+<!-- ── FRAMEWORK DRAWER ── -->
+<div class="fw-overlay" id="fw-overlay"></div>
+<div class="fw-drawer" id="fw-drawer">
+  <button class="fw-drawer-close" id="fw-close"><span>✕</span><span>CLOSE</span></button>
+  <div class="fw-node-label">[ FRAMEWORK LAYER ]</div>
+  <div class="fw-node-title" id="fw-node-title"></div>
+  <div class="fw-definition" id="fw-definition"></div>
+  <div class="fw-example-label">[ EXAMPLE ]</div>
+  <div class="fw-example" id="fw-example"></div>
+</div>
+
 <script>
 // ── COSMOS ──────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('cosmos');
@@ -908,6 +937,61 @@ function draw(t) {
   requestAnimationFrame(ts => draw(ts / 1000));
 }
 draw(0);
+
+// ── FRAMEWORK DRAWER ─────────────────────────────────────────────────────────
+const FRAMEWORK = {
+  State: {
+    definition: 'The actual condition your system is operating in before you have interpreted anything. Not how you feel about something — what is actually running underneath. Body, nervous system, energy level — before meaning gets applied. Most people skip State entirely and go straight to the story. The story runs on top of whatever State is actually present.',
+    example: 'You wake up at 3am after bad sleep. Your phone shows a message from someone you have tension with. Before you have read a single word — your system is already in a specific State. Tight. Guarded. Slightly elevated. That State is going to read that message before your conscious mind does. Whatever the message actually says is almost irrelevant — your State is already deciding what it means.'
+  },
+  Perception: {
+    definition: 'How your current State is reading what is in front of you. Not what is actually happening — what your system is registering as happening. Two people in different States will perceive the same situation as two different realities. Perception is the filter. Most people experience it as fact.',
+    example: 'You are in a meeting, presenting an idea you are uncertain about. Someone shifts in their chair and looks at their phone. From inside a low-confidence State, you perceive that as disinterest. Someone in a grounded State perceives the same movement as irrelevant. Same room, same gesture. Two completely different realities — both generated by the perceiver, not the situation.'
+  },
+  Formation: {
+    definition: 'Where meaning begins to organize before it becomes a conscious thought. Patterns initiate here. Familiar interpretations take shape. The mind begins moving toward a conclusion before you have decided to. Most people only become aware of Formation after it has already run — when the thought or reaction is already there.',
+    example: 'You send an important email and do not hear back for two days. Before you have consciously decided what it means — something is already forming. A familiar story is organizing: they are ignoring you, you said something wrong. You did not choose that interpretation. It arrived. That is Formation — where meaning assembles itself before you get to weigh in.'
+  },
+  Decision: {
+    definition: 'What gets chosen from inside the position your State, Perception, and Formation have already created. Most decisions feel like free choices — they are actually the only choices visible from where you currently stand. A different State produces different decisions from the same situation.',
+    example: 'After two days of silence, you have formed the story that something is wrong. From that position, your available decisions are: send a slightly defensive follow-up, say nothing and stew, or surface the tension. A different State — one that did not form that story — would see completely different options. The decision did not change. The position it was made from did.'
+  },
+  Experience: {
+    definition: 'The output your decision generates in contact with reality. What actually happens — not what you planned or expected. Where the system produces its result. Also where most people begin their analysis — working backward from what happened rather than forward from what was running underneath.',
+    example: 'You send the slightly defensive follow-up. The person responds warmly — they had just been traveling and had not checked email. The Experience does not match the story Formation built. Most people file this as it worked out and move on. They do not go back to examine what State they were in, what formed. The Experience is data. Most people do not read it that way.'
+  },
+  Reality: {
+    definition: 'The feedback that Experience produces — which immediately becomes the input for the next State. Reality is not the end of the sequence. It is the beginning of the next cycle. What you take from an experience shapes the State you enter the next one with.',
+    example: 'That interaction leaves something behind. A slight residue of reacting again. That residue becomes part of your State the next time you send an important message and do not hear back. Reality does not just happen to you. It writes back into the system. The question is whether you are reading what it is writing — or just living the next cycle of the same sequence.'
+  }
+};
+
+const fwDrawer  = document.getElementById('fw-drawer');
+const fwOverlay = document.getElementById('fw-overlay');
+
+function openFwDrawer(node) {
+  const data = FRAMEWORK[node];
+  if (!data) return;
+  document.getElementById('fw-node-title').textContent = node;
+  document.getElementById('fw-definition').textContent = data.definition;
+  document.getElementById('fw-example').textContent    = data.example;
+  fwDrawer.classList.add('open');
+  fwOverlay.classList.add('open');
+}
+
+function closeFwDrawer() {
+  fwDrawer.classList.remove('open');
+  fwOverlay.classList.remove('open');
+}
+
+document.getElementById('fw-close').addEventListener('click', closeFwDrawer);
+fwOverlay.addEventListener('click', closeFwDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFwDrawer(); });
+
+document.addEventListener('click', e => {
+  const node = e.target.closest('.seq-node[data-node]');
+  if (node) openFwDrawer(node.dataset.node);
+});
 </script>
 
 </body>
