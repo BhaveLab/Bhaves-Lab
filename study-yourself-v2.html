@@ -657,6 +657,8 @@ function renderQuestion(sIndex, qIndex) {
     try {
       const sysPrompt = `${BASE_PROMPT}\n\nSection: ${s.num} — ${s.title} (${s.layer})\nQuestion: ${q.text}`;
       const result = await callClaude(sysPrompt, answer);
+      console.log('[REFLECT] raw result:', JSON.stringify(result));
+      console.log('[REFLECT] surface:', result.surface, '| reflection:', result.reflection);
       loading.style.display = 'none';
 
       if (result.surface) {
@@ -680,8 +682,12 @@ function renderQuestion(sIndex, qIndex) {
         });
 
       } else {
-        document.getElementById('claude-text').textContent = result.reflection;
-        claudePanel.style.display = 'block';
+        console.log('[REFLECT] honest path — showing claude-panel');
+        const claudeTextEl = document.getElementById('claude-text');
+        const claudePanelEl = document.getElementById('claude-panel');
+        console.log('[REFLECT] claude-text el:', claudeTextEl, '| claude-panel el:', claudePanelEl);
+        if (claudeTextEl) claudeTextEl.textContent = result.reflection || '—';
+        if (claudePanelEl) claudePanelEl.style.display = 'block';
         recordAnswer(sIndex, qIndex, answer, result.reflection, false);
         advanceBlock.style.display = 'block';
         document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
@@ -731,8 +737,11 @@ async function callClaude(systemPrompt, answer) {
   });
   if (!response.ok) throw new Error('Backend error');
   const data = await response.json();
+  console.log('[callClaude] raw data:', JSON.stringify(data));
   let text = data.content?.[0]?.text || data.text || '';
+  console.log('[callClaude] extracted text:', text);
   text = text.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+  console.log('[callClaude] cleaned text:', text);
   return JSON.parse(text);
 }
 
