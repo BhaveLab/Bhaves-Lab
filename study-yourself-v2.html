@@ -252,20 +252,6 @@
 
   .section-subtitle { font-size: 1rem; font-style: italic; color: var(--ash); }
 
-  .layer-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-    color: var(--ash);
-    border: 1px solid rgba(201,169,110,0.12);
-    padding: 0.35rem 0.75rem;
-    margin-bottom: 2rem;
-  }
-
-  .layer-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
 
   .context-block {
     background: var(--surface);
@@ -537,11 +523,46 @@
 
   .flag-text { font-size: 0.9rem; color: var(--smoke); line-height: 1.6; font-weight: 300; }
 
+  /* ── SEQUENCE DISPLAY ── */
+  .seq-display {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 2rem;
+    row-gap: 0.4rem;
+  }
+
+  .seq-node {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: var(--ash);
+    padding: 0.3rem 0.65rem;
+    border: 1px solid rgba(201,169,110,0.08);
+    background: transparent;
+    transition: all 0.3s;
+  }
+
+  .seq-node.active {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgba(201,169,110,0.06);
+  }
+
+  .seq-sep {
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    color: rgba(90,90,90,0.4);
+    padding: 0 0.3rem;
+  }
+
   @media (max-width: 640px) {
     nav { padding: 1rem 1.25rem; }
     .wrapper, #intro { padding-left: 1.25rem; padding-right: 1.25rem; }
     .section-sub { display: none; }
     #web-canvas { height: 380px; }
+    .seq-node { font-size: 0.5rem; padding: 0.25rem 0.5rem; }
   }
 </style>
 </head>
@@ -668,7 +689,7 @@ setTimeout(spawnShooter, 1000);
 const SECTIONS = [
   {
     num:'01', title:'The Unstudied System', subtitle:'What is already running',
-    layer:'ENTRY LAYER', framework:'Before the Sequence',
+    layer:'ENTRY LAYER', framework:'Before the Sequence', seqActive:[],
     context:'Before anything can be studied, something has to be noticed. Most of what runs your experience has never been looked at directly. Not because it\'s hidden — because looking at it directly has never been the instruction. This section begins there.',
     question:'What is one thing about how you operate — a pattern, a reaction, a way of moving through situations — that you\'ve noticed but never fully examined?',
     placeholder:'Take your time. Write what actually comes up, not what sounds right.',
@@ -686,7 +707,7 @@ Return ONLY valid JSON. No other text.`
   },
   {
     num:'02', title:'State', subtitle:'The ground everything builds on',
-    layer:'STATE LAYER', framework:'State → ...',
+    layer:'STATE LAYER', framework:'State → ...', seqActive:['State'],
     context:'State is the actual operating condition of your system before any interpretation happens. Not your mood. Not your story about what\'s happening. The raw condition — body, nervous system, energy — that everything else runs on top of. Most people skip this entirely and go straight to meaning. The sequence doesn\'t work that way.',
     question:'Describe your current state right now — not what you think about it, not why it is the way it is. Just what is actually present in your body and energy at this moment.',
     placeholder:'What is physically and energetically present right now. Not the reason for it — just what is.',
@@ -704,7 +725,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'03', title:'The Sequence', subtitle:'State to Reality',
-    layer:'SEQUENCE LAYER', framework:'State → Perception → Formation → Decision → Experience → Reality',
+    layer:'SEQUENCE LAYER', framework:'State → Perception → Formation → Decision → Experience → Reality', seqActive:['State','Perception','Formation','Decision','Experience','Reality'],
     context:'State → Perception → Formation → Decision → Experience → Reality. This is not a model to understand. It is the actual sequence through which every experience you have is generated. Right now, in your current state, your perception is already filtered. What you notice, what you miss, what feels significant — all of it is running through that filter before you\'re aware of it.',
     question:'Think of a situation in your life right now that feels unresolved or stuck. Walk it through the sequence: What is your actual State around it? What are you Perceiving? What meaning are you forming? What decisions are available from that position?',
     placeholder:'Move through it step by step. State first — then what you\'re perceiving — then what\'s forming — then what decisions look possible from there.',
@@ -722,7 +743,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'04', title:'Automatic Living', subtitle:'The program running without you',
-    layer:'FORMATION LAYER', framework:'... → Formation → ...',
+    layer:'FORMATION LAYER', framework:'... → Formation → ...', seqActive:['Formation'],
     context:'Formation is where patterns begin before they become conscious. Before you decide, before you react — something is already organizing. Familiar loops are attempting to run. Most people only ever experience the output: the decision, the reaction, the feeling. Formation is the layer before that. The place where the pattern initiates.',
     question:'Identify one automatic pattern in your life — something you do, feel, or think that happens before you consciously choose it. When did you first notice it was automatic rather than chosen?',
     placeholder:'A reaction, a behavior, a way you move toward or away from something. When did you realize it was running on its own?',
@@ -740,7 +761,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'05', title:'The Observer', subtitle:'Seeing without becoming',
-    layer:'PERCEPTION LAYER', framework:'... → Perception → ...',
+    layer:'PERCEPTION LAYER', framework:'... → Perception → ...', seqActive:['Perception'],
     context:'The Observer is the part of awareness that can watch what is happening without merging with it. Most people are inside their patterns — living them, driven by them, identified with them. The Observer is not a different self. It is the same awareness turned toward itself. The moment you notice you\'re in a pattern is already the Observer working.',
     question:'Describe a recent moment when you caught yourself in a pattern while it was happening — not after, not in reflection, but in the middle of it. What did it feel like to observe it from inside?',
     placeholder:'A moment of real-time recognition. What was happening, and what was it like to see it while it was running?',
@@ -758,7 +779,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'06', title:'Pattern Recognition', subtitle:'The structure underneath everything',
-    layer:'PERCEPTION → FORMATION', framework:'... → Perception → Formation → ...',
+    layer:'PERCEPTION → FORMATION', framework:'... → Perception → Formation → ...', seqActive:['Perception','Formation'],
     context:'Patterns are not random. They have structure. The same core pattern often runs underneath very different surface situations — relationships, work, money, conflict — wearing different costumes. Recognizing the structure underneath the content is the shift from reacting to observing. The pattern is not the problem. Not seeing it is.',
     question:'What is one pattern that has appeared in multiple areas of your life — under different circumstances, with different people, in different contexts — but with a recognizable structure underneath? Describe the structure, not the stories.',
     placeholder:'Not the individual situations — the underlying shape. What is the same in all of them?',
@@ -776,7 +797,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'07', title:'Loop vs Spiral', subtitle:'Where are you in this right now',
-    layer:'DECISION LAYER', framework:'... → Decision → ...',
+    layer:'DECISION LAYER', framework:'... → Decision → ...', seqActive:['Decision'],
     context:'A loop returns to the same point. A spiral returns to the same position but at a different depth — same territory, different layer of understanding. Most people can\'t tell the difference from the inside. The loop feels like movement. The spiral feels like being stuck. The question is not which one is happening — it\'s whether you can see which one is happening.',
     question:'Pick something you\'ve been working on, thinking about, or moving through for a long time. Is it a loop or a spiral? What evidence do you have either way — and what would it take to know for certain?',
     placeholder:'Not what you want it to be. What does the evidence actually show?',
@@ -794,7 +815,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'08', title:'Live Observation', subtitle:'Watching the system while it runs',
-    layer:'EXPERIENCE LAYER', framework:'... → Experience → ...',
+    layer:'EXPERIENCE LAYER', framework:'... → Experience → ...', seqActive:['Experience'],
     context:'This section does not introduce a new concept. It asks you to apply everything from the previous seven sections to something happening right now. Not a memory. Not a hypothetical. What is actually active in your experience at this moment — and can you watch it as it runs?',
     question:'What is most active in your awareness right now — in this moment, doing this work? Name what you\'re noticing, what\'s coming up, and where in the sequence (State, Perception, Formation, Decision) you can feel it most clearly.',
     placeholder:'Real-time observation. What is present right now, and where in the sequence is it most alive?',
@@ -814,7 +835,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'09', title:'The Interruption Point', subtitle:'Where choice actually lives',
-    layer:'DECISION → EXPERIENCE', framework:'... → Decision → Experience → ...',
+    layer:'DECISION → EXPERIENCE', framework:'... → Decision → Experience → ...', seqActive:['Decision','Experience'],
     context:'Between the pattern initiating and the behavior executing, there is a gap. Most of the time that gap is invisible — the pattern runs before there\'s any awareness of it. But the gap exists. The Interruption Point is not about willpower or stopping the pattern. It is about finding the gap — the moment before the automatic becomes complete — and recognizing it as the actual location of choice.',
     question:'In one of your identified patterns, can you locate the Interruption Point — the specific moment between the trigger and the automatic response where something else is possible? Describe that moment as precisely as you can.',
     placeholder:'The gap between trigger and response. What does it feel like, how long does it last, what is available there?',
@@ -832,7 +853,7 @@ Return ONLY valid JSON.`
   },
   {
     num:'10', title:'Integration', subtitle:'You are where the work begins',
-    layer:'REALITY LAYER', framework:'... → Reality → State',
+    layer:'REALITY LAYER', framework:'... → Reality → State', seqActive:['Reality'],
     context:'The sequence completes and begins again. Reality is not the end — it is the feedback that informs the next State. Integration is not a conclusion. It is a recognition: what you\'ve observed across this work is now part of the system that is observing. The map has changed because you looked at it.',
     question:'What is the most significant thing that surfaced for you across this entire session — not the most comfortable thing, not the most conceptually interesting thing, but the thing that has the most actual weight for how you operate?',
     placeholder:'The thing with the most weight. Not the insight you\'re most comfortable with — the one that matters most.',
@@ -883,10 +904,17 @@ function renderSection(index) {
       <h2 class="section-title">${s.title}</h2>
       <div class="section-subtitle">${s.subtitle}</div>
     </div>
-    <div class="layer-indicator">
-      <div class="layer-dot"></div>
-      ${s.layer} — ${s.framework}
-    </div>
+    ${(()=>{
+      const nodes=['State','Perception','Formation','Decision','Experience','Reality'];
+      const active=s.seqActive||[];
+      return '<div class="seq-display">' +
+        nodes.map((n,i)=>{
+          const cls=active.includes(n)?'seq-node active':'seq-node';
+          const sep=i<nodes.length-1?'<span class="seq-sep">→</span>':'';
+          return `<span class="${cls}">${n}</span>${sep}`;
+        }).join('') +
+        '</div>';
+    })()}
     <div class="context-block">${s.context}</div>
     <div class="question-block">
       <div class="question-label">[ THE QUESTION ]</div>
