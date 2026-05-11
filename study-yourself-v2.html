@@ -1,665 +1,1125 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Yourself - Bhave's Lab</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { background: #0a0a0a; }
-    body {
-      background: #0a0a0a;
-      color: #e8e0d4;
-      font-family: 'Cormorant Garamond', serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      -webkit-text-size-adjust: 100%;
-    }
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 1.25rem 2rem;
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(10,10,10,0.95);
-      border-bottom: 1px solid #1a1a1a;
-    }
-    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; color: #e8e0d4; text-decoration: none; }
-    .nav-logo span { color: #c4a45a; }
-    .nav-btn { font-family: 'Syne', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; color: #c4a45a; border: 1px solid #c4a45a; padding: 0.6rem 1.25rem; text-decoration: none; background: transparent; cursor: pointer; }
-    .container { max-width: 660px; margin: 0 auto; padding: 6rem 1.5rem 4rem; min-height: 100vh; }
-    .screen { display: none; }
-    .screen.active { display: block; animation: fadeUp 0.6s ease forwards; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .logo-mark { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 3rem; }
-    .logo-mark-box { width: 36px; height: 36px; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; }
-    .logo-mark-dot { width: 12px; height: 12px; background: #c4a45a; border-radius: 50%; }
-    .logo-mark-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.25em; color: #444; }
-    .intro-title { font-size: 3.5rem; font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; color: #f5f0e8; margin-bottom: 1rem; text-align: center; }
-    .intro-subtitle { font-size: 1rem; color: #888; font-style: italic; text-align: center; margin-bottom: 2.5rem; }
-    .intro-quote { border-top: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e; padding: 1.75rem 0; margin-bottom: 2.5rem; text-align: center; }
-    .intro-quote p { font-size: 1.1rem; font-style: italic; color: #999; line-height: 1.9; }
-    .intro-body { font-size: 0.95rem; line-height: 1.9; color: #999; margin-bottom: 1.25rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; color: #888; margin-bottom: 0.5rem; }
-    .form-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid #2a2a2a; border-bottom: 1px solid #c4a45a; color: #f5f0e8; font-family: 'Cormorant Garamond', serif; font-size: 1rem; padding: 0.75rem 1rem; outline: none; }
-    .form-input::placeholder { color: #444; font-style: italic; }
-    .form-error { color: #e06060; font-size: 0.8rem; margin-top: 0.5rem; display: none; }
-    .sections-list { margin-bottom: 3rem; }
-    .section-row { display: flex; gap: 1.5rem; padding: 0.7rem 0; border-bottom: 1px solid #1a1a1a; align-items: baseline; }
-    .section-num { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #444; letter-spacing: 0.1em; min-width: 18px; }
-    .section-name { font-size: 0.9rem; color: #777; }
-    .section-sub { font-size: 0.75rem; color: #444; margin-left: 0.75rem; font-style: italic; }
-    .resume-banner { text-align: center; margin-top: 1.5rem; display: none; }
-    .resume-banner p { font-size: 0.75rem; color: #888; margin-bottom: 0.5rem; }
-    .resume-link { background: transparent; border: none; color: #c4a45a; font-size: 0.75rem; letter-spacing: 0.1em; text-decoration: underline; cursor: pointer; font-family: 'Cormorant Garamond', serif; }
-    .btn-gold { background: #c4a45a; border: none; color: #0a0a0a; padding: 1rem 3.5rem; font-family: 'Syne', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; cursor: pointer; transition: opacity 0.2s; display: block; margin: 0 auto; }
-    .btn-gold:hover { opacity: 0.85; }
-    .btn-outline { background: transparent; border: 1px solid #c4a45a; color: #c4a45a; padding: 0.8rem 2.5rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.18em; cursor: pointer; transition: all 0.2s; }
-    .btn-outline:hover { background: #c4a45a; color: #0a0a0a; }
-    .btn-ghost { background: transparent; border: 1px solid #2a2a2a; color: #444; padding: 0.6rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; cursor: pointer; }
-    .progress-wrap { margin-bottom: 2.5rem; }
-    .progress-labels { display: flex; justify-content: space-between; margin-bottom: 0.4rem; }
-    .progress-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; color: #444; }
-    .progress-track { height: 1px; background: #1e1e1e; }
-    .progress-fill { height: 1px; background: #c4a45a; transition: width 0.8s ease; }
-    .section-header { margin-bottom: 2rem; }
-    .section-num-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; color: #c4a45a; margin-right: 1rem; }
-    .section-title { font-size: 2rem; font-weight: 300; color: #f5f0e8; letter-spacing: -0.01em; }
-    .section-subtitle { font-size: 0.8rem; color: #444; font-style: italic; margin-top: 0.35rem; margin-left: 2.2rem; }
-    .teaching-block { margin-bottom: 2.5rem; padding: 1.75rem; background: #111; border: 1px solid #1e1e1e; }
-    .teaching-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.25em; color: #c4a45a; margin-bottom: 1.25rem; }
-    .teaching-p { font-size: 1rem; line-height: 1.85; color: #888; margin-bottom: 1rem; font-weight: 300; }
-    .teaching-p.first { color: #f5f0e8; font-weight: 600; }
-    .teaching-transition { font-size: 0.9rem; font-style: italic; color: #c4a45a; line-height: 1.7; border-top: 1px solid #1e1e1e; padding-top: 1rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
-    .past-answer { margin-bottom: 2rem; }
-    .past-question { font-size: 0.75rem; color: #444; margin-bottom: 0.5rem; line-height: 1.6; }
-    .past-text { font-size: 0.95rem; line-height: 1.8; color: #ccc; padding-left: 1rem; border-left: 1px solid #1e1e1e; }
-    .reflection { margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(196,164,90,0.1); border-left: 2px solid #c4a45a; }
-    .reflection-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; margin-bottom: 0.5rem; }
-    .reflection-text { font-size: 0.95rem; line-height: 1.75; color: #ccc; font-style: italic; }
-    .question-counter { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #444; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
-    .question-text { font-size: 1.05rem; line-height: 1.8; color: #e8e3d8; margin-bottom: 1rem; font-weight: 400; }
-    textarea { width: 100%; background: rgba(255,255,255,0.025); border: 1px solid #2a2a2a; border-bottom: 1px solid #c4a45a; color: #f5f0e8; font-family: 'Cormorant Garamond', serif; font-size: 1rem; line-height: 1.8; padding: 1rem; resize: none; outline: none; min-height: 140px; }
-    textarea::placeholder { color: #444; font-style: italic; }
-    textarea:disabled { opacity: 0.5; }
-    .question-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; }
-    .cmd-hint { font-family: 'Syne', sans-serif; font-size: 0.55rem; color: #333; letter-spacing: 0.08em; }
-    .action-right { display: flex; gap: 1rem; align-items: center; }
-    .observing-label { font-family: 'Syne', sans-serif; font-size: 0.6rem; color: #c4a45a; letter-spacing: 0.15em; animation: pulse 1.5s infinite; }
-    .summary-block { margin-top: 2rem; padding: 1.5rem; border: 1px solid #2a2a2a; background: rgba(255,255,255,0.02); }
-    .summary-label { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; margin-bottom: 1rem; }
-    .summary-text { font-size: 0.95rem; line-height: 1.85; color: #e8e3d8; white-space: pre-wrap; }
-    .summary-actions { text-align: center; margin-top: 2.5rem; }
-    .generating { text-align: center; padding: 2rem; font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; color: #444; }
-    .map-title { font-size: 2.8rem; font-weight: 300; color: #f5f0e8; letter-spacing: -0.02em; text-align: center; margin: 2rem 0 0.75rem; }
-    .map-subtitle { font-size: 1rem; font-style: italic; color: #888; text-align: center; margin-bottom: 2.5rem; }
-    .map-quote { border-top: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e; padding: 1.5rem 0; margin-bottom: 3rem; text-align: center; }
-    .map-quote p { font-style: italic; color: #888; font-size: 1.05rem; line-height: 1.9; }
-    .map-section { margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid #1e1e1e; background: rgba(255,255,255,0.015); }
-    .map-section-header { display: flex; gap: 1rem; align-items: baseline; margin-bottom: 0.75rem; }
-    .map-section-num { font-family: 'Syne', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: #c4a45a; }
-    .map-section-title { font-size: 0.85rem; color: #f5f0e8; font-weight: 600; letter-spacing: 0.06em; font-family: 'Syne', sans-serif; }
-    .map-section-text { font-size: 0.9rem; line-height: 1.85; color: #bbb; white-space: pre-wrap; }
-    .map-footer { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #1e1e1e; }
-    .map-footer-msg { font-size: 0.85rem; color: #888; line-height: 1.8; margin-bottom: 1.5rem; }
-    .map-footer a { color: #c4a45a; font-family: 'Syne', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-decoration: none; }
-    .map-footer-brand { font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; color: #444; margin-top: 2rem; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Yourself — Bhavé's Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #080808;
+    --deep: #0f0f0f;
+    --surface: #141414;
+    --border: rgba(201,169,110,0.15);
+    --gold: #C9A96E;
+    --gold-dim: rgba(201,169,110,0.4);
+    --ash: #6b6b6b;
+    --smoke: #9a9a9a;
+    --light: #e8e4dc;
+    --mono: 'Share Tech Mono', monospace;
+    --serif: 'Cormorant Garamond', serif;
+  }
 
-  </style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--void);
+    color: var(--light);
+    font-family: var(--serif);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #cosmos {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: var(--light);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-logo em { color: var(--gold); font-style: italic; }
+
+  nav a.book {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid var(--gold-dim);
+    padding: 0.45rem 1rem;
+    transition: all 0.3s;
+  }
+
+  nav a.book:hover {
+    background: rgba(201,169,110,0.08);
+    border-color: var(--gold);
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 10;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 7rem 2rem 6rem;
+  }
+
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7rem 2rem 4rem;
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+
+  #intro h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--light);
+    margin-bottom: 1.5rem;
+  }
+
+  #intro h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  #intro .sub {
+    font-size: 1.15rem;
+    font-weight: 300;
+    color: var(--smoke);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    max-width: 560px;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold-dim);
+    margin: 2rem 0;
+  }
+
+  .section-list { margin-bottom: 3rem; }
+
+  .section-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(201,169,110,0.08);
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.5s forwards;
+  }
+
+  .section-item:nth-child(1)  { animation-delay: 0.1s; }
+  .section-item:nth-child(2)  { animation-delay: 0.15s; }
+  .section-item:nth-child(3)  { animation-delay: 0.2s; }
+  .section-item:nth-child(4)  { animation-delay: 0.25s; }
+  .section-item:nth-child(5)  { animation-delay: 0.3s; }
+  .section-item:nth-child(6)  { animation-delay: 0.35s; }
+  .section-item:nth-child(7)  { animation-delay: 0.4s; }
+  .section-item:nth-child(8)  { animation-delay: 0.45s; }
+  .section-item:nth-child(9)  { animation-delay: 0.5s; }
+  .section-item:nth-child(10) { animation-delay: 0.55s; }
+
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    min-width: 24px;
+  }
+
+  .section-name { font-size: 1rem; font-weight: 300; color: var(--light); }
+  .section-sub { font-size: 0.85rem; font-style: italic; color: var(--ash); margin-left: auto; }
+
+  .email-block { margin-bottom: 2rem; }
+
+  .email-block label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .email-block input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--light);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    padding: 0.85rem 1.1rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .email-block input:focus { border-color: var(--gold-dim); }
+  .email-block input::placeholder { color: var(--ash); }
+
+  .btn-primary {
+    display: inline-block;
+    width: 100%;
+    background: var(--gold);
+    color: var(--void);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    padding: 1.1rem 2rem;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.3s;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  #course { display: none; }
+
+  .progress-track {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(201,169,110,0.1);
+    z-index: 200;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.6s ease;
+  }
+
+  .section-header { margin-bottom: 3rem; }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle { font-size: 1rem; font-style: italic; color: var(--ash); }
+
+  .layer-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--ash);
+    border: 1px solid rgba(201,169,110,0.12);
+    padding: 0.35rem 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .layer-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+  .context-block {
+    background: var(--surface);
+    border-left: 2px solid var(--gold-dim);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--smoke);
+  }
+
+  .question-block { margin-bottom: 1.5rem; }
+
+  .question-label {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .question-text {
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--light);
+    margin-bottom: 1.5rem;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--light);
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.7;
+    padding: 1.25rem 1.4rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  textarea:focus { border-color: var(--gold-dim); }
+  textarea::placeholder { color: var(--ash); font-style: italic; }
+
+  .reflection-panel {
+    display: none;
+    margin: 1.5rem 0;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid rgba(201,169,110,0.2);
+    background: rgba(201,169,110,0.03);
+    animation: panelIn 0.5s ease;
+  }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reflection-panel.sit-with-it {
+    border-color: rgba(201,169,110,0.3);
+    background: rgba(201,169,110,0.05);
+  }
+
+  .reflection-tag {
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .reflection-text {
+    font-size: 1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--smoke);
+    line-height: 1.75;
+  }
+
+  .sit-action {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-sit {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--gold-dim);
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-sit:hover { background: rgba(201,169,110,0.08); }
+
+  .btn-sit.advance { color: var(--ash); border-color: rgba(107,107,107,0.3); }
+
+  .claude-reflection {
+    display: none;
+    margin: 1.5rem 0;
+    padding: 1.5rem 1.75rem;
+    border-left: 2px solid var(--gold-dim);
+    background: var(--surface);
+    animation: panelIn 0.5s ease;
+  }
+
+  .claude-reflection .reflection-tag { color: var(--ash); }
+
+  .advance-block {
+    display: none;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-advance {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    padding: 0.85rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .btn-advance:hover { background: rgba(201,169,110,0.06); border-color: var(--gold); }
+
+  .btn-submit {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    color: var(--void);
+    background: var(--gold);
+    border: none;
+    padding: 0.85rem 2rem;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    margin-top: 1rem;
+  }
+
+  .btn-submit:hover { opacity: 0.88; }
+  .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .loading-text {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--ash);
+    padding: 1rem 0;
+    display: none;
+  }
+
+  @keyframes dots {
+    0%   { content: '.'; }
+    33%  { content: '..'; }
+    66%  { content: '...'; }
+  }
+
+  .loading-text::after { content: ''; animation: dots 1.4s infinite; }
+
+  #completion { display: none; }
+
+  .completion-header { margin-bottom: 3rem; }
+
+  .completion-header h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .completion-header p { font-size: 1rem; color: var(--smoke); font-style: italic; }
+
+  #web-canvas {
+    width: 100%;
+    height: 500px;
+    margin: 2rem 0;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  #web-svg { width: 100%; height: 100%; }
+
+  .web-label {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  #node-tooltip {
+    position: fixed;
+    background: var(--deep);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    max-width: 300px;
+    z-index: 500;
+    display: none;
+    pointer-events: none;
+  }
+
+  #node-tooltip .tt-title {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  #node-tooltip .tt-text {
+    font-size: 0.85rem;
+    color: var(--smoke);
+    line-height: 1.6;
+    font-family: var(--serif);
+    font-weight: 300;
+  }
+
+  .delivery-block {
+    margin-top: 2rem;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .delivery-block p {
+    font-size: 0.95rem;
+    color: var(--smoke);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    font-style: italic;
+  }
+
+  .pattern-flags { margin: 2rem 0; }
+
+  .flag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(201,169,110,0.08);
+  }
+
+  .flag-icon {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--gold-dim);
+    white-space: nowrap;
+    margin-top: 0.1rem;
+  }
+
+  .flag-text { font-size: 0.9rem; color: var(--smoke); line-height: 1.6; font-weight: 300; }
+
+  @media (max-width: 640px) {
+    nav { padding: 1rem 1.25rem; }
+    .wrapper, #intro { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .section-sub { display: none; }
+    #web-canvas { height: 380px; }
+  }
+</style>
 </head>
 <body>
 
+<canvas id="cosmos"></canvas>
+
 <nav>
-  <a href="/" class="nav-logo">Bhav<span>e</span>'s Lab</a>
-  <a href="/#book" class="nav-btn">BOOK A SESSION</a>
+  <a href="index.html" class="nav-logo">Bhav<em>é</em>'s Lab</a>
+  <a href="https://calendly.com/bhaveslab/30min" class="book" target="_blank">BOOK A SESSION</a>
 </nav>
 
-<div class="container">
+<div class="progress-track">
+  <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+</div>
 
-  <div id="screen-intro" class="screen active">
-    <div class="logo-mark">
-      <div class="logo-mark-box"><div class="logo-mark-dot"></div></div>
-      <span class="logo-mark-label">BHAVE'S LAB</span>
-    </div>
-    <h1 class="intro-title">Study Yourself</h1>
-    <p class="intro-subtitle">A guide to inner knowing</p>
-    <div class="intro-quote">
-      <p>You don't know yourself.<br>Study yourself.<br>Everything else follows from that.</p>
-    </div>
-    <p class="intro-body">This is not a course you read through and finish. It is a mirror.</p>
-    <p class="intro-body">Each section teaches you a concept from the Study Yourself framework. Then it asks you to apply it directly to your own system, in your own words. As you write, it reflects back what your answers reveal.</p>
-    <p class="intro-body">By the end you have a complete personal pattern map built entirely from your own observations -- and it gets emailed directly to you.</p>
-    <p class="intro-body" style="margin-bottom:2.5rem;">Ten sections. Move at your own pace. Your progress saves automatically -- come back anytime.</p>
-    <div class="form-group">
-      <label class="form-label">YOUR NAME</label>
-      <input id="input-name" class="form-input" type="text" placeholder="First name">
-    </div>
-    <div class="form-group" style="margin-bottom:0.5rem;">
-      <label class="form-label">YOUR EMAIL -- YOUR PATTERN MAP WILL BE SENT HERE</label>
-      <input id="input-email" class="form-input" type="email" placeholder="email@example.com">
-    </div>
-    <div id="form-error" class="form-error"></div>
-    <div class="sections-list" style="margin-top:2rem;" id="sections-list"></div>
-    <button class="btn-gold" id="begin-btn" style="margin-top:2rem;">BEGIN THE STUDY</button>
-    <div class="resume-banner" id="resume-banner">
-      <p>You have a session in progress.</p>
-      <button class="resume-link" id="resume-btn">CONTINUE WHERE YOU LEFT OFF</button>
-    </div>
+<!-- INTRO -->
+<div id="intro">
+  <div class="label">BHAVÉ'S LAB — STUDY YOURSELF</div>
+  <h1>Study <em>Yourself</em></h1>
+  <p class="sub">Ten sections. One framework. Your own life as the material. This is not a course you consume — it is a system you move through.</p>
+  <div class="divider"></div>
+
+  <div class="section-list">
+    <div class="section-item"><span class="section-num">01</span><span class="section-name">The Unstudied System</span><span class="section-sub">What is already running</span></div>
+    <div class="section-item"><span class="section-num">02</span><span class="section-name">State</span><span class="section-sub">The ground everything builds on</span></div>
+    <div class="section-item"><span class="section-num">03</span><span class="section-name">The Sequence</span><span class="section-sub">State to Reality</span></div>
+    <div class="section-item"><span class="section-num">04</span><span class="section-name">Automatic Living</span><span class="section-sub">The program running without you</span></div>
+    <div class="section-item"><span class="section-num">05</span><span class="section-name">The Observer</span><span class="section-sub">Seeing without becoming</span></div>
+    <div class="section-item"><span class="section-num">06</span><span class="section-name">Pattern Recognition</span><span class="section-sub">The structure underneath everything</span></div>
+    <div class="section-item"><span class="section-num">07</span><span class="section-name">Loop vs Spiral</span><span class="section-sub">Where are you in this right now</span></div>
+    <div class="section-item"><span class="section-num">08</span><span class="section-name">Live Observation</span><span class="section-sub">Watching the system while it runs</span></div>
+    <div class="section-item"><span class="section-num">09</span><span class="section-name">The Interruption Point</span><span class="section-sub">Where choice actually lives</span></div>
+    <div class="section-item"><span class="section-num">10</span><span class="section-name">Integration</span><span class="section-sub">You are where the work begins</span></div>
   </div>
 
-  <div id="screen-section" class="screen">
-    <div class="progress-wrap">
-      <div class="progress-labels">
-        <span class="progress-label" id="progress-label">SECTION 1 OF 10</span>
-        <span class="progress-label" id="progress-pct">10%</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
-    </div>
-    <div class="section-header" id="section-header"></div>
-    <div id="teaching-block" class="teaching-block"></div>
-    <div id="questions-area" style="display:none;"></div>
+  <div class="email-block">
+    <label>YOUR EMAIL — THE PATTERN MAP DELIVERS HERE</label>
+    <input type="email" id="user-email" placeholder="your@email.com" autocomplete="email">
   </div>
 
-  <div id="screen-map" class="screen">
-    <div class="logo-mark">
-      <div class="logo-mark-box"><div class="logo-mark-dot"></div></div>
-      <span class="logo-mark-label">BHAVE'S LAB</span>
+  <button class="btn-primary" id="begin-btn">BEGIN THE STUDY</button>
+</div>
+
+<!-- COURSE -->
+<div id="course">
+  <div class="wrapper">
+    <div id="section-content"></div>
+  </div>
+</div>
+
+<!-- COMPLETION -->
+<div id="completion">
+  <div class="wrapper">
+    <div class="completion-header">
+      <div class="label">SESSION COMPLETE</div>
+      <h2>Your Pattern Map</h2>
+      <p>Everything that surfaced — mapped across the full sequence.</p>
     </div>
-    <h1 class="map-title" id="map-title">Your Pattern Map</h1>
-    <p class="map-subtitle">Built entirely from your own observations.</p>
-    <div class="map-quote"><p>You are not the end of this work.<br>You are where it begins.</p></div>
-    <div id="map-sections"></div>
-    <div class="map-footer">
-      <p class="map-footer-msg" id="map-email-msg"></p>
-      <a href="/#book">BOOK A SESSION AT BHAVESLAB.COM</a>
-      <div style="margin-top:2rem;"><button class="btn-ghost" id="restart-btn">START OVER</button></div>
-      <p class="map-footer-brand" style="margin-top:2rem;">BHAVE'S LAB - BHAVESLAB.COM</p>
+
+    <div class="web-label">[ PATTERN WEB — PULL ANY NODE TO SEE WHAT SURFACED THERE ]</div>
+    <div id="web-canvas"><svg id="web-svg"></svg></div>
+
+    <div class="pattern-flags" id="pattern-flags"></div>
+
+    <div class="delivery-block">
+      <p>The full session breakdown — every answer, every reflection, every place the system showed itself — has been sent to <span id="delivery-email" style="color:var(--gold)"></span></p>
+      <p style="margin-bottom:0;font-size:0.85rem;color:var(--ash);">If it doesn't arrive within a few minutes, check your spam folder.</p>
+    </div>
+
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);">
+      <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:1.1rem 2rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">BOOK A SESSION — TAKE THIS FURTHER</a>
     </div>
   </div>
+</div>
 
+<!-- NODE TOOLTIP -->
+<div id="node-tooltip">
+  <div class="tt-title" id="tt-title"></div>
+  <div class="tt-text" id="tt-text"></div>
 </div>
 
 <script>
-var BACKEND = "https://bhaveslab-backend.vercel.app";
-var SAVE_KEY = "sy_course_v3";
+// ── COSMOS ───────────────────────────────────────────────────
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [], shooters = [];
 
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
 
+for (let i = 0; i < 180; i++) {
+  stars.push({ x: Math.random(), y: Math.random(), r: Math.random()*0.9+0.2, a: Math.random()*0.5+0.1, blink: Math.random()*4+2, gold: Math.random()<0.08, phase: Math.random()*Math.PI*2 });
+}
 
-// COURSE DATA
-var SECTIONS = [
+function spawnShooter() {
+  shooters.push({ x: Math.random()*W*0.6, y: Math.random()*H*0.4, vx: 3+Math.random()*4, vy: 1.5+Math.random()*2, life: 1, decay: 0.012+Math.random()*0.01, trail: [], gold: Math.random()<0.3 });
+  setTimeout(spawnShooter, 3000+Math.random()*5000);
+}
+
+function drawCosmos(t) {
+  ctx.clearRect(0,0,W,H);
+  stars.forEach(s => {
+    const a = s.a*(0.6+0.4*Math.sin(t*(1/s.blink)+s.phase));
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+    ctx.fillStyle = s.gold ? `rgba(201,169,110,${a})` : `rgba(237,232,224,${a*0.7})`;
+    ctx.fill();
+  });
+  shooters = shooters.filter(s => s.life > 0);
+  shooters.forEach(s => {
+    s.trail.push({x:s.x,y:s.y}); if(s.trail.length>20) s.trail.shift();
+    s.x+=s.vx; s.y+=s.vy; s.life-=s.decay;
+    if(s.trail.length<2) return;
+    const c = s.gold?'201,169,110':'237,232,224';
+    for(let i=1;i<s.trail.length;i++){const p=i/s.trail.length;ctx.beginPath();ctx.moveTo(s.trail[i-1].x,s.trail[i-1].y);ctx.lineTo(s.trail[i].x,s.trail[i].y);ctx.strokeStyle=`rgba(${c},${p*s.life*0.7})`;ctx.lineWidth=p*1.5;ctx.stroke();}
+  });
+  requestAnimationFrame(ts => drawCosmos(ts/1000));
+}
+drawCosmos(0);
+setTimeout(spawnShooter, 1000);
+
+// ── SECTIONS DATA ─────────────────────────────────────────────
+const SECTIONS = [
   {
-    id:"unstudied", number:"01", title:"The Unstudied System", subtitle:"What is already running",
-    teaching:["You are operating a system you never examined.","It was built before you were old enough to decide what went into it. By the time you were making conscious choices the system was already running -- and it had been running long enough to feel like you. The reactions feel like personality. The patterns feel like character. The loops feel like just how things are.","They are not how things are. They are how the system is running. Those are not the same thing.","This course is not here to fix anything. It is not here to make you a better version of yourself. It is here to show you what is already running. Because you cannot change what you cannot see -- and most people have never actually looked.","You are not the cargo in your own life. But if you have never studied the system driving it, you might as well be.","The moment you decide to study it everything stays the same on the surface and starts to become visible underneath. That is the only shift that matters. Not a new you. A seen one."],
-    transition:"Now begin the observation. Look at what is already running -- without changing anything.",
-    questions:["What is a result in your life that keeps repeating regardless of how many times you try to change it? Describe it specifically -- not why it happens, just what it is.","When something goes wrong what is the first explanation you reach for? Write it down exactly as you usually say it to yourself.","What version of yourself shows up most consistently in your daily life? Is that who you actually are or who you learned to be?","Think of a pattern in your relationships -- at work, at home, with friends. What is the common element across all of them?","What have you always called just how I am that might actually be a program the system learned to run?","What were you searching for before you found this work? Not the answer that sounds right -- the honest one.","If your life right now is the output of a system running without examination -- what does that system appear to be built around?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. Your role is that of a precise observer -- not a coach, not a therapist. You reveal structure. You do not interpret, advise, or solve.\n\nWhen someone answers a question about their unstudied system, reflect back what you heard using their exact words. Show them the structure of what they just revealed. Be direct and precise. 2-3 sentences maximum. No questions back. No advice. No encouragement. No spiritual language.\n\nStyle: Clean. Direct. Like a mirror held steady. Use their exact words. Show them what the system just revealed about itself.",
-    summaryPrompt:"Based on all answers in this section, write a precise 4-5 sentence summary of what this person's unstudied system appears to be built around. Use their exact words. Name the repeating pattern clearly. Name what the system has been calling it. Name what it actually is structurally. Start with: What your unstudied system revealed:"
+    num:'01', title:'The Unstudied System', subtitle:'What is already running',
+    layer:'ENTRY LAYER', framework:'Before the Sequence',
+    context:'Before anything can be studied, something has to be noticed. Most of what runs your experience has never been looked at directly. Not because it\'s hidden — because looking at it directly has never been the instruction. This section begins there.',
+    question:'What is one thing about how you operate — a pattern, a reaction, a way of moving through situations — that you\'ve noticed but never fully examined?',
+    placeholder:'Take your time. Write what actually comes up, not what sounds right.',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 01 — The Unstudied System.
+
+Analyze this response for honest self-observation. The person should be naming something real they've noticed about themselves — a pattern, reaction, or way of operating.
+
+SURFACE / DEFLECTION signals: vague generalities ("I overthink things"), immediate pivot to positives, describing someone else's behavior, intellectual framing without personal specificity, extremely brief response (under 2 sentences).
+
+If SURFACE: respond with ONLY this JSON: {"surface": true, "reflection": "That answer named something familiar. The familiar version of a pattern and the actual pattern underneath it are often different. What happens in your body or your behavior right before that pattern shows up?"}
+
+If HONEST: respond with ONLY this JSON: {"surface": false, "reflection": "[2-3 sentences. Mirror back what they actually named. Use their own language. No interpretation, no praise, no suggestion. Just: here is what you said, held precisely.]"}
+
+Return ONLY valid JSON. No other text.`
   },
   {
-    id:"state", number:"02", title:"State", subtitle:"The ground everything builds on",
-    teaching:["Before a thought. Before a decision. Before any action. There is a state.","State is the condition your entire internal system is operating from right now. Not your mood. Not how you feel about what happened today. The baseline. The ground everything else is built on.","Check in for five seconds. Feel the actual condition of your body right now. Tight or open. Fast or slow. Heavy or clear. You do not need to name it perfectly. You need to notice it.","That state is not neutral background noise. It is the first input into everything that follows. A tight state hands a different world to your perception than a settled one. The same room. The same situation. The same person. Different state -- different experience. Every time.","Most people try to change what they think or do without touching what they are in. That is why nothing holds. You are working at the end of the chain. The chain starts here.","Your body has been reading state your entire life. It already knows. You are just learning to track what it has always been tracking."],
-    transition:"Now notice the state you are actually in -- before you change it, explain it, or judge it.",
-    questions:["Check in right now. Feel the actual condition of your body. Tight or open. Fast or slow. Heavy or clear. Describe what is actually present -- not what you want to be present.","Think of the last time your state shifted noticeably. What caused it? Was it internal or external?","What environment consistently settles your system? What specifically about it does that -- the pace, the sound, the people, the absence of something?","What environment consistently activates your system? What is the first thing that shifts in your body when you enter it?","What are you consuming daily -- food, information, relationships, pace -- that is shaping your state without your awareness?","When did you last feel completely at home in your own state -- not because of where you were but because of what you were carrying inside you?","If your state for the last 30 days could be described in three words -- what would they be? What has been producing that state?","What is the difference between how you present yourself to others and what your actual state is underneath that presentation?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section is about State -- the internal baseline condition that drives everything downstream.\n\nWhen someone describes their state, reflect it back precisely. Name the state they described. Show them what that state is producing. 2-3 sentences. Use their exact words. No interpretation. No advice.",
-    summaryPrompt:"Summarize what this person revealed about their state. Name their baseline state clearly. Name what produces it. Name what it is doing downstream to their perception and decisions. 4-5 sentences. Use their words. Start with: Your state baseline:"
+    num:'02', title:'State', subtitle:'The ground everything builds on',
+    layer:'STATE LAYER', framework:'State → ...',
+    context:'State is the actual operating condition of your system before any interpretation happens. Not your mood. Not your story about what\'s happening. The raw condition — body, nervous system, energy — that everything else runs on top of. Most people skip this entirely and go straight to meaning. The sequence doesn\'t work that way.',
+    question:'Describe your current state right now — not what you think about it, not why it is the way it is. Just what is actually present in your body and energy at this moment.',
+    placeholder:'What is physically and energetically present right now. Not the reason for it — just what is.',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 02 — State.
+
+This section probes the State layer — the actual operating condition before interpretation. The person should be describing raw physical/energetic reality, NOT thoughts, stories, or explanations about why.
+
+SURFACE signals: explaining WHY they feel a certain way, emotional labels without physical grounding ("I feel anxious"), describing events rather than state, philosophical reflection, future or past focus rather than present moment.
+
+If SURFACE: {"surface": true, "reflection": "That answer moved toward the story about the state rather than the state itself. Set the explanation aside for a moment. Where do you feel it in your body right now — and what is its actual quality? Heavy, tight, scattered, flat, charged?"}
+
+If HONEST: {"surface": false, "reflection": "[Mirror the specific physical/energetic details they named. Don't interpret. Don't add meaning. Reflect the state back precisely as they described it.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"sequence", number:"03", title:"The Sequence", subtitle:"State to Perception to Decision to Experience to Reality",
-    teaching:["What feels like a moment is actually a sequence.","State leads to perception. Perception shapes the decision. Decision creates the experience. Experience repeated becomes what you call your reality.","This happens so fast it feels like one thing. But it is not. It is layered. And because it is layered it can be seen. And because it can be seen it can be worked with.","Most people try to change their reality without understanding the sequence that created it. They adjust circumstances. Change environments. Find different people. The sequence keeps running. Because the sequence was never touched.","This is not complicated. It is mechanical. The same inputs produce the same outputs every time. If you want different results you have to find where in the chain the work actually lives -- not at the end where the results appear, but at the beginning where the state sets everything in motion.","You have lived this sequence your entire life without naming the steps. That is why it felt random. Once you see the order it stops feeling random. It stops feeling like something that happens to you. It starts feeling like something the system produces."],
-    transition:"Now trace one full sequence from something that happened today. Start with state. Follow it all the way through.",
-    questions:["Think of an experience that keeps repeating in your life. What state were you in before it started? Be specific -- not stressed, describe the actual felt condition.","From that state -- what did you start noticing or focusing on? What did your attention lock onto?","What decision did you make from that perception -- automatically, without fully examining it?","What experience did that decision produce? What actually happened as a result?","How many times has this same sequence run in your life with different people or situations but the same structure?","Where in that sequence has your awareness been the strongest historically -- and where has it gone blind?","If you changed only the state at the beginning of that sequence -- what would be different by the time it reached experience?","What story have you been telling about the outcome of this sequence that has prevented you from seeing the sequence itself?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section maps the sequence: State to Perception to Decision to Experience to Reality.\n\nAfter each answer, show the person which step of the sequence they just described and what it reveals. Use this format: [Step name]: [their words reflected back precisely]. Then one sentence showing what that step produced. 2-3 sentences total. Use their exact words.",
-    summaryPrompt:"Map this person's sequence using their exact words. State: what they described. Perception: what they described. Decision: what they described. Experience: what they described. Then show how the sequence runs. Then one sentence on how many times this sequence has run. Start with: Your sequence:"
+    num:'03', title:'The Sequence', subtitle:'State to Reality',
+    layer:'SEQUENCE LAYER', framework:'State → Perception → Formation → Decision → Experience → Reality',
+    context:'State → Perception → Formation → Decision → Experience → Reality. This is not a model to understand. It is the actual sequence through which every experience you have is generated. Right now, in your current state, your perception is already filtered. What you notice, what you miss, what feels significant — all of it is running through that filter before you\'re aware of it.',
+    question:'Think of a situation in your life right now that feels unresolved or stuck. Walk it through the sequence: What is your actual State around it? What are you Perceiving? What meaning are you forming? What decisions are available from that position?',
+    placeholder:'Move through it step by step. State first — then what you\'re perceiving — then what\'s forming — then what decisions look possible from there.',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 03 — The Sequence.
+
+This section asks the person to walk a real situation through State → Perception → Formation → Decision. They should be applying the sequence to something specific and real, not describing the concept abstractly.
+
+SURFACE signals: defining or explaining the sequence theoretically, choosing a resolved situation, keeping it generic, only addressing one step, giving the "right answer" version of the sequence rather than their actual experience.
+
+If SURFACE: {"surface": true, "reflection": "That stayed close to the concept rather than moving through it with a real situation. Pick something that actually has charge on it right now — unresolved, uncomfortable, or unclear. Run that through the sequence. Start with: what is your actual State when you think about it?"}
+
+If HONEST: {"surface": false, "reflection": "[Name which layer in the sequence showed up most clearly in their answer. Reflect back what they described at each layer without adding interpretation. Note if one layer was skipped or compressed — name it without judgment.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"automatic", number:"04", title:"Automatic Living", subtitle:"The program running without you",
-    teaching:["The system does not stop running just because you are not watching it.","It runs patterns. Repeats responses. Moves through the same sequences again and again -- not because you chose it but because it is familiar. Familiar is efficient. The system does not waste energy questioning what it already knows how to do.","This is automatic living. You react before you see. You decide before you understand. The sequence fires and what comes out feels like a choice because it always comes out that way.","But what actually happened is the system ran without observation.","There is nothing wrong with the system running. Every system runs. The problem is not knowing it is running. Because if you cannot see it you cannot step into it. You are not driving. You are being driven.","The automatic does not end through effort. Fighting it just creates another program -- The Fighter. It looks like progress. It is the same system running a different script.","It ends when the system is seen while it is running. Not after. While. Seeing it is the first interruption. Not changing it. Seeing it."],
-    transition:"Now look at something you did recently and notice how much of it happened before you consciously chose it.",
-    questions:["What is one behavior you repeat that you have always explained as just how you are? Describe it as a program running -- not a personality trait.","Think of the last time you reacted before you saw. What was the situation? What fired before you consciously chose it?","Who in your life pulls a specific version of you out -- a version you did not choose? What script runs when you are around them?","When was the last time you bumped into the same limitation you have bumped into before? What did you tell yourself about why it happened this time?","What automatic response do you run that you know does not serve you -- but runs anyway because it is familiar?","Where in your life are you currently living playback rather than making a conscious choice? Be specific.","What would change about your daily experience if 20% more of your actions were conscious rather than automatic?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section is about automatic living -- the system running without observation.\n\nWhen someone describes their automatic patterns, reflect back what they revealed. Name the automatic program clearly. Show them the difference between what they thought was happening and what was mechanically running. 2-3 sentences. Use their exact words. No judgment. No advice.",
-    summaryPrompt:"Summarize the automatic programs this person identified. Name each program clearly. Show the difference between what they called it and what it actually is structurally. 4-5 sentences. Use their words. Start with: Your automatic programs:"
+    num:'04', title:'Automatic Living', subtitle:'The program running without you',
+    layer:'FORMATION LAYER', framework:'... → Formation → ...',
+    context:'Formation is where patterns begin before they become conscious. Before you decide, before you react — something is already organizing. Familiar loops are attempting to run. Most people only ever experience the output: the decision, the reaction, the feeling. Formation is the layer before that. The place where the pattern initiates.',
+    question:'Identify one automatic pattern in your life — something you do, feel, or think that happens before you consciously choose it. When did you first notice it was automatic rather than chosen?',
+    placeholder:'A reaction, a behavior, a way you move toward or away from something. When did you realize it was running on its own?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 04 — Automatic Living / Formation Layer.
+
+The person should be identifying something genuinely automatic — a pattern that operates before conscious choice. This is the Formation layer: where patterns initiate before becoming decisions.
+
+SURFACE signals: describing a habit they're "working on" (implies conscious engagement), choosing something minor or socially acceptable, framing it as a strength, not actually identifying when they noticed it was automatic (key signal of real observation), explaining it away with context.
+
+If SURFACE: {"surface": true, "reflection": "That named something familiar. The question underneath it: when you're in that pattern, is there a moment before it fully runs where you can feel it starting — or does it only become visible after? That edge — if it exists — is where the real observation lives."}
+
+If HONEST: {"surface": false, "reflection": "[Reflect back the specific automatic pattern they named. Note the moment they identified when they first saw it as automatic — that moment of recognition is itself important. Mirror it without analysis.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"observer", number:"05", title:"The Observer", subtitle:"Seeing without becoming",
-    teaching:["There is a difference between being in the system and seeing the system.","Most people are inside it. They are thinking, reacting, responding -- but they are not aware of what is driving it. The observer is different. The observer is not outside the system. The observer is the part of you that can see it while it is running. Not after. While.","It does not judge what it sees. It does not defend or explain. It does not soften what is uncomfortable. It reports accurately -- without the filter of what the system wants to be true, without the protection of what needs to be maintained.","This is the most honest part of you. And it is the part most people have the least access to -- not because it is hidden but because the noise of the automatic system is loud enough to drown it out.","You do not build the observer. You uncover it. It is already there. It has always been there. It is the part of you reading these words right now and recognizing something true in them.","The moment you can see what is happening you are no longer fully inside the automatic response. You are present with it. And from that position something new becomes possible. Not force. Not control. A choice."],
-    transition:"Now notice one reaction as it happens. Stay with it. Watch it without becoming it.",
-    questions:["When have you last caught yourself mid-pattern -- not after it ran but while it was running? What made that recognition possible?","What pattern in your life has the most pull on your attention? Describe what it feels like from fully inside it versus from even a slight distance.","Who in your life consistently pulls you out of observer position and back into identification? What is your system doing in their presence?","Think of the last time you were in a strong reaction. Was there any part of you watching it happen -- or were you completely inside it?","What is the difference in your body between being the reaction and watching the reaction? Can you feel that difference right now?","What would it mean to hold observer position in your most challenging relationship or environment -- not to disengage, but to stay present and aware simultaneously?","What does the observer see about your system right now that the system itself would prefer not to look at?","What happens when you observe something in yourself without immediately judging it, explaining it, or trying to fix it? Describe that experience."],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section develops the observer position -- seeing the system while it runs without being consumed by it.\n\nWhen someone describes what they observe about themselves, validate the observation precisely. Show them what they just accessed. Name whether they were in observer position or identified with the pattern. 2-3 sentences. Use their exact words. No good/bad framing. Just precise observation.",
-    summaryPrompt:"Summarize what this person revealed about their observer capacity. When is the observer present? When does it collapse into identification? What pulls them out of observer position? What does the observer see that the system prefers not to look at? 4-5 sentences. Use their words. Start with: Your observer position:"
+    num:'05', title:'The Observer', subtitle:'Seeing without becoming',
+    layer:'PERCEPTION LAYER', framework:'... → Perception → ...',
+    context:'The Observer is the part of awareness that can watch what is happening without merging with it. Most people are inside their patterns — living them, driven by them, identified with them. The Observer is not a different self. It is the same awareness turned toward itself. The moment you notice you\'re in a pattern is already the Observer working.',
+    question:'Describe a recent moment when you caught yourself in a pattern while it was happening — not after, not in reflection, but in the middle of it. What did it feel like to observe it from inside?',
+    placeholder:'A moment of real-time recognition. What was happening, and what was it like to see it while it was running?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 05 — The Observer / Perception Layer.
+
+The person should describe genuine real-time observation — catching a pattern WHILE it's running, not in hindsight. The quality of Observer experience should be present: the strange doubling of being in something and watching it simultaneously.
+
+SURFACE signals: describing only retrospective reflection ("later I realized"), describing the pattern itself without the observation experience, framing it as a success story of how they "caught themselves," not conveying the phenomenology of the observation moment, very short answer without texture.
+
+If SURFACE: {"surface": true, "reflection": "That described the pattern more than the observation of it. The distinction matters: what is it actually like to see something running inside you while it's running — not after? The Observer experience has a specific quality. What did that moment feel like from the inside?"}
+
+If HONEST: {"surface": false, "reflection": "[Reflect back the specific texture of their observation experience. The moment of doubling — being in the pattern and watching it. Don't interpret what it means. Mirror the quality of that observation precisely.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"patterns", number:"06", title:"Pattern Recognition", subtitle:"The structure underneath everything",
-    teaching:["A pattern is not random.","It is a sequence the system has run so many times it no longer requires conscious input. It activates automatically. It produces consistent results. And because the results are consistent the system treats them as confirmation rather than information.","This is why patterns are so difficult to see from inside them. They feel like reality. They feel like personality. They feel like the natural order of how your life goes. Not because they are any of these things. Because they have been running long enough to feel inevitable.","The cast of characters changes. The script does not. Different person, same conflict. Different situation, same frustration. Different circumstances, same outcome. The variety is real. The pattern underneath the variety is also real.","You do not have a thousand different problems. You have one or two patterns expressing across a thousand different situations. Once you see the shape of your pattern it loses its power to surprise you. You stop asking what happened. You start saying -- there it is again.","Patterns thrive in the dark. They rely on you believing that every situation is different, every person is new, every outcome was unforeseeable. Once you collect enough honest observations the pattern reveals itself. Not because something changed. Because you finally looked long enough to see it."],
-    transition:"Now identify the structure underneath your most repeated experience. Not the story -- the structure.",
-    questions:["What pattern have you recognized most clearly in your own life -- not the event but the structure underneath multiple events? Describe the structure.","The cast of characters in your life has changed over the years. What has stayed the same in how situations unfold? What is the constant?","Where in your body does your most persistent pattern live? What does it feel like when it is running -- the texture of it, not the story.","Think of someone whose pattern you can see clearly from the outside. Now look for the same pattern in yourself. Where does it appear in a different form?","What is a pattern you have been defending as a justified response to external circumstances? What would it look like to see it as a program running regardless of circumstances?","When did you first run this pattern? What was the context that taught the system this response was necessary?","What does the pattern protect you from? What would you have to face if it stopped running?","What would change in how you relate to your most persistent pattern if you stopped seeing it as who you are and started seeing it as something the system is running?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section is about pattern recognition -- seeing the structure underneath repeated experiences.\n\nWhen someone describes their pattern, reflect the structure back clearly. Separate the story from the structure. Name the pattern precisely. Show them what it is built around. 2-3 sentences. Use their exact words.\n\nThe goal: they see the pattern as a structure the system runs -- not as who they are.",
-    summaryPrompt:"Name this person's core pattern clearly and structurally. Describe where it lives in the body. What it protects. When it first formed. What would have to be faced if it stopped running. 4-5 sentences. Use their words. Start with: Your pattern:"
+    num:'06', title:'Pattern Recognition', subtitle:'The structure underneath everything',
+    layer:'PERCEPTION → FORMATION', framework:'... → Perception → Formation → ...',
+    context:'Patterns are not random. They have structure. The same core pattern often runs underneath very different surface situations — relationships, work, money, conflict — wearing different costumes. Recognizing the structure underneath the content is the shift from reacting to observing. The pattern is not the problem. Not seeing it is.',
+    question:'What is one pattern that has appeared in multiple areas of your life — under different circumstances, with different people, in different contexts — but with a recognizable structure underneath? Describe the structure, not the stories.',
+    placeholder:'Not the individual situations — the underlying shape. What is the same in all of them?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 06 — Pattern Recognition.
+
+This is the deepest Perception/Formation section. The person should be identifying the STRUCTURE of a recurring pattern — the underlying shape that appears across different life contexts — not just listing situations where the pattern appeared.
+
+SURFACE signals: listing situations without extracting the structure, naming only surface behaviors without the underlying mechanism, choosing a very minor pattern, describing it as already resolved, or intellectualizing without personal specificity.
+
+If SURFACE: {"surface": true, "reflection": "That named the pattern in its surface form. Underneath the specific situations — the argument, the job, the relationship — there is usually a structure that repeats. A role you take. A moment where something closes or opens. A decision point that feels like no decision. What is the actual shape of it, stripped of context?"}
+
+If HONEST: {"surface": false, "reflection": "[Name the structural pattern they've identified — the underlying shape. Reflect it back in their language. Note if they've located it accurately at the Formation layer — where the pattern initiates before decision. Don't add meaning. Just mirror the structure.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"loop", number:"07", title:"Loop vs Spiral", subtitle:"Where are you in this right now",
-    teaching:["A loop and a spiral can look identical from the outside.","Same situation. Same trigger. Same emotional weather. Same type of person. Same outcome. To the system without awareness it feels new every time. Again and again it feels like this time is different. That is the loop.","The loop does not know it is a loop. That is what makes it one. It does not connect this moment to the last. It reacts as if it is happening for the first time. The pattern runs. The outcome appears. The system concludes: this is just how things are.","The spiral is different. The territory may be the same. But the relationship to it is not. You see it while it is happening. Something in you recognizes it -- not intellectually but in the body. The same emotional temperature. The same pull. The same invitation. But this time it is seen. That is the whole shift.","The spiral still revisits. It does not avoid the territory. It moves through it differently. Not through effort. Not through willpower. Through awareness. Knowing where you are while you are in it.","Growth is not the absence of patterns. It is the increase of awareness within them. You may still encounter the same situation. But you arrive as a different observer. And that changes everything downstream."],
-    transition:"Now look at the pattern you identified. Are you in a loop or a spiral? How do you know?",
-    questions:["Describe your most persistent pattern in one sentence -- just the structure, not the story.","How many times has this pattern run in your life? Give an honest estimate. What does that number tell you?","When you are inside this pattern -- what does it feel like in the body? Tight, hot, flat, rushing, heavy? Be specific.","When you can see this pattern from even a slight distance -- what changes in your body? What is the difference between those two states?","What is the most recent moment you caught this pattern while it was running -- not afterward, during? What made that possible?","What evidence do you have that you are in a spiral rather than a loop with this pattern -- that you are meeting it from a higher level of awareness than before?","What one different choice -- even small, even imperfect -- could interrupt the confirmation cycle the next time this pattern appears?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section distinguishes between loop and spiral -- repetition without awareness versus meeting the same territory with increasing clarity.\n\nAfter each answer, reflect back whether what they described is loop behavior or spiral behavior. Name it clearly. Use their words. Show the evidence from what they said. 2-3 sentences. No judgment. Just accurate reading.",
-    summaryPrompt:"Assess clearly whether this person is in a loop or a spiral with their pattern. Name the evidence from their answers. Show what is moving and what is still stuck. Name the one interruption available to them. 4-5 sentences. Use their words. Start with: Loop or spiral:"
+    num:'07', title:'Loop vs Spiral', subtitle:'Where are you in this right now',
+    layer:'DECISION LAYER', framework:'... → Decision → ...',
+    context:'A loop returns to the same point. A spiral returns to the same position but at a different depth — same territory, different layer of understanding. Most people can\'t tell the difference from the inside. The loop feels like movement. The spiral feels like being stuck. The question is not which one is happening — it\'s whether you can see which one is happening.',
+    question:'Pick something you\'ve been working on, thinking about, or moving through for a long time. Is it a loop or a spiral? What evidence do you have either way — and what would it take to know for certain?',
+    placeholder:'Not what you want it to be. What does the evidence actually show?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 07 — Loop vs Spiral / Decision Layer.
+
+The person should be making a genuine assessment of whether they're looping or spiraling — not giving the aspirational answer. The Decision layer is where this distinction lives: the loop is the same decision repeatedly, the spiral is the same territory with genuine new depth.
+
+SURFACE signals: immediately claiming spiral without evidence, describing why they believe it's a spiral without naming what would indicate it's a loop, choosing a minor situation rather than something with real weight, not engaging the "what would it take to know for certain" part.
+
+If SURFACE: {"surface": true, "reflection": "That named the preferred answer. The harder question is: what would the loop version of this look like? If you were looping and couldn't see it — what would the evidence be? That question has to be held before the spiral conclusion can land accurately."}
+
+If HONEST: {"surface": false, "reflection": "[Reflect back their actual assessment. Note the specific evidence they named for loop or spiral. If they held genuine uncertainty about which it is — reflect that uncertainty as accurate observation, not as something to resolve. The not-knowing is itself information at the Decision layer.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"liveobs", number:"08", title:"Live Observation", subtitle:"Watching the system while it runs",
-    teaching:["It is easy to see things after they happen.","What changes everything is seeing them while they are happening.","Most observation happens in reflection. You look back at what occurred and trace the sequence from memory. That is valuable. It builds the data set. But it is working with what already passed.","Live observation is different. You are watching the sequence unfold in real time. You feel the state shift. You notice the perception forming. You watch the decision arriving before it fully locks in. You are inside the process as it builds -- not reconstructing it afterward.","This is where awareness sharpens into something usable. Because now you are not just understanding the pattern -- you are present with it while it moves. That presence is what creates the gap. Not thinking about the gap. Being in it.","Do not wait for a quiet moment to practice this. Every conversation is the session. Every activation is the laboratory. The system is always running. The observation can always begin."],
-    transition:"Now stay with whatever is happening in you right now. Watch the sequence as it moves. Do not explain it. Just look.",
-    questions:["Right now -- before you think about what to write -- what is your body doing? Where is there tension, ease, activation, stillness? Describe what is actually present.","As you sit with this course right now -- what state is running? What does your nervous system feel like?","In the last hour something activated you or settled you. What was it? Track it back -- what state did it produce and what did that state make you notice?","Think of a conversation you had recently. Can you track the moment your state shifted inside it? What triggered the shift?","What is the hardest part of watching yourself in real time rather than in reflection? What does the system do when you try to observe it live?","When you observe yourself without judgment -- what is the quality of that attention? What does it feel like to just see without adding anything?","What is available to you when you are observing in real time that is not available when you reconstruct afterward?","Practice right now -- stay with whatever is happening in your body for 60 seconds without naming it, changing it, or explaining it. Then describe what happened during that time."],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section is about live observation -- watching the system while it is running rather than reconstructing it afterward.\n\nThis section is different. The person is observing themselves right now, in real time. Your reflections should feel present-tense and immediate.\n\nReflect back what they are observing with present-tense precision. Show them what live observation just revealed. 2-3 sentences. Use their exact words. Keep the observation quality -- do not shift into analysis.",
-    summaryPrompt:"Summarize what live observation revealed about this person's system right now -- their current state, what the body is reporting, where attention goes, what the system does when observed. Present tense. 4-5 sentences. Use their words. Start with: What live observation revealed:"
+    num:'08', title:'Live Observation', subtitle:'Watching the system while it runs',
+    layer:'EXPERIENCE LAYER', framework:'... → Experience → ...',
+    context:'This section does not introduce a new concept. It asks you to apply everything from the previous seven sections to something happening right now. Not a memory. Not a hypothetical. What is actually active in your experience at this moment — and can you watch it as it runs?',
+    question:'What is most active in your awareness right now — in this moment, doing this work? Name what you\'re noticing, what\'s coming up, and where in the sequence (State, Perception, Formation, Decision) you can feel it most clearly.',
+    placeholder:'Real-time observation. What is present right now, and where in the sequence is it most alive?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 08 — Live Observation / Experience Layer.
+
+This section is entirely present-moment. The person should be reporting what is ACTUALLY alive right now as they do this work — not reflecting on a past situation. They should locate it in the sequence.
+
+SURFACE signals: describing a past situation, talking about the concept of observation, not engaging the real-time dimension, failing to locate the experience in the sequence, short or evasive response (high indicator of real activation they may be avoiding).
+
+NOTE: A very short or deflecting response here is often the most honest signal — the system is activating and they're moving past it. Reflect this possibility if you see it.
+
+If SURFACE: {"surface": true, "reflection": "That moved away from right now. This section only asks about this moment — not a situation, not a concept. What is actually happening in your body and attention as you do this work right now? Something is present. Name it."}
+
+If HONEST: {"surface": false, "reflection": "[Mirror exactly what they named as present right now. Reflect the sequence location they identified. If they named resistance, avoidance, or discomfort — reflect it without soothing it. The Experience layer is where the system's output becomes visible.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"interruption", number:"09", title:"The Interruption Point", subtitle:"Where choice actually lives",
-    teaching:["There is a gap between perception and decision.","Usually it is so small it is invisible. The perception forms and the decision fires and it feels like one motion. That is the loop running at full speed without observation.","The purpose of everything in this course has been to widen that gap.","Because in that gap -- however small -- is your only real point of leverage. Not at the end where the outcome appears. Not at the beginning where the state loads. Right there. Between what you noticed and what you chose to do about it.","You do not need force in that moment. You do not need a better reaction already prepared. You only need to be present when the gap opens. The moment you are there -- consciously there, observer position active -- the sequence is no longer fully automatic. Something has been introduced. A variable the loop did not account for.","Even if you choose the same response you always chose, choosing it consciously changes your relationship to the result. You are no longer cargo. You made a choice. That is different. That difference compounds over time.","One interruption gives the system new data. New data makes different options visible next time. That is how the spiral forms. Not through one breakthrough. Through accumulated interruption."],
-    transition:"Now locate the gap in a sequence that is running right now or recently. Name the moment between the perception and the decision. Stay there.",
-    questions:["Using the sequence you mapped earlier -- at what specific point does the pattern first become visible to you before it has fully run?","What does it feel like right at that moment -- the first signal that this sequence is beginning? Describe the physical sensation as precisely as you can.","What has happened in the past when you have caught the pattern at that point? Have you ever made a different choice there? What resulted?","What makes it hardest to stay present at the interruption point rather than defaulting to the automatic response?","If you paused right at that moment -- not to choose a better response but simply to be present with the gap -- what do you think you would find there?","What is one small different move you could make at your interruption point -- not to stop the pattern, just to interrupt the confirmation cycle?","How many times in a given day does your interruption point appear? What would your life look like if you were present for it even half the time?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This section is about the interruption point -- the gap between perception and decision where the observer can introduce awareness and change what follows.\n\nWhen someone describes their interruption point, reflect back exactly where it is in their sequence. Name the gap. Show them what is available in that space. 2-3 sentences. Precise. Use their words.",
-    summaryPrompt:"Identify this person's interruption point precisely. Name where it is in their sequence. Describe the physical signal that marks it. Name the one move available there. Show what becomes possible if they are present at that point consistently. 4-5 sentences. Use their words. Start with: Your interruption point:"
+    num:'09', title:'The Interruption Point', subtitle:'Where choice actually lives',
+    layer:'DECISION → EXPERIENCE', framework:'... → Decision → Experience → ...',
+    context:'Between the pattern initiating and the behavior executing, there is a gap. Most of the time that gap is invisible — the pattern runs before there\'s any awareness of it. But the gap exists. The Interruption Point is not about willpower or stopping the pattern. It is about finding the gap — the moment before the automatic becomes complete — and recognizing it as the actual location of choice.',
+    question:'In one of your identified patterns, can you locate the Interruption Point — the specific moment between the trigger and the automatic response where something else is possible? Describe that moment as precisely as you can.',
+    placeholder:'The gap between trigger and response. What does it feel like, how long does it last, what is available there?',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 09 — The Interruption Point.
+
+The person should be locating the actual gap between trigger and automatic response in a specific pattern. This is not conceptual — it requires genuine recall of the phenomenology of that moment. The quality of specificity here indicates depth of observation.
+
+SURFACE signals: describing what they should do at the interruption point rather than what it actually feels like, claiming the gap doesn't exist for them, describing the pattern rather than the gap, very abstract or philosophical response.
+
+If SURFACE: {"surface": true, "reflection": "That described around the gap rather than inside it. The gap is a specific moment with a specific quality — it may be very brief, barely there. In one pattern you know well: what is the last thing you notice before the automatic response is already running? Even if it's only a fraction of a second — what is present there?"}
+
+If HONEST: {"surface": false, "reflection": "[Reflect back the specific phenomenology of the gap they described — its texture, duration, quality. Note what they said is available there. Don't prescribe what to do with it. The observation of the Interruption Point is the work.]"}
+
+Return ONLY valid JSON.`
   },
   {
-    id:"integration", number:"10", title:"Integration", subtitle:"You are where the work begins",
-    teaching:["This is not something you complete.","Integration is not the finish line. It is the point where studying yourself stops being a practice you do and starts being the way you move through your life. The observer position is no longer something you remember to take. It is where you already are.","The framework does not disappear. It becomes invisible in the way breathing is invisible -- constant, present, not requiring effort because it has become the default.","The system knows it is being studied. It adjusts. Not dramatically. Incrementally. The reactions become slightly less automatic. The gap widens slightly more. The pattern shows up and instead of surprise you feel recognition. There it is. You already know what this is. You know where it starts. You know where you can meet it differently.","Nothing was fixed. Nothing was eliminated. Everything became workable. That is the shift. Not a new identity. Not a better version. The same system -- now visible. Now understood. Now yours in a way it was not before.","The study does not end here. What you built in this course is not a conclusion. It is a capacity. A way of being present with yourself that does not require a course to sustain it.","You are not the end of this work. You are where it begins."],
-    transition:"Now move through your day with the observer present. Not as a practice. As the way you are.",
-    questions:["What did you become aware of in this course that you did not see clearly before you began?","What pattern or quality in yourself that you have seen as a limitation might actually contain information or capacity you have not yet used? What is the angle that makes it useful?","Looking at the sequence you mapped -- what has shifted in how you understand it now versus when you first described it?","Where in your daily life will the observer position be most useful -- and most challenged? What is the environment or relationship that will test this most?","What is your living question right now -- the one this work has been circling, the one still open, the one not yet finished with you?","What is one thing you are going to keep watching -- one specific place in your sequence where you are going to stay present?","What would your life look like in 90 days if the observer position became your default operating mode?","You are not the end of this work. You are where it begins. What does that mean for you right now -- honestly?"],
-    systemPrompt:"You are part of a consciousness course called Study Yourself by Bhave. This is the final section -- integration.\n\nWhen someone answers these closing questions, reflect back what they just named with precision and care. Show them the significance of what they articulated. Use their exact words. 2-3 sentences. This is the closing of the work -- make the reflection land.\n\nNo advice about what to do next. Just accurate reflection of what they found.",
-    summaryPrompt:"Write the final integration summary. What they became aware of. What shifted in their understanding of their sequence. What their living question is. What they are going to keep watching. Close with what it means that they are not the end of this work but where it begins -- using their specific words. 5-6 sentences. Start with: What you found in this work:"
+    num:'10', title:'Integration', subtitle:'You are where the work begins',
+    layer:'REALITY LAYER', framework:'... → Reality → State',
+    context:'The sequence completes and begins again. Reality is not the end — it is the feedback that informs the next State. Integration is not a conclusion. It is a recognition: what you\'ve observed across this work is now part of the system that is observing. The map has changed because you looked at it.',
+    question:'What is the most significant thing that surfaced for you across this entire session — not the most comfortable thing, not the most conceptually interesting thing, but the thing that has the most actual weight for how you operate?',
+    placeholder:'The thing with the most weight. Not the insight you\'re most comfortable with — the one that matters most.',
+    systemPrompt:`You are a precise awareness reflector for Bhavé's Lab Study Yourself course. Section 10 — Integration / Reality Layer.
+
+This is the final section. The person should be naming something with genuine weight — the most significant observation from across the full session. Not a summary, not a tidy conclusion, but the thing that actually carries charge.
+
+SURFACE signals: choosing the most comfortable or socially acceptable insight, summarizing all sections rather than pointing to one thing, intellectual synthesis without weight, choosing something already resolved, vague generality.
+
+If SURFACE: {"surface": true, "reflection": "That named something comfortable. The question asks for the thing with the most weight — the one that may be least easy to say. What came up across this session that you moved past quickly, or that you're still not sure what to do with?"}
+
+If HONEST: {"surface": false, "reflection": "[Reflect back the thing they named with weight. Don't interpret its significance or tell them what it means. Don't offer resolution. The Reality layer feeds back into State — this observation is now part of the system. Reflect it precisely and let it sit.]"}
+
+Return ONLY valid JSON.`
   }
 ];
 
-// STATE
-var state = {
-  userName: "", userEmail: "", secIdx: 0, qIdx: 0,
-  showTeaching: true, answers: {}, reflections: {}, summaries: {},
-  showSummary: false, sectionSummary: "", emailSent: false
-};
+// ── STATE ─────────────────────────────────────────────────────
+let userEmail = '';
+let currentSection = 0;
+let sessionData = [];
+let sectionFlags = [];
+const BACKEND = 'https://bhaveslab-backend.vercel.app';
 
-var conversationHistory = [];
-
-function loadSavedState() {
-  try {
-    var raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return null;
-}
-
-function saveStateToStorage() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e) {}
-}
-
-function clearStoredState() {
-  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
-}
-
-// API
-function callReflect(systemPrompt, messages, callback) {
-  fetch(BACKEND + "/api/reflect", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) { callback(data.text || ""); })
-  .catch(function() { callback("The system is processing. Continue."); });
-}
-
-function sendPatternMap() {
-  var payload = [];
-  for (var i = 0; i < SECTIONS.length; i++) {
-    var s = SECTIONS[i];
-    if (state.summaries[s.id]) {
-      payload.push({ number: s.number, title: s.title, summary: state.summaries[s.id] });
-    }
-  }
-  fetch(BACKEND + "/api/send-pattern-map", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: state.userName, email: state.userEmail, summaries: payload })
-  }).catch(function() {});
-}
-
-// SCREENS
-function showScreen(id) {
-  var screens = document.querySelectorAll(".screen");
-  for (var i = 0; i < screens.length; i++) {
-    screens[i].classList.remove("active");
-  }
-  var el = document.getElementById("screen-" + id);
-  if (el) { el.classList.add("active"); window.scrollTo(0, 0); }
-}
-
-// INTRO
-function initIntro() {
-  var list = document.getElementById("sections-list");
-  var html = "";
-  for (var i = 0; i < SECTIONS.length; i++) {
-    var s = SECTIONS[i];
-    html += '<div class="section-row">';
-    html += '<span class="section-num">' + s.number + '</span>';
-    html += '<div><span class="section-name">' + s.title + '</span>';
-    html += '<span class="section-sub">' + s.subtitle + '</span></div>';
-    html += '</div>';
-  }
-  list.innerHTML = html;
-
-  var saved = loadSavedState();
-  if (saved && saved.secIdx > 0) {
-    document.getElementById("resume-banner").style.display = "block";
-  }
-
-  document.getElementById("begin-btn").addEventListener("click", beginCourse);
-  document.getElementById("resume-btn").addEventListener("click", resumeCourse);
-  document.getElementById("restart-btn").addEventListener("click", restartCourse);
-}
-
-function beginCourse() {
-  var nameEl = document.getElementById("input-name");
-  var emailEl = document.getElementById("input-email");
-  var errEl = document.getElementById("form-error");
-  var name = nameEl ? nameEl.value.trim() : "";
-  var email = emailEl ? emailEl.value.trim() : "";
-  if (!name) {
-    errEl.textContent = "Please enter your name.";
-    errEl.style.display = "block";
+// ── BEGIN ─────────────────────────────────────────────────────
+document.getElementById('begin-btn').addEventListener('click', () => {
+  const email = document.getElementById('user-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('user-email').style.borderColor = 'rgba(201,169,110,0.6)';
+    document.getElementById('user-email').focus();
     return;
   }
-  if (!email || email.indexOf("@") === -1) {
-    errEl.textContent = "Please enter a valid email address.";
-    errEl.style.display = "block";
-    return;
-  }
-  errEl.style.display = "none";
-  state.userName = name;
-  state.userEmail = email;
-  saveStateToStorage();
-  renderSection();
-  showScreen("section");
-}
-
-function resumeCourse() {
-  var saved = loadSavedState();
-  if (saved) {
-    state = saved;
-    var nameEl = document.getElementById("input-name");
-    var emailEl = document.getElementById("input-email");
-    if (nameEl) nameEl.value = state.userName;
-    if (emailEl) emailEl.value = state.userEmail;
-    renderSection();
-    showScreen("section");
-  }
-}
-
-// SECTION RENDER
-function renderSection() {
-  var sec = SECTIONS[state.secIdx];
-  var total = SECTIONS.length;
-  var current = state.secIdx + 1;
-  var pct = Math.round((current / total) * 100);
-
-  document.getElementById("progress-label").textContent = "SECTION " + current + " OF " + total;
-  document.getElementById("progress-pct").textContent = pct + "%";
-  document.getElementById("progress-fill").style.width = pct + "%";
-
-  var header = document.getElementById("section-header");
-  header.innerHTML = '<div><span class="section-num-label">' + sec.number + '</span><span class="section-title">' + sec.title + '</span></div><div class="section-subtitle">' + sec.subtitle + '</div>';
-
-  if (state.showTeaching) {
-    renderTeaching(sec);
-    document.getElementById("questions-area").style.display = "none";
-  } else {
-    document.getElementById("teaching-block").style.display = "none";
-    document.getElementById("questions-area").style.display = "block";
-    renderQuestions(sec);
-  }
-}
-
-function renderTeaching(sec) {
-  var block = document.getElementById("teaching-block");
-  block.style.display = "block";
-  var html = '<div class="teaching-label">STUDY THIS FIRST</div>';
-  for (var i = 0; i < sec.teaching.length; i++) {
-    var cls = (i === 0) ? "teaching-p first" : "teaching-p";
-    html += '<p class="' + cls + '">' + sec.teaching[i] + '</p>';
-  }
-  html += '<div class="teaching-transition">' + sec.transition + '</div>';
-  html += '<button class="btn-gold" id="begin-obs-btn" style="margin:0;">BEGIN OBSERVATION</button>';
-  block.innerHTML = html;
-  document.getElementById("begin-obs-btn").addEventListener("click", startObservation);
-}
-
-function startObservation() {
-  state.showTeaching = false;
-  saveStateToStorage();
-  document.getElementById("teaching-block").style.display = "none";
-  document.getElementById("questions-area").style.display = "block";
-  renderQuestions(SECTIONS[state.secIdx]);
-}
-
-function escHtml(str) {
-  if (!str) return "";
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/\n/g,"<br>");
-}
-
-function renderQuestions(sec) {
-  var area = document.getElementById("questions-area");
-  var html = "";
-
-  // Render all previously answered questions with their reflections
-  var limit = state.showSummary ? sec.questions.length : state.qIdx;
-  for (var i = 0; i < limit; i++) {
-    var key = sec.id + "_" + i;
-    var ans = state.answers[key];
-    var ref = state.reflections[key];
-    if (!ans) continue;
-    html += '<div class="past-answer">';
-    html += '<div class="past-question">' + sec.questions[i] + '</div>';
-    html += '<div class="past-text">' + escHtml(ans) + '</div>';
-    if (ref) {
-      html += '<div class="reflection">';
-      html += '<div class="reflection-label">OBSERVED</div>';
-      html += '<div class="reflection-text">' + escHtml(ref) + '</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // FIX: Only show the summary block if showSummary is true AND sectionSummary exists
-  if (state.showSummary && state.sectionSummary) {
-    html += '<div class="summary-block">';
-    html += '<div class="summary-label">SECTION COMPLETE</div>';
-    html += '<div class="summary-text">' + escHtml(state.sectionSummary) + '</div>';
-    html += '</div>';
-    html += '<div class="summary-actions">';
-
-    // FIX: Build next label safely -- define next before using it
-    var nextLabel;
-    if (state.secIdx === SECTIONS.length - 1) {
-      nextLabel = 'VIEW YOUR PATTERN MAP';
-    } else {
-      var next = SECTIONS[state.secIdx + 1];
-      nextLabel = 'CONTINUE TO ' + next.number + ' -- ' + next.title.toUpperCase();
-    }
-    html += '<button id="next-section-btn" class="btn-outline">' + nextLabel + '</button>';
-    html += '</div>';
-
-  } else if (state.showSummary && !state.sectionSummary) {
-    // FIX: Generating state -- show spinner while summary is being fetched
-    html += '<div class="generating">BUILDING YOUR SECTION SUMMARY...</div>';
-
-  } else {
-    // Active question input
-    var q = sec.questions[state.qIdx];
-    html += '<div id="current-question">';
-    html += '<div class="question-counter">' + (state.qIdx + 1) + " / " + sec.questions.length + '</div>';
-    html += '<div class="question-text">' + q + '</div>';
-    html += '<textarea id="answer-input" rows="6" placeholder="Write honestly. Not the answer that sounds right -- the honest one."></textarea>';
-
-
-html += '<div class="question-actions">';
-html += '<span class="cmd-hint">Ctrl + Enter to submit</span>';
-html += '<div class="action-right">';
-html += '<span id="observing-label" class="observing-label" style="display:none;">OBSERVING</span>';
-html += '<button id="submit-btn" class="btn-outline">CONTINUE</button>';
-html += '</div></div></div>';
-
-
-}
-
-area.innerHTML = html;
-
-// Attach listeners after rendering
-var submitBtn = document.getElementById("submit-btn");
-if (submitBtn) {
-submitBtn.addEventListener("click", submitAnswer);
-}
-
-var nextBtn = document.getElementById("next-section-btn");
-if (nextBtn) {
-nextBtn.addEventListener("click", nextSection);
-}
-
-var ta = document.getElementById("answer-input");
-if (ta) {
-ta.addEventListener("keydown", function(e) {
-if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submitAnswer();
+  userEmail = email;
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('course').style.display = 'block';
+  renderSection(0);
 });
-setTimeout(function() { ta.focus(); }, 100);
-}
-}
 
-function submitAnswer() {
-var ta = document.getElementById("answer-input");
-if (!ta || !ta.value.trim()) return;
-var input = ta.value.trim();
-var sec = SECTIONS[state.secIdx];
-var key = sec.id + "_" + state.qIdx;
+// ── RENDER SECTION ────────────────────────────────────────────
+function renderSection(index) {
+  const s = SECTIONS[index];
+  updateProgress(index);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-// Disable input while processing
-ta.disabled = true;
-var btn = document.getElementById("submit-btn");
-if (btn) btn.disabled = true;
-var obs = document.getElementById("observing-label");
-if (obs) obs.style.display = "inline";
+  document.getElementById('section-content').innerHTML = `
+    <div class="section-header">
+      <div class="section-tag">SECTION ${s.num} OF 10</div>
+      <h2 class="section-title">${s.title}</h2>
+      <div class="section-subtitle">${s.subtitle}</div>
+    </div>
+    <div class="layer-indicator">
+      <div class="layer-dot"></div>
+      ${s.layer} — ${s.framework}
+    </div>
+    <div class="context-block">${s.context}</div>
+    <div class="question-block">
+      <div class="question-label">[ THE QUESTION ]</div>
+      <div class="question-text">${s.question}</div>
+      <textarea id="answer-input" placeholder="${s.placeholder}" rows="6"></textarea>
+      <br>
+      <button class="btn-submit" id="submit-btn">REFLECT</button>
+      <div class="loading-text" id="loading">Reading your answer</div>
+    </div>
+    <div class="reflection-panel sit-with-it" id="sit-panel">
+      <div class="reflection-tag">[ SIGNAL ]</div>
+      <div class="reflection-text" id="sit-text"></div>
+      <div class="sit-action">
+        <button class="btn-sit" id="re-answer-btn">SIT WITH IT — RE-ANSWER</button>
+        <button class="btn-sit advance" id="advance-anyway-btn">ADVANCE ANYWAY</button>
+      </div>
+    </div>
+    <div class="claude-reflection" id="claude-panel">
+      <div class="reflection-tag">[ REFLECTED ]</div>
+      <div class="reflection-text" id="claude-text"></div>
+    </div>
+    <div class="advance-block" id="advance-block">
+      <button class="btn-advance" id="next-btn">${index < 9 ? 'ADVANCE TO SECTION ' + (index + 2) : 'COMPLETE THE STUDY'}</button>
+    </div>
+  `;
 
-state.answers[key] = input;
-var newHistory = conversationHistory.slice();
-newHistory.push({ role: "user", content: input });
+  const submitBtn    = document.getElementById('submit-btn');
+  const answerInput  = document.getElementById('answer-input');
+  const loading      = document.getElementById('loading');
+  const sitPanel     = document.getElementById('sit-panel');
+  const claudePanel  = document.getElementById('claude-panel');
+  const advanceBlock = document.getElementById('advance-block');
+  let finalAnswer = '';
 
-var isLastQ = (state.qIdx === sec.questions.length - 1);
+  submitBtn.addEventListener('click', async () => {
+    const answer = answerInput.value.trim();
+    if (answer.length < 20) { answerInput.style.borderColor = 'rgba(201,169,110,0.5)'; answerInput.focus(); return; }
 
-callReflect(sec.systemPrompt, newHistory, function(reflection) {
-conversationHistory = newHistory.slice();
-conversationHistory.push({ role: "assistant", content: reflection });
-state.reflections[key] = reflection;
+    submitBtn.disabled = true;
+    loading.style.display = 'block';
+    sitPanel.style.display = 'none';
+    claudePanel.style.display = 'none';
+    advanceBlock.style.display = 'none';
+    finalAnswer = answer;
 
+    try {
+      const result = await callClaude(s.systemPrompt, answer);
+      loading.style.display = 'none';
+      submitBtn.style.display = 'none';
 
-if (isLastQ) {
-  // FIX: Set showSummary = true but sectionSummary = "" BEFORE re-render
-  // so the "generating" spinner shows while we fetch the summary
-  state.showSummary = true;
-  state.sectionSummary = "";
-  saveStateToStorage();
-  renderQuestions(sec);
+      if (result.surface) {
+        document.getElementById('sit-text').textContent = result.reflection;
+        sitPanel.style.display = 'block';
+        sectionFlags.push({ section: s.title, num: s.num, type: 'SURFACE_DETECTED' });
 
-  var allA = "";
-  for (var i = 0; i < sec.questions.length; i++) {
-    var k = sec.id + "_" + i;
-    allA += "Q" + (i+1) + ": " + sec.questions[i] + "\nA: " + (state.answers[k] || "") + "\n\n";
-  }
-  callReflect(sec.summaryPrompt, [{ role: "user", content: "Here are all answers:\n\n" + allA + "\nGenerate the section summary." }], function(sum) {
-    state.sectionSummary = sum;
-    state.summaries[sec.id] = sum;
-    saveStateToStorage();
-    renderQuestions(sec);
+        document.getElementById('re-answer-btn').addEventListener('click', () => {
+          sitPanel.style.display = 'none';
+          answerInput.value = '';
+          submitBtn.style.display = 'inline-block';
+          submitBtn.disabled = false;
+          answerInput.focus();
+        });
+
+        document.getElementById('advance-anyway-btn').addEventListener('click', () => {
+          recordAnswer(index, answer, result.reflection, true);
+          sitPanel.style.display = 'none';
+          advanceBlock.style.display = 'block';
+          document.getElementById('next-btn').addEventListener('click', () => advanceSection(index));
+        });
+
+      } else {
+        document.getElementById('claude-text').textContent = result.reflection;
+        claudePanel.style.display = 'block';
+        recordAnswer(index, answer, result.reflection, false);
+        advanceBlock.style.display = 'block';
+        document.getElementById('next-btn').addEventListener('click', () => advanceSection(index));
+      }
+
+    } catch (err) {
+      loading.style.display = 'none';
+      submitBtn.disabled = false;
+      recordAnswer(index, answer, '', false);
+      advanceBlock.style.display = 'block';
+      if (document.getElementById('next-btn')) {
+        document.getElementById('next-btn').addEventListener('click', () => advanceSection(index));
+      }
+    }
   });
-} else {
-  state.qIdx++;
-  saveStateToStorage();
-  renderQuestions(sec);
 }
 
-
-});
+// ── CALL CLAUDE ───────────────────────────────────────────────
+async function callClaude(systemPrompt, answer) {
+  const response = await fetch(`${BACKEND}/api/reflect`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ systemPrompt, messages: [{ role: 'user', content: answer }], max_tokens: 400 })
+  });
+  if (!response.ok) throw new Error('Backend error');
+  const data = await response.json();
+  let text = (data.text || '').trim().replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+  return JSON.parse(text);
 }
 
-function nextSection() {
-if (state.secIdx === SECTIONS.length - 1) {
-showMapScreen();
-} else {
-state.secIdx++;
-state.qIdx = 0;
-state.showTeaching = true;
-state.showSummary = false;
-state.sectionSummary = "";
-conversationHistory = [];
-saveStateToStorage();
-document.getElementById("teaching-block").style.display = "block";
-renderSection();
-window.scrollTo(0, 0);
-}
+// ── RECORD ANSWER ─────────────────────────────────────────────
+function recordAnswer(index, answer, reflection, movedThrough) {
+  const s = SECTIONS[index];
+  sessionData[index] = { section: s.title, num: s.num, layer: s.layer, framework: s.framework, question: s.question, answer, reflection, movedThrough, timestamp: new Date().toISOString() };
 }
 
-function showMapScreen() {
-var mapTitle = document.getElementById("map-title");
-if (mapTitle) mapTitle.textContent = state.userName ? state.userName + "'s Pattern Map" : "Your Pattern Map";
-
-var mapMsg = document.getElementById("map-email-msg");
-if (mapMsg && state.userEmail) {
-mapMsg.textContent = "Your pattern map has been sent to “ + state.userEmail + “. Ready to go deeper?";
+// ── ADVANCE ───────────────────────────────────────────────────
+function advanceSection(index) {
+  if (index < 9) { currentSection = index + 1; renderSection(currentSection); }
+  else { showCompletion(); }
 }
 
-var mapSections = document.getElementById("map-sections");
-var html = "";
-for (var i = 0; i < SECTIONS.length; i++) {
-var s = SECTIONS[i];
-var sum = state.summaries[s.id];
-if (!sum) continue;
-html += '<div class="map-section">';
-html += '<div class="map-section-header">';
-html += '<span class="map-section-num">' + s.number + '</span>';
-html += '<span class="map-section-title">' + s.title.toUpperCase() + '</span>';
-html += '</div>';
-html += '<div class="map-section-text">' + escHtml(sum) + '</div>';
-html += '</div>';
-}
-mapSections.innerHTML = html;
-
-showScreen("map");
-
-if (!state.emailSent && state.userEmail) {
-state.emailSent = true;
-saveStateToStorage();
-sendPatternMap();
-}
+// ── PROGRESS ──────────────────────────────────────────────────
+function updateProgress(index) {
+  document.getElementById('progress-fill').style.width = ((index / 10) * 100) + '%';
 }
 
-function restartCourse() {
-clearStoredState();
-state = {
-userName: ", userEmail: "", secIdx: 0, qIdx: 0,
-showTeaching: true, answers: {}, reflections: {}, summaries: {},
-showSummary: false, sectionSummary: "", emailSent: false
-};
-conversationHistory = [];
-var nameEl = document.getElementById("input-name");
-var emailEl = document.getElementById("input-email");
-if (nameEl) nameEl.value = "";
-if (emailEl) emailEl.value = "";
-document.getElementById("resume-banner").style.display = "none";
-document.getElementById("teaching-block").style.display = "block";
-showScreen("intro");
+// ── COMPLETION ────────────────────────────────────────────────
+async function showCompletion() {
+  updateProgress(10);
+  document.getElementById('course').style.display = 'none';
+  document.getElementById('completion').style.display = 'block';
+  document.getElementById('delivery-email').textContent = userEmail;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderWeb();
+  renderFlags();
+  try { await sendPatternMap(); } catch(e) { console.log('Email send failed:', e); }
 }
 
-// INIT
-window.addEventListener("DOMContentLoaded", function() {
-initIntro();
-});
+// ── WEB VISUALIZATION ─────────────────────────────────────────
+function renderWeb() {
+  const svg = document.getElementById('web-svg');
+  const container = document.getElementById('web-canvas');
+  const W = container.offsetWidth, H = container.offsetHeight;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const cx = W/2, cy = H/2;
+  const nodes = SECTIONS.map((s,i) => {
+    const angle = (i/10)*Math.PI*2 - Math.PI/2;
+    const r = Math.min(W,H)*0.35;
+    const jitter = (i%2===0) ? r : r*0.72;
+    return { x: cx+Math.cos(angle)*jitter, y: cy+Math.sin(angle)*jitter, section: s, data: sessionData[i], moved: sessionData[i]?.movedThrough||false };
+  });
+
+  for (let i=0;i<nodes.length;i++) {
+    for (let j=i+1;j<nodes.length;j++) {
+      const a=nodes[i],b=nodes[j];
+      if (Math.hypot(a.x-b.x,a.y-b.y) < Math.min(W,H)*0.45) {
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);
+        line.setAttribute('stroke',`rgba(201,169,110,${a.moved||b.moved?0.08:0.2})`);line.setAttribute('stroke-width','0.5');
+        svg.appendChild(line);
+      }
+    }
+  }
+
+  nodes.forEach(n => {
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.style.cursor='pointer';
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',n.x);circle.setAttribute('cy',n.y);circle.setAttribute('r',n.moved?5:8);
+    circle.setAttribute('fill',n.moved?'rgba(201,169,110,0.15)':'rgba(201,169,110,0.6)');circle.setAttribute('stroke','rgba(201,169,110,0.8)');circle.setAttribute('stroke-width','1');
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',n.x);lbl.setAttribute('y',n.y-14);lbl.setAttribute('text-anchor','middle');lbl.setAttribute('fill','rgba(201,169,110,0.7)');lbl.setAttribute('font-family','Share Tech Mono, monospace');lbl.setAttribute('font-size','9');lbl.setAttribute('letter-spacing','1');lbl.textContent=n.section.num;
+    const name=document.createElementNS('http://www.w3.org/2000/svg','text');
+    name.setAttribute('x',n.x);name.setAttribute('y',n.y+20);name.setAttribute('text-anchor','middle');name.setAttribute('fill','rgba(180,170,155,0.5)');name.setAttribute('font-family','Cormorant Garamond, serif');name.setAttribute('font-size','9');name.textContent=n.section.title;
+    g.appendChild(circle);g.appendChild(lbl);g.appendChild(name);
+    const tooltip=document.getElementById('node-tooltip');
+    g.addEventListener('mouseenter',e=>{tooltip.style.display='block';document.getElementById('tt-title').textContent=`${n.section.num} — ${n.section.title}`;document.getElementById('tt-text').textContent=n.data?.answer?n.data.answer.substring(0,180)+(n.data.answer.length>180?'...':''):'No answer recorded.';tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-20)+'px';});
+    g.addEventListener('mousemove',e=>{tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-20)+'px';});
+    g.addEventListener('mouseleave',()=>{tooltip.style.display='none';});
+    svg.appendChild(g);
+  });
+}
+
+// ── PATTERN FLAGS ─────────────────────────────────────────────
+function renderFlags() {
+  const container = document.getElementById('pattern-flags');
+  if (sectionFlags.length === 0) {
+    container.innerHTML = `<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;color:var(--ash);padding:1rem 0;">[ NO_SURFACE_FLAGS — Full engagement across all sections ]</div>`;
+    return;
+  }
+  let html = `<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;color:var(--gold);margin-bottom:1rem;">[ PATTERN FLAGS — Sections where the system moved quickly ]</div>`;
+  sectionFlags.forEach(f => {
+    html += `<div class="flag-item"><div class="flag-icon">${f.type.replace('_',' ')}</div><div class="flag-text">Section ${f.num} — ${f.section}</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ── SEND EMAIL ────────────────────────────────────────────────
+async function sendPatternMap() {
+  const flagSummary = sectionFlags.length > 0
+    ? `<p style="color:#9a9a9a;font-size:14px;line-height:1.7;">Sections where the system moved quickly: ${sectionFlags.map(f=>f.section).join(', ')}</p>`
+    : `<p style="color:#9a9a9a;font-size:14px;">Full engagement logged across all sections.</p>`;
+
+  const sectionBlocks = sessionData.map(d => {
+    if (!d) return '';
+    return `<div style="margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid rgba(201,169,110,0.15);">
+      <p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">${d.num} — ${d.section.toUpperCase()} / ${d.layer}</p>
+      <p style="font-size:13px;color:#6b6b6b;font-style:italic;line-height:1.6;margin-bottom:12px;">${d.question}</p>
+      <p style="font-size:15px;color:#e8e4dc;line-height:1.8;margin-bottom:12px;">${d.answer}</p>
+      ${d.reflection?`<p style="font-size:13px;color:#9a9a9a;line-height:1.7;padding-left:16px;border-left:2px solid rgba(201,169,110,0.3);">${d.reflection}</p>`:''}
+      ${d.movedThrough?`<p style="font-family:monospace;font-size:10px;color:#C9A96E;letter-spacing:1px;margin-top:8px;">[ SURFACE DETECTED — ADVANCED THROUGH ]</p>`:''}
+    </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;">
+    <p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p>
+    <h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1>
+    <p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p>
+    <div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);">
+      <p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p>
+      <p style="font-size:14px;color:#9a9a9a;line-height:1.7;">10 sections completed. State → Perception → Formation → Decision → Experience → Reality — mapped from your own material.</p>
+      ${flagSummary}
+    </div>
+    <div style="margin-bottom:40px;">
+      <p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION — SECTION BY SECTION</p>
+      ${sectionBlocks}
+    </div>
+    <div style="padding:24px;border:1px solid rgba(201,169,110,0.2);">
+      <p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p>
+      <a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER →</a>
+    </div>
+    <p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p>
+  </body></html>`;
+
+  await fetch(`${BACKEND}/api/send-pattern-map`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to: userEmail, from: 'info@bhaveslab.com', subject: 'Your Pattern Map — Study Yourself Session Complete', html })
+  });
+}
 </script>
-
 </body>
 </html>
