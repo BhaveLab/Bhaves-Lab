@@ -113,12 +113,31 @@ display: inline-block;
 from { opacity: 0; transform: translateY(20px); }
 to { opacity: 1; transform: translateY(0); }
 }
+
+#ty-arch-section {
+width: 100%;
+max-width: 780px;
+margin-top: 80px;
+text-align: left;
+padding-bottom: 80px;
+}
+
+.ty-arch-label {
+font-family: 'Syne', sans-serif;
+font-size: 9px;
+letter-spacing: 0.38em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.32);
+margin-bottom: 24px;
+text-align: center;
+}
 </style>
 <script src="/i18n/i18n.js"></script>
 <script src="/i18n/strings.en.js"></script>
 <script src="/i18n/strings.es.js"></script>
 <script src="/i18n/strings.pt.js"></script>
 <script src="/i18n/strings.fr.js"></script>
+<script src="/pattern-map-entry.js"></script>
 <script src="/lang-switcher.js"></script>
 </head>
 <body>
@@ -134,6 +153,12 @@ to { opacity: 1; transform: translateY(0); }
   </p>
   <a href="/" class="back-link">Return to the Lab</a>
 </div>
+
+<div id="ty-arch-section" style="display:none;">
+  <p class="ty-arch-label">[ your operating architecture ]</p>
+  <div id="ty-arch-output"></div>
+</div>
+
 <script>
 (function() {
   function applyI18n() {
@@ -154,6 +179,28 @@ to { opacity: 1; transform: translateY(0); }
     applyI18n();
   }
   document.addEventListener('bhave:languageChanged', applyI18n);
+})();
+</script>
+
+<script>
+(function () {
+  function renderArch() {
+    if (!window.PatternMapEntry) return;
+    var block   = window.PatternMapEntry.getEmailBlock();
+    if (!block) return;
+    var section = document.getElementById('ty-arch-section');
+    var output  = document.getElementById('ty-arch-output');
+    if (section && output) {
+      output.innerHTML    = block;
+      section.style.display = '';
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderArch);
+  } else {
+    renderArch();
+  }
+  document.addEventListener('bhave:languageChanged', renderArch);
 })();
 </script>
 </body>
