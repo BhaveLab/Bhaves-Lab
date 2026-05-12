@@ -116,13 +116,45 @@
   border-bottom-color: #b8952a;
 }
 
-/* Date + time inputs: restore native picker (overrides the global -webkit-appearance:none
-   so the calendar/clock controls and the empty-field placeholder text are visible). */
-.bde-input[type="date"],
+/* Time input: restore native picker so clock controls are visible. */
 .bde-input[type="time"] {
   color-scheme: dark;
   -webkit-appearance: auto;
   appearance: auto;
+}
+
+/* ── DATE GROUP (three selects) ──────────────────────────────────────────── */
+
+.bde-date-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.bde-select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(184,149,42,0.25);
+  color: #e8e4dc;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 0;
+  outline: none;
+  transition: border-color 0.25s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.bde-select:focus {
+  border-bottom-color: #b8952a;
+}
+
+.bde-select option {
+  background: #141414;
+  color: #e8e4dc;
 }
 
 .bde-hint {

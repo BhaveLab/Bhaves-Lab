@@ -96,6 +96,27 @@
     var sectionName = '<span class="bde-section-name">' + t('form.subtitleSection') + '</span>';
     var subtitle    = subtitleRaw.replace('{{section}}', sectionName);
 
+    // ── Date dropdown option strings ──────────────────────────────────────
+    var _MONTHS = ['January','February','March','April','May','June',
+                   'July','August','September','October','November','December'];
+    var _thisYear = new Date().getFullYear();
+
+    var _moOpts = '<option value="">' + t('form.birthDate.monthLabel') + '</option>';
+    for (var _m = 0; _m < 12; _m++) {
+      var _mv = (_m < 9 ? '0' : '') + (_m + 1);
+      _moOpts += '<option value="' + _mv + '">' + _MONTHS[_m] + '</option>';
+    }
+
+    var _dyOpts = '<option value="">' + t('form.birthDate.dayLabel') + '</option>';
+    for (var _d = 1; _d <= 31; _d++) {
+      _dyOpts += '<option value="' + _d + '">' + _d + '</option>';
+    }
+
+    var _yrOpts = '<option value="">' + t('form.birthDate.yearLabel') + '</option>';
+    for (var _y = _thisYear; _y >= 1920; _y--) {
+      _yrOpts += '<option value="' + _y + '">' + _y + '</option>';
+    }
+
     try {
     mount.innerHTML =
       '<div class="bde-overlay">'
@@ -115,8 +136,12 @@
     +       '</div>'
 
     +       '<div class="bde-field">'
-    +         '<label class="bde-label" for="bde-date">' + t('form.birthDate.label') + '</label>'
-    +         '<input type="date" id="bde-date" class="bde-input" style="color-scheme:dark;" />'
+    +         '<label class="bde-label">' + t('form.birthDate.label') + '</label>'
+    +         '<div class="bde-date-group">'
+    +           '<select id="bde-month" class="bde-select">' + _moOpts + '</select>'
+    +           '<select id="bde-day"   class="bde-select">' + _dyOpts + '</select>'
+    +           '<select id="bde-year"  class="bde-select">' + _yrOpts + '</select>'
+    +         '</div>'
     +         '<div class="bde-hint">' + t('form.birthDate.hint') + '</div>'
     +       '</div>'
 
@@ -241,7 +266,12 @@
       errorEl.textContent = '';
 
       var name     = document.getElementById('bde-name').value.trim();
-      var date     = document.getElementById('bde-date').value;
+      var _month   = document.getElementById('bde-month').value;
+      var _day     = document.getElementById('bde-day').value;
+      var _year    = document.getElementById('bde-year').value;
+      var date     = (_year && _month && _day)
+                     ? _year + '-' + _month + '-' + (_day.length < 2 ? '0' + _day : _day)
+                     : '';
       var time     = document.getElementById('bde-time').value.trim();
       var location = document.getElementById('bde-location').value.trim();
 

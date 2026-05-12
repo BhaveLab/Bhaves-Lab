@@ -26,6 +26,9 @@ BhaveI18n.register('pt', {
     birthDate: {
       label: 'Dia de Manifestação',
       hint: 'O dia em que você chegou à terra.',
+      monthLabel: 'Mês',
+      dayLabel: 'Dia',
+      yearLabel: 'Ano',
     },
     birthTime: {
       label: 'A hora que você chegou',

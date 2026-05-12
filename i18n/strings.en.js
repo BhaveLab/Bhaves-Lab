@@ -30,6 +30,9 @@ BhaveI18n.register('en', {
     birthDate: {
       label: 'Manifestation Day',
       hint: 'The day you arrived on earth.',
+      monthLabel: 'Month',
+      dayLabel: 'Day',
+      yearLabel: 'Year',
     },
     birthTime: {
       label: 'The hour you arrived',
