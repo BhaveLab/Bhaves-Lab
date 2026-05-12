@@ -385,20 +385,16 @@ function drawCosmos(t) {
 drawCosmos(0);
 setTimeout(spawnShooter, 1000);
 
-// ── BASE PROMPT ──────────────────────────────────────────────────────────────
-const BASE_PROMPT = `You are a precise awareness reflector for Bhavé's Lab Study Yourself course.
-Analyze the response for honest self-observation at the depth this question requires.
+// ── EVAL PROMPT ──────────────────────────────────────────────────────────────
+const EVAL_PROMPT = `You are evaluating a course answer for depth and completeness. The question was: {{question}}
+The user answered: {{answer}}
 
-SURFACE / DEFLECTION signals (any of these): vague generalities without personal specificity,
-familiar rehearsed answers, describing someone else rather than self, intellectual framing that
-avoids felt experience, resolving the question too quickly, extremely brief responses,
-moving past something without actually touching it.
+Did they actually answer what was asked with specific, embodied detail — not just conceptual language?
 
-If SURFACE: respond ONLY with JSON: {"surface": true, "reflection": "[One precise observation about what the answer avoided or moved past. Not a correction — a mirror. Point to the specific gap. Under 40 words.]"}
+If yes: return { "signal": false }
+If no or partial: return { "signal": true, "gap": "one sentence identifying exactly what was not addressed" }
 
-If HONEST: respond ONLY with JSON: {"surface": false, "reflection": "[2-3 sentences. Mirror back exactly what they said using their own language. No interpretation, no praise, no suggestion. Just: here is what you named, held.]"}
-
-Return ONLY valid JSON. No preamble, no markdown.`;
+Return JSON only. No other text.`;
 
 // ── SECTIONS DATA ────────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -667,15 +663,17 @@ function renderQuestion(sIndex, qIndex) {
     claudePanel.style.display = 'none';
 
     try {
-      const sysPrompt = `${BASE_PROMPT}\n\nSection: ${s.num} — ${s.title} (${s.layer})\nQuestion: ${q.text}`;
-      const result = await callClaude(sysPrompt, answer);
+      const prompt = EVAL_PROMPT
+        .replace('{{question}}', q.text)
+        .replace('{{answer}}', answer);
+      const result = await callClaude(prompt, '');
       console.log('[REFLECT] raw result:', JSON.stringify(result));
-      console.log('[REFLECT] surface:', result.surface, '| reflection:', result.reflection);
+      console.log('[REFLECT] signal:', result.signal, '| gap:', result.gap);
       loading.style.display = 'none';
 
-      if (result.surface) {
-        sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SURFACE' });
-        document.getElementById('sit-text').textContent = result.reflection;
+      if (result.signal) {
+        sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
+        document.getElementById('sit-text').textContent = result.gap;
         sitPanel.style.display = 'block';
 
         document.getElementById('re-answer-btn').addEventListener('click', () => {
@@ -687,20 +685,15 @@ function renderQuestion(sIndex, qIndex) {
         });
 
         document.getElementById('advance-anyway-btn').addEventListener('click', () => {
-          recordAnswer(sIndex, qIndex, answer, result.reflection, true);
+          recordAnswer(sIndex, qIndex, answer, result.gap, true);
           sitPanel.style.display = 'none';
           advanceBlock.style.display = 'block';
           document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
         });
 
       } else {
-        console.log('[REFLECT] honest path — showing claude-panel');
-        const claudeTextEl = document.getElementById('claude-text');
-        const claudePanelEl = document.getElementById('claude-panel');
-        console.log('[REFLECT] claude-text el:', claudeTextEl, '| claude-panel el:', claudePanelEl);
-        if (claudeTextEl) claudeTextEl.textContent = result.reflection || '—';
-        if (claudePanelEl) claudePanelEl.style.display = 'block';
-        recordAnswer(sIndex, qIndex, answer, result.reflection, false);
+        console.log('[REFLECT] signal false — answer complete');
+        recordAnswer(sIndex, qIndex, answer, '', false);
         advanceBlock.style.display = 'block';
         document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
       }
@@ -841,12 +834,12 @@ function renderWeb() {
 function renderFlags() {
   const container = document.getElementById('pattern-flags');
   if (sectionFlags.length === 0) {
-    container.innerHTML = `<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;color:var(--ash);padding:1rem 0;">[ NO SURFACE FLAGS — Full engagement across all questions ]</div>`;
+    container.innerHTML = `<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;color:var(--ash);padding:1rem 0;">[ NO SIGNAL FLAGS — Full engagement across all questions ]</div>`;
     return;
   }
   let html = `<div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;color:var(--gold);margin-bottom:1rem;">[ PATTERN FLAGS — Questions where the system moved quickly ]</div>`;
   sectionFlags.forEach(f => {
-    html += `<div class="flag-item"><div class="flag-icon">SURFACE</div><div class="flag-text">Section ${f.num} — ${f.section} / Question ${f.question}</div></div>`;
+    html += `<div class="flag-item"><div class="flag-icon">SIGNAL</div><div class="flag-text">Section ${f.num} — ${f.section} / Question ${f.question}</div></div>`;
   });
   container.innerHTML = html;
 }
@@ -875,12 +868,12 @@ function buildEmailBody() {
         <p style="font-size:13px;color:#6b6b6b;font-style:italic;line-height:1.6;margin-bottom:10px;">${d.question}</p>
         <p style="font-size:15px;color:#e8e4dc;line-height:1.8;margin-bottom:10px;">${d.answer}</p>
         ${d.reflection ? `<p style="font-size:13px;color:#9a9a9a;line-height:1.7;padding-left:14px;border-left:2px solid rgba(201,169,110,0.25);">${d.reflection}</p>` : ''}
-        ${d.movedThrough ? `<p style="font-family:monospace;font-size:9px;color:#C9A96E;letter-spacing:1px;margin-top:6px;">[ SURFACE — ADVANCED THROUGH ]</p>` : ''}
+        ${d.movedThrough ? `<p style="font-family:monospace;font-size:9px;color:#C9A96E;letter-spacing:1px;margin-top:6px;">[ SIGNAL — ADVANCED THROUGH ]</p>` : ''}
       </div>`).join('');
     return `<div style="margin-bottom:36px;padding-bottom:36px;border-bottom:2px solid rgba(201,169,110,0.12);"><p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:16px;">${s.num} — ${s.title.toUpperCase()} / ${s.layer}</p>${qBlocks}</div>`;
   }).join('');
 
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' surface flags logged.' : 'Full engagement — no surface flags.'}</p></div>${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' signal flags logged.' : 'Full engagement — no signal flags.'}</p></div>${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
 }
 
 // ── FRAMEWORK DRAWER ─────────────────────────────────────────────────────────
