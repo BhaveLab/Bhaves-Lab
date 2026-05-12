@@ -689,110 +689,129 @@ function renderQuestion(sIndex, qIndex) {
     </div>
   `;
 
-  const submitBtn    = document.getElementById('submit-btn');
-  const answerInput  = document.getElementById('answer-input');
-  const loading      = document.getElementById('loading');
-  const sitPanel     = document.getElementById('sit-panel');
-  const claudePanel  = document.getElementById('claude-panel');
-  const advanceBlock = document.getElementById('advance-block');
+  // ── Wire form — wrapped in try/catch so setup errors surface in console ────
+  try {
+    const submitBtn    = document.getElementById('submit-btn');
+    const answerInput  = document.getElementById('answer-input');
+    const loading      = document.getElementById('loading');
+    const sitPanel     = document.getElementById('sit-panel');
+    const claudePanel  = document.getElementById('claude-panel');
+    const advanceBlock = document.getElementById('advance-block');
 
-  submitBtn.addEventListener('click', async () => {
-    const answer = answerInput.value.trim();
-    if (answer.length < 15) { answerInput.style.borderColor = 'rgba(201,169,110,0.5)'; answerInput.focus(); return; }
+    if (!submitBtn)    { console.error('[renderQuestion] submit-btn not found'); return; }
+    if (!answerInput)  { console.error('[renderQuestion] answer-input not found'); return; }
+    if (!sitPanel)     { console.error('[renderQuestion] sit-panel not found'); return; }
+    if (!claudePanel)  { console.error('[renderQuestion] claude-panel not found'); return; }
+    if (!advanceBlock) { console.error('[renderQuestion] advance-block not found'); return; }
 
-    submitBtn.style.display = 'none';
-    loading.style.display = 'block';
-    sitPanel.style.display = 'none';
-    claudePanel.style.display = 'none';
-    advanceBlock.style.display = 'none';
+    console.log('[renderQuestion] all elements found — attaching click listener');
 
-    console.log('[REFLECT] submitting answer, length:', answer.length);
+    submitBtn.addEventListener('click', async () => {
+      // ── First thing: confirm click is firing ──────────────────────────────
+      console.log('[REFLECT] click registered — answer length:', answerInput.value.trim().length);
 
-    try {
-      const prompt = EVAL_PROMPT
-        .replace('{{question}}', q.text)
-        .replace('{{answer}}', answer);
+      const answer = answerInput.value.trim();
+      if (answer.length < 15) {
+        answerInput.style.borderColor = 'rgba(201,169,110,0.5)';
+        answerInput.focus();
+        console.log('[REFLECT] answer too short, returning early');
+        return;
+      }
 
-      console.log('[REFLECT] calling Claude...');
-      const result = await callClaude(prompt, '');
-      console.log('[REFLECT] result received:', JSON.stringify(result));
-      console.log('[REFLECT] signal type:', typeof result.signal, '| value:', result.signal);
-      console.log('[REFLECT] gap:', result.gap);
-      console.log('[REFLECT] mirror:', result.mirror);
+      // ── Disable (not hide) button so it stays in DOM but can't double-fire
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.4';
+      loading.style.display = 'block';
+      sitPanel.style.display = 'none';
+      claudePanel.style.display = 'none';
+      advanceBlock.style.display = 'none';
 
-      loading.style.display = 'none';
+      console.log('[REFLECT] UI locked — calling API...');
 
-      // Normalise signal — handle boolean false, string "false", 0, null
-      const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
-      console.log('[REFLECT] isIncomplete:', isIncomplete);
+      try {
+        const prompt = EVAL_PROMPT
+          .replace('{{question}}', q.text)
+          .replace('{{answer}}', answer);
 
-      if (isIncomplete) {
-        // ── GAP PATH — incomplete answer ────────────────────────────────────
-        console.log('[REFLECT] showing sit-panel, gap text:', result.gap);
-        sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
+        console.log('[REFLECT] API call started');
+        const result = await callClaude(prompt, '');
+        console.log('[REFLECT] API response received:', JSON.stringify(result));
+        console.log('[REFLECT] signal type:', typeof result.signal, '| value:', result.signal);
+        console.log('[REFLECT] gap:', result.gap, '| mirror:', result.mirror);
 
-        const sitTextEl = document.getElementById('sit-text');
-        console.log('[REFLECT] sit-text element:', sitTextEl);
-        if (sitTextEl) sitTextEl.textContent = result.gap || 'There is more here — sit with the question again.';
+        loading.style.display = 'none';
 
-        console.log('[REFLECT] sit-panel before show:', sitPanel, 'display was:', sitPanel ? sitPanel.style.display : 'N/A');
-        sitPanel.style.display = 'block';
-        console.log('[REFLECT] sit-panel display after set:', sitPanel.style.display);
+        // Normalise signal — boolean true, string "true", or 1 → incomplete
+        const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
+        console.log('[REFLECT] isIncomplete:', isIncomplete);
 
-        document.getElementById('re-answer-btn').addEventListener('click', () => {
-          sitPanel.style.display = 'none';
-          answerInput.value = '';
-          submitBtn.style.display = 'inline-block';
-          submitBtn.disabled = false;
-          answerInput.focus();
-        });
+        if (isIncomplete) {
+          // ── GAP PATH — incomplete answer ──────────────────────────────────
+          console.log('[REFLECT] gap path — showing sit-panel');
+          sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
 
-        document.getElementById('advance-anyway-btn').addEventListener('click', () => {
-          recordAnswer(sIndex, qIndex, answer, result.gap, true);
-          sitPanel.style.display = 'none';
-          advanceBlock.style.display = 'block';
-          document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
-        });
+          const sitTextEl = document.getElementById('sit-text');
+          if (sitTextEl) sitTextEl.textContent = result.gap || 'There is more here — sit with the question again.';
 
-      } else {
-        // ── MIRROR PATH — complete answer ────────────────────────────────────
-        const mirrorText = result.mirror || '';
-        console.log('[REFLECT] showing claude-panel, mirror text:', mirrorText);
+          sitPanel.style.display = 'block';
+          console.log('[REFLECT] sit-panel shown');
 
-        const claudeTextEl = document.getElementById('claude-text');
-        const claudePanelEl = document.getElementById('claude-panel');
-        console.log('[REFLECT] claude-text element:', claudeTextEl);
-        console.log('[REFLECT] claude-panel element:', claudePanelEl);
-        console.log('[REFLECT] claude-panel display before:', claudePanelEl ? claudePanelEl.style.display : 'N/A');
+          document.getElementById('re-answer-btn').addEventListener('click', () => {
+            sitPanel.style.display = 'none';
+            answerInput.value = '';
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '';
+            answerInput.focus();
+            console.log('[REFLECT] re-answer — button restored');
+          });
 
-        if (claudeTextEl) claudeTextEl.textContent = mirrorText;
+          document.getElementById('advance-anyway-btn').addEventListener('click', () => {
+            recordAnswer(sIndex, qIndex, answer, result.gap, true);
+            sitPanel.style.display = 'none';
+            advanceBlock.style.display = 'block';
+            document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
+          });
 
-        // Show the panel regardless of whether mirror text is present
-        if (claudePanelEl) {
-          claudePanelEl.style.display = 'block';
-          console.log('[REFLECT] claude-panel display after set:', claudePanelEl.style.display);
         } else {
-          console.warn('[REFLECT] claude-panel element NOT FOUND in DOM');
+          // ── MIRROR PATH — complete answer ─────────────────────────────────
+          const mirrorText = result.mirror || '';
+          console.log('[REFLECT] mirror path — text:', mirrorText);
+
+          const claudeTextEl = document.getElementById('claude-text');
+          if (claudeTextEl) claudeTextEl.textContent = mirrorText;
+
+          console.log('[REFLECT] panel update attempted — setting claude-panel display:block');
+          claudePanel.style.display = 'block';
+          console.log('[REFLECT] claude-panel display is now:', claudePanel.style.display);
+
+          // Hide the button permanently for this question (answer is done)
+          submitBtn.style.display = 'none';
+
+          recordAnswer(sIndex, qIndex, answer, mirrorText, false);
+          advanceBlock.style.display = 'block';
+          console.log('[REFLECT] advance-block shown — NEXT button ready');
+          document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
         }
 
-        recordAnswer(sIndex, qIndex, answer, mirrorText, false);
+      } catch (err) {
+        console.error('[REFLECT] error caught:', err.name, err.message);
+        loading.style.display = 'none';
+        // Always restore button on error so user can retry
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '';
+        recordAnswer(sIndex, qIndex, answer, '', false);
         advanceBlock.style.display = 'block';
-        console.log('[REFLECT] advance-block shown');
-        document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
+        if (document.getElementById('next-btn')) {
+          document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
+        }
       }
+    });
 
-    } catch (err) {
-      console.error('[REFLECT] error:', err);
-      loading.style.display = 'none';
-      submitBtn.style.display = 'inline-block';
-      submitBtn.disabled = false;
-      recordAnswer(sIndex, qIndex, answer, '', false);
-      advanceBlock.style.display = 'block';
-      if (document.getElementById('next-btn')) {
-        document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
-      }
-    }
-  });
+    console.log('[renderQuestion] click listener attached to submit-btn OK');
+
+  } catch (setupErr) {
+    console.error('[renderQuestion] setup failed:', setupErr);
+  }
 }
 
 // ── ADVANCE ──────────────────────────────────────────────────────────────────
@@ -824,12 +843,32 @@ function recordAnswer(sIndex, qIndex, answer, reflection, movedThrough) {
 
 // ── CALL CLAUDE ──────────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, answer) {
-  const response = await fetch(`${BACKEND}/api/reflect`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, answer, model: 'claude-sonnet-4-20250514', max_tokens: 300 })
-  });
-  if (!response.ok) throw new Error('Backend error');
+  const controller = new AbortController();
+  const timer = setTimeout(() => {
+    console.warn('[callClaude] 30s timeout — aborting fetch');
+    controller.abort();
+  }, 30000);
+
+  let response;
+  try {
+    console.log('[callClaude] fetching', BACKEND + '/api/reflect');
+    response = await fetch(`${BACKEND}/api/reflect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt, answer, model: 'claude-sonnet-4-20250514', max_tokens: 300 }),
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+
+  console.log('[callClaude] status:', response.status, response.statusText);
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '(unreadable)');
+    console.error('[callClaude] error body:', errText);
+    throw new Error('Backend ' + response.status + ': ' + errText);
+  }
+
   const data = await response.json();
   console.log('[callClaude] raw data:', JSON.stringify(data));
   let text = data.content?.[0]?.text || data.text || '';
