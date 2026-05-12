@@ -24,8 +24,8 @@ BhaveI18n.register('fr', {
       placeholder: 'ex. Marie Claire Dupont',
     },
     birthDate: {
-      label: 'Le jour où vous êtes arrivé',
-      hint: 'Le jour où vous vous êtes manifesté sur terre. C\'est la base de votre schéma numérique.',
+      label: 'Jour de Manifestation',
+      hint: 'Le jour où vous êtes arrivé sur terre.',
     },
     birthTime: {
       label: 'L\'heure où vous êtes arrivé',

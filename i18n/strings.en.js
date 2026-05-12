@@ -28,8 +28,8 @@ BhaveI18n.register('en', {
       placeholder: 'e.g. Sarah Marie Johnson',
     },
     birthDate: {
-      label: 'The day you arrived',
-      hint: 'The day you manifested on earth. This is the foundation of your numerical pattern.',
+      label: 'Manifestation Day',
+      hint: 'The day you arrived on earth.',
     },
     birthTime: {
       label: 'The hour you arrived',

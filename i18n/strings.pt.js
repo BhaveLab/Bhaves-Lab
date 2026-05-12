@@ -24,8 +24,8 @@ BhaveI18n.register('pt', {
       placeholder: 'ex. Ana Carolina Silva',
     },
     birthDate: {
-      label: 'O dia que você chegou',
-      hint: 'O dia em que você se manifestou na terra. Esta é a base do seu padrão numérico.',
+      label: 'Dia de Manifestação',
+      hint: 'O dia em que você chegou à terra.',
     },
     birthTime: {
       label: 'A hora que você chegou',

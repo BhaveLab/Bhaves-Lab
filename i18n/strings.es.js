@@ -27,8 +27,8 @@ BhaveI18n.register('es', {
       placeholder: 'ej. María Elena Rodríguez',
     },
     birthDate: {
-      label: 'El día que llegaste',
-      hint: 'El día que te manifestaste en la tierra. Esta es la base de tu patrón numérico.',
+      label: 'Día de Manifestación',
+      hint: 'El día que llegaste a la tierra.',
     },
     birthTime: {
       label: 'La hora que llegaste',

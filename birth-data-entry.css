@@ -116,10 +116,13 @@
   border-bottom-color: #b8952a;
 }
 
-/* Date + time inputs: normalize across browsers */
+/* Date + time inputs: restore native picker (overrides the global -webkit-appearance:none
+   so the calendar/clock controls and the empty-field placeholder text are visible). */
 .bde-input[type="date"],
 .bde-input[type="time"] {
   color-scheme: dark;
+  -webkit-appearance: auto;
+  appearance: auto;
 }
 
 .bde-hint {
