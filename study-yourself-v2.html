@@ -704,20 +704,40 @@ function renderQuestion(sIndex, qIndex) {
     loading.style.display = 'block';
     sitPanel.style.display = 'none';
     claudePanel.style.display = 'none';
+    advanceBlock.style.display = 'none';
+
+    console.log('[REFLECT] submitting answer, length:', answer.length);
 
     try {
       const prompt = EVAL_PROMPT
         .replace('{{question}}', q.text)
         .replace('{{answer}}', answer);
+
+      console.log('[REFLECT] calling Claude...');
       const result = await callClaude(prompt, '');
-      console.log('[REFLECT] raw result:', JSON.stringify(result));
-      console.log('[REFLECT] signal:', result.signal, '| gap:', result.gap);
+      console.log('[REFLECT] result received:', JSON.stringify(result));
+      console.log('[REFLECT] signal type:', typeof result.signal, '| value:', result.signal);
+      console.log('[REFLECT] gap:', result.gap);
+      console.log('[REFLECT] mirror:', result.mirror);
+
       loading.style.display = 'none';
 
-      if (result.signal) {
+      // Normalise signal — handle boolean false, string "false", 0, null
+      const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
+      console.log('[REFLECT] isIncomplete:', isIncomplete);
+
+      if (isIncomplete) {
+        // ── GAP PATH — incomplete answer ────────────────────────────────────
+        console.log('[REFLECT] showing sit-panel, gap text:', result.gap);
         sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
-        document.getElementById('sit-text').textContent = result.gap;
+
+        const sitTextEl = document.getElementById('sit-text');
+        console.log('[REFLECT] sit-text element:', sitTextEl);
+        if (sitTextEl) sitTextEl.textContent = result.gap || 'There is more here — sit with the question again.';
+
+        console.log('[REFLECT] sit-panel before show:', sitPanel, 'display was:', sitPanel ? sitPanel.style.display : 'N/A');
         sitPanel.style.display = 'block';
+        console.log('[REFLECT] sit-panel display after set:', sitPanel.style.display);
 
         document.getElementById('re-answer-btn').addEventListener('click', () => {
           sitPanel.style.display = 'none';
@@ -735,17 +755,34 @@ function renderQuestion(sIndex, qIndex) {
         });
 
       } else {
-        console.log('[REFLECT] signal false — answer complete, mirror:', result.mirror);
+        // ── MIRROR PATH — complete answer ────────────────────────────────────
+        const mirrorText = result.mirror || '';
+        console.log('[REFLECT] showing claude-panel, mirror text:', mirrorText);
+
         const claudeTextEl = document.getElementById('claude-text');
         const claudePanelEl = document.getElementById('claude-panel');
-        if (claudeTextEl) claudeTextEl.textContent = result.mirror || '';
-        if (claudePanelEl && result.mirror) claudePanelEl.style.display = 'block';
-        recordAnswer(sIndex, qIndex, answer, result.mirror || '', false);
+        console.log('[REFLECT] claude-text element:', claudeTextEl);
+        console.log('[REFLECT] claude-panel element:', claudePanelEl);
+        console.log('[REFLECT] claude-panel display before:', claudePanelEl ? claudePanelEl.style.display : 'N/A');
+
+        if (claudeTextEl) claudeTextEl.textContent = mirrorText;
+
+        // Show the panel regardless of whether mirror text is present
+        if (claudePanelEl) {
+          claudePanelEl.style.display = 'block';
+          console.log('[REFLECT] claude-panel display after set:', claudePanelEl.style.display);
+        } else {
+          console.warn('[REFLECT] claude-panel element NOT FOUND in DOM');
+        }
+
+        recordAnswer(sIndex, qIndex, answer, mirrorText, false);
         advanceBlock.style.display = 'block';
+        console.log('[REFLECT] advance-block shown');
         document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
       }
 
     } catch (err) {
+      console.error('[REFLECT] error:', err);
       loading.style.display = 'none';
       submitBtn.style.display = 'inline-block';
       submitBtn.disabled = false;
