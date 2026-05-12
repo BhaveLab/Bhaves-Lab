@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/assets/images/logo-primary.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pattern Immersion — Bhavé's Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
@@ -87,6 +87,7 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 .reveal.visible { opacity: 1; transform: translateY(0); }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .specs-inner { grid-template-columns: 1fr 1fr; } .section { padding: 5rem 2rem; } .tools-included { grid-template-columns: 1fr; } .phase { grid-template-columns: 1fr; } .apply-section { padding: 5rem 2rem; } .apply-inner { grid-template-columns: 1fr; gap: 3rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
+.nav-logo-img { height: 44px; width: auto; display: block; }
 </style>
 <script src="/i18n/i18n.js" defer></script>
 <script src="/i18n/strings.en.js" defer></script>
@@ -102,7 +103,7 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 <canvas id="cosmos"></canvas>
 
 <nav>
-  <a href="/" class="nav-logo">Bhav<span>é</span>'s Lab</a>
+  <a href="/" class="nav-logo-link"><img src="/assets/images/logo-primary.png" alt="Bhavé's Lab" class="nav-logo-img"></a>
   <a href="index.html#session" class="nav-back">← Where to Begin</a>
   <div class="nav-cta"><a href="https://calendly.com/bhaveslab/30min" target="_blank">Apply</a></div>
 </nav>
