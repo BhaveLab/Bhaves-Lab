@@ -51,6 +51,7 @@
   // stuck on a blank screen.
 
   function init() {
+    console.log('[BDE] init fired, mount:', document.getElementById('bde-mount'));
     console.log('[BDE] init() — readyState:', document.readyState);
     try {
       if (localStorage.getItem(STORAGE_KEY)) {
