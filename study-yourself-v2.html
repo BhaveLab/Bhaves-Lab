@@ -391,8 +391,11 @@ The user answered: {{answer}}
 
 Did they actually answer what was asked with specific, embodied detail — not just conceptual language?
 
-If yes: return { "signal": false }
-If no or partial: return { "signal": true, "gap": "one sentence identifying exactly what was not addressed" }
+If the answer is complete and specific return:
+{ "signal": false, "mirror": "one sentence reflecting the structural pattern in what they said — observational, not affirming" }
+
+If incomplete return:
+{ "signal": true, "gap": "exactly what was not addressed" }
 
 Return JSON only. No other text.`;
 
@@ -692,8 +695,12 @@ function renderQuestion(sIndex, qIndex) {
         });
 
       } else {
-        console.log('[REFLECT] signal false — answer complete');
-        recordAnswer(sIndex, qIndex, answer, '', false);
+        console.log('[REFLECT] signal false — answer complete, mirror:', result.mirror);
+        const claudeTextEl = document.getElementById('claude-text');
+        const claudePanelEl = document.getElementById('claude-panel');
+        if (claudeTextEl) claudeTextEl.textContent = result.mirror || '';
+        if (claudePanelEl && result.mirror) claudePanelEl.style.display = 'block';
+        recordAnswer(sIndex, qIndex, answer, result.mirror || '', false);
         advanceBlock.style.display = 'block';
         document.getElementById('next-btn').addEventListener('click', () => advance(sIndex, qIndex));
       }
