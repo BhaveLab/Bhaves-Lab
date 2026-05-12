@@ -87,12 +87,12 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 768px) { nav { padding: 1.5rem 2rem; } .specs-inner { grid-template-columns: 1fr 1fr; } .section { padding: 5rem 2rem; } .tools-included { grid-template-columns: 1fr; } .phase { grid-template-columns: 1fr; } .apply-section { padding: 5rem 2rem; } .apply-inner { grid-template-columns: 1fr; gap: 3rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; } }
 </style>
-<script src="/i18n/i18n.js"></script>
-<script src="/i18n/strings.en.js"></script>
-<script src="/i18n/strings.es.js"></script>
-<script src="/i18n/strings.pt.js"></script>
-<script src="/i18n/strings.fr.js"></script>
-<script src="/lang-switcher.js"></script>
+<script src="/i18n/i18n.js" defer></script>
+<script src="/i18n/strings.en.js" defer></script>
+<script src="/i18n/strings.es.js" defer></script>
+<script src="/i18n/strings.pt.js" defer></script>
+<script src="/i18n/strings.fr.js" defer></script>
+<script src="/lang-switcher.js" defer></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -275,13 +275,14 @@ document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(entrie
     if(applyDetails[3]){ applyDetails[3].querySelector('.apply-detail-label').textContent=t('patternImmersion.detail4Label'); applyDetails[3].querySelector('.apply-detail-value').textContent=t('patternImmersion.detail4Val'); }
     if(applyDetails[4]){ applyDetails[4].querySelector('.apply-detail-label').textContent=t('patternImmersion.detail5Label'); applyDetails[4].querySelector('.apply-detail-value').textContent=t('patternImmersion.detail5Val'); }
   }
-  window.__i18nPatch = applyI18n;
+  function safeApply() { try { applyI18n(); } catch(e) { console.warn('[i18n]', e); } }
+  window.__i18nPatch = safeApply;
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyI18n);
+    document.addEventListener('DOMContentLoaded', safeApply);
   } else {
-    applyI18n();
+    safeApply();
   }
-  document.addEventListener('bhave:languageChanged', applyI18n);
+  document.addEventListener('bhave:languageChanged', safeApply);
 })();
 </script>
 </body>

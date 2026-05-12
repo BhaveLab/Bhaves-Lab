@@ -39,13 +39,23 @@
   }
 
   // ── Public entry point ─────────────────────────────────────────────────────
+  //
+  // Safety contract: #course-content is VISIBLE by default in the HTML.
+  // We hide it only after the form has been built and inserted. On any
+  // error we leave (or restore) #course-content so the user is never
+  // stuck on a blank screen.
 
   function init() {
-    if (localStorage.getItem(STORAGE_KEY)) {
-      showCourse();
-      return;
+    try {
+      if (localStorage.getItem(STORAGE_KEY)) {
+        showCourse();   // already completed — keep course visible, hide mount
+        return;
+      }
+      renderForm();     // first visit — build form, then hide course
+    } catch (err) {
+      console.error('[BDE] init failed — leaving course visible:', err);
+      // course-content is already visible by default; nothing to do
     }
-    renderForm();
   }
 
   // ── Show / hide ────────────────────────────────────────────────────────────
@@ -57,16 +67,26 @@
     if (course) course.style.display = '';
   }
 
+  function hideCourse() {
+    var mount  = document.getElementById('bde-mount');
+    var course = document.getElementById('course-content');
+    if (mount)  mount.style.display  = '';      // reveal the form overlay
+    if (course) course.style.display = 'none';  // hide course behind it
+  }
+
   // ── Form render ────────────────────────────────────────────────────────────
 
   function renderForm() {
     var mount = document.getElementById('bde-mount');
+    // No mount point → leave course visible and bail
     if (!mount) return;
 
+    // Build form HTML first, THEN hide course so there's no visual gap
     var subtitleRaw = t('form.subtitle');
     var sectionName = '<span class="bde-section-name">' + t('form.subtitleSection') + '</span>';
     var subtitle    = subtitleRaw.replace('{{section}}', sectionName);
 
+    try {
     mount.innerHTML =
       '<div class="bde-overlay">'
     +   '<div class="bde-inner">'
@@ -120,7 +140,19 @@
     +   '</div>'
     + '</div>';
 
-    wireForm();
+    // Form is in the DOM — safe to hide course now
+    hideCourse();
+    } catch (buildErr) {
+      console.error('[BDE] renderForm build failed — leaving course visible:', buildErr);
+      return; // course stays visible
+    }
+
+    // Wire interactivity (form already visible; errors here are non-fatal)
+    try {
+      wireForm();
+    } catch (wireErr) {
+      console.warn('[BDE] wireForm failed (form visible but not interactive):', wireErr);
+    }
   }
 
   // ── Wire geocoding + submission ────────────────────────────────────────────
@@ -273,6 +305,18 @@
   } else {
     init();
   }
+
+  // ── Safety timeout ─────────────────────────────────────────────────────────
+  // If course-content is still hidden after 4 s (script error, slow network,
+  // or any other failure), reveal it so users are never stuck on a black screen.
+
+  setTimeout(function () {
+    var course = document.getElementById('course-content');
+    if (course && course.style.display === 'none') {
+      console.warn('[BDE] Safety timeout — revealing course-content');
+      showCourse();
+    }
+  }, 4000);
 
   window.BirthDataEntry = { init: init };
 

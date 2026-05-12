@@ -323,12 +323,12 @@ nav {
   .data-row { grid-template-columns: 1fr; }
 }
 </style>
-<script src="/i18n/i18n.js"></script>
-<script src="/i18n/strings.en.js"></script>
-<script src="/i18n/strings.es.js"></script>
-<script src="/i18n/strings.pt.js"></script>
-<script src="/i18n/strings.fr.js"></script>
-<script src="/lang-switcher.js"></script>
+<script src="/i18n/i18n.js" defer></script>
+<script src="/i18n/strings.en.js" defer></script>
+<script src="/i18n/strings.es.js" defer></script>
+<script src="/i18n/strings.pt.js" defer></script>
+<script src="/i18n/strings.fr.js" defer></script>
+<script src="/lang-switcher.js" defer></script>
 </head>
 <body>
 
@@ -464,13 +464,14 @@ nav {
     set('.cta-heading', t('heartmath.ctaH2'), true);
     set('.cta-btn', t('heartmath.ctaBtn'));
   }
-  window.__i18nPatch = applyI18n;
+  function safeApply() { try { applyI18n(); } catch(e) { console.warn('[i18n]', e); } }
+  window.__i18nPatch = safeApply;
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyI18n);
+    document.addEventListener('DOMContentLoaded', safeApply);
   } else {
-    applyI18n();
+    safeApply();
   }
-  document.addEventListener('bhave:languageChanged', applyI18n);
+  document.addEventListener('bhave:languageChanged', safeApply);
 })();
 </script>
 
