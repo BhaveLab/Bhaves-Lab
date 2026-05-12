@@ -116,7 +116,8 @@
 
     +       '<div class="bde-field">'
     +         '<label class="bde-label" for="bde-date">' + t('form.birthDate.label') + '</label>'
-    +         '<input type="date" id="bde-date" class="bde-input" />'
+    +         '<input type="date" id="bde-date" class="bde-input" style="color-scheme:dark;" />'
+    +         '<div class="bde-hint">' + t('form.birthDate.hint') + '</div>'
     +       '</div>'
 
     +       '<div class="bde-field">'

@@ -19,20 +19,21 @@ BhaveI18n.register('fr', {
     subtitleSection: 'Votre Architecture Opérationnelle',
 
     birthName: {
-      label: 'Nom complet de naissance',
+      label: 'Le nom qu\'on vous a donné',
       hint: 'Exactement tel qu\'il figure sur votre acte de naissance. C\'est le nom à partir duquel la numérologie est calculée.',
       placeholder: 'ex. Marie Claire Dupont',
     },
     birthDate: {
-      label: 'Date de naissance',
+      label: 'Le jour où vous êtes arrivé',
+      hint: 'Le jour où vous vous êtes manifesté sur terre. C\'est la base de votre schéma numérique.',
     },
     birthTime: {
-      label: 'Heure de naissance',
+      label: 'L\'heure où vous êtes arrivé',
       optionalTag: 'optionnel',
       hint: 'Active le signe Ascendant. Si inconnue, laissez vide — Soleil et Lune sont calculés quand même.',
     },
     birthLocation: {
-      label: 'Lieu de naissance',
+      label: 'Là où vous êtes arrivé',
       optionalTag: 'optionnel',
       hint: 'Ville et pays. Requis pour le signe Ascendant.',
       placeholder: 'ex. Paris, France',

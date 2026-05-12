@@ -23,20 +23,21 @@ BhaveI18n.register('en', {
     subtitleSection: 'Your Operating Architecture',
 
     birthName: {
-      label: 'Full birth name',
+      label: 'The name you were given',
       hint: 'Exactly as it appears on your birth certificate. This is the name the numerology calculates from.',
       placeholder: 'e.g. Sarah Marie Johnson',
     },
     birthDate: {
-      label: 'Date of birth',
+      label: 'The day you arrived',
+      hint: 'The day you manifested on earth. This is the foundation of your numerical pattern.',
     },
     birthTime: {
-      label: 'Time of birth',
+      label: 'The hour you arrived',
       optionalTag: 'optional',
       hint: 'Unlocks Rising sign. If unknown, leave blank — Sun and Moon still calculate.',
     },
     birthLocation: {
-      label: 'Birth location',
+      label: 'Where you arrived',
       optionalTag: 'optional',
       hint: 'City and country. Required for Rising sign.',
       placeholder: 'e.g. Chicago, USA',

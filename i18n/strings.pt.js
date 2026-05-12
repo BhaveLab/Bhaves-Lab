@@ -19,20 +19,21 @@ BhaveI18n.register('pt', {
     subtitleSection: 'Sua Arquitetura Operacional',
 
     birthName: {
-      label: 'Nome completo de nascimento',
+      label: 'O nome que lhe deram',
       hint: 'Exatamente como aparece na sua certidão de nascimento. É o nome a partir do qual a numerologia é calculada.',
       placeholder: 'ex. Ana Carolina Silva',
     },
     birthDate: {
-      label: 'Data de nascimento',
+      label: 'O dia que você chegou',
+      hint: 'O dia em que você se manifestou na terra. Esta é a base do seu padrão numérico.',
     },
     birthTime: {
-      label: 'Hora de nascimento',
+      label: 'A hora que você chegou',
       optionalTag: 'opcional',
       hint: 'Ativa o Ascendente. Se não souber, deixe em branco — Sol e Lua ainda são calculados.',
     },
     birthLocation: {
-      label: 'Local de nascimento',
+      label: 'Onde você chegou',
       optionalTag: 'opcional',
       hint: 'Cidade e país. Necessário para o Ascendente.',
       placeholder: 'ex. São Paulo, Brasil',

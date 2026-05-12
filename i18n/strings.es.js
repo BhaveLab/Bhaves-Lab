@@ -22,20 +22,21 @@ BhaveI18n.register('es', {
     subtitleSection: 'Tu Arquitectura Operativa',
 
     birthName: {
-      label: 'Nombre completo de nacimiento',
+      label: 'El nombre que te dieron',
       hint: 'Exactamente como aparece en tu acta de nacimiento. Este es el nombre desde el que se calculan los números.',
       placeholder: 'ej. María Elena Rodríguez',
     },
     birthDate: {
-      label: 'Fecha de nacimiento',
+      label: 'El día que llegaste',
+      hint: 'El día que te manifestaste en la tierra. Esta es la base de tu patrón numérico.',
     },
     birthTime: {
-      label: 'Hora de nacimiento',
+      label: 'La hora que llegaste',
       optionalTag: 'opcional',
       hint: 'Activa el signo Ascendente. Si no la sabes, déjalo en blanco — el Sol y la Luna igual se calculan.',
     },
     birthLocation: {
-      label: 'Lugar de nacimiento',
+      label: 'Donde llegaste',
       optionalTag: 'opcional',
       hint: 'Ciudad y país. Requerido para el signo Ascendente.',
       placeholder: 'ej. Ciudad de México, México',
