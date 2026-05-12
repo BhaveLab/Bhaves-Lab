@@ -1464,9 +1464,14 @@ reveals.forEach(el => observer.observe(el));
 <script>
 (function() {
   function applyI18n() {
-    var t = window.BhaveI18n ? window.BhaveI18n.t.bind(window.BhaveI18n) : function(k){return k.split('.').pop();};
+    // Guard: bail if BhaveI18n isn't loaded or has no strings registered yet.
+    // This leaves the original hardcoded text intact as the fallback so the
+    // page never shows raw key names (e.g. heroEyebrow, heroH1).
+    if (!window.BhaveI18n || typeof window.BhaveI18n.t !== 'function') return;
+    if (!window.BhaveI18n.available || !window.BhaveI18n.available().length) return;
+    var t = window.BhaveI18n.t.bind(window.BhaveI18n);
     var q = function(sel) { return document.querySelector(sel); };
-    var set = function(sel, val, html) { var el=q(sel); if(el){ if(html) el.innerHTML=val; else el.textContent=val; } };
+    var set = function(sel, val, html) { var el=q(sel); if(el && val){ if(html) el.innerHTML=val; else el.textContent=val; } };
 
     // nav
     set('.nav-cta a', t('nav.bookSession'));

@@ -28,6 +28,11 @@
   var GEO_DEBOUNCE_MS = 600;
   var NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
+  // Tracks whether the form has been successfully mounted into #bde-mount.
+  // The safety timeout checks this to avoid restoring #course-content when
+  // the form is intentionally showing.
+  var _formMounted = false;
+
   // ── i18n helper ────────────────────────────────────────────────────────────
 
   function t(key, subs) {
@@ -46,11 +51,14 @@
   // stuck on a blank screen.
 
   function init() {
+    console.log('[BDE] init() — readyState:', document.readyState);
     try {
       if (localStorage.getItem(STORAGE_KEY)) {
+        console.log('[BDE] Existing architecture found — showing course directly.');
         showCourse();   // already completed — keep course visible, hide mount
         return;
       }
+      console.log('[BDE] No existing data — rendering birth entry form.');
       renderForm();     // first visit — build form, then hide course
     } catch (err) {
       console.error('[BDE] init failed — leaving course visible:', err);
@@ -68,10 +76,12 @@
   }
 
   function hideCourse() {
+    _formMounted = true;  // form successfully rendered — disarm safety timeout
     var mount  = document.getElementById('bde-mount');
     var course = document.getElementById('course-content');
     if (mount)  mount.style.display  = '';      // reveal the form overlay
     if (course) course.style.display = 'none';  // hide course behind it
+    console.log('[BDE] Form mounted — #course-content hidden, #bde-mount visible.');
   }
 
   // ── Form render ────────────────────────────────────────────────────────────
@@ -307,13 +317,19 @@
   }
 
   // ── Safety timeout ─────────────────────────────────────────────────────────
-  // If course-content is still hidden after 4 s (script error, slow network,
-  // or any other failure), reveal it so users are never stuck on a black screen.
+  // Only fires if the form was NOT successfully mounted (_formMounted === false).
+  // This guards against script errors or slow network leaving the page blank.
+  // When the form IS mounted, _formMounted is true and we skip this entirely —
+  // avoiding the bug where the timeout would undo a correctly-mounted form.
 
   setTimeout(function () {
+    if (_formMounted) {
+      // Form rendered correctly — nothing to do.
+      return;
+    }
     var course = document.getElementById('course-content');
     if (course && course.style.display === 'none') {
-      console.warn('[BDE] Safety timeout — revealing course-content');
+      console.warn('[BDE] Safety timeout — form did not mount; revealing course-content as fallback.');
       showCourse();
     }
   }, 4000);
