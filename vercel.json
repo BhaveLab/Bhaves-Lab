@@ -1,4 +1,7 @@
 {
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
   "rewrites": [
     { "source": "/realm", "destination": "/realm.html" },
     { "source": "/consciousness-mirror", "destination": "/consciousness-mirror.html" },
