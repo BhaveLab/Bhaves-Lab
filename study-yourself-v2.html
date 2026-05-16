@@ -266,7 +266,7 @@
 <div id="intro">
   <div class="label">BHAVÉ'S LAB — STUDY YOURSELF</div>
   <h1>Study <em>Yourself</em></h1>
-  <p class="sub">Ten sections. One framework. Your own life as the material. This is not a course you consume — it is a system you move through.</p>
+  <p class="sub">Ten sections. One framework. Your own life as the material. This is not a study you consume — it is a system you move through.</p>
   <div class="divider"></div>
 
   <div class="section-list">
@@ -501,7 +501,7 @@ const SECTIONS = [
     questions: [
       { text: 'What is most active in your awareness right now — in this moment, doing this work?', placeholder: 'Real-time. What is present right now, not what you think should be.' },
       { text: 'Where in the sequence can you feel what is active most clearly — State, Perception, Formation, or Decision?', placeholder: 'Locate it in the sequence. Which layer is it most alive at?' },
-      { text: 'What are you noticing about how you are engaging with this course — honestly?', placeholder: 'The quality of your engagement. What you have brought to it and what you have withheld.' },
+      { text: 'What are you noticing about how you are engaging with this study — honestly?', placeholder: 'The quality of your engagement. What you have brought to it and what you have withheld.' },
       { text: 'What sections have you moved through quickly — and what does that movement tell you?', placeholder: 'Speed is information. Where did you not slow down when the question asked for it?' },
       { text: 'What has surfaced across this work that you did not expect?', placeholder: 'What arrived that was not part of the plan. What showed up uninvited.' },
       { text: 'What are you resisting looking at — right now, in this moment?', placeholder: 'The thing present in your awareness that you are moving away from.' }
@@ -743,7 +743,8 @@ function renderQuestion(sIndex, qIndex) {
         .replace('{{question}}', q.text)
         .replace('{{answer}}', answer);
 
-      const result = await callClaude(prompt, '');
+      console.log('[REFLECT] answer to send (length ' + answer.length + '):', answer.substring(0, 80));
+      const result = await callClaude(prompt, answer);
       console.log('[REFLECT] API response received:', JSON.stringify(result));
 
       // Normalise signal — handle boolean, string, or numeric
