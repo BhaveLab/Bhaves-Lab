@@ -53,6 +53,14 @@
   function init() {
     console.log('[BDE] init fired, mount:', document.getElementById('bde-mount'));
     console.log('[BDE] init() — readyState:', document.readyState);
+
+    // study-yourself-v2.html owns its own intro → email → settling → state check
+    // → course sequence. BDE must not touch #course-content or #intro on that page.
+    if (document.getElementById('begin-btn')) {
+      console.log('[BDE] Study-yourself flow detected — standing down.');
+      return;
+    }
+
     try {
       if (localStorage.getItem(STORAGE_KEY)) {
         console.log('[BDE] Existing architecture found — showing course directly.');
