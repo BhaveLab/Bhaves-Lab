@@ -200,6 +200,21 @@
   .settling-continue { margin-top: 4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--ash); background: none; border: 1px solid rgba(107,107,107,0.2); padding: 0.85rem 2rem; cursor: pointer; transition: all 0.4s; opacity: 0; animation: fadeUp 0.8s 2.5s forwards; }
   .settling-continue:hover { border-color: var(--gold-dim); color: var(--gold); }
 
+  /* ── BIRTH DATA SCREEN ── */
+  #birth-data { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; overflow-y: auto; }
+  #birth-data.active { display: block; }
+  .birth-data-inner { width: 100%; max-width: 560px; margin: 0 auto; padding: 6rem 2rem 4rem; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .birth-data-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 2rem; }
+  .birth-data-sub { font-size: 0.9rem; font-style: italic; color: var(--ash); margin-bottom: 2.75rem; line-height: 1.6; }
+  .birth-field { margin-bottom: 1.75rem; }
+  .birth-field-label { display: block; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; color: var(--gold); margin-bottom: 0.65rem; }
+  .birth-optional { color: var(--ash); font-size: 0.52rem; letter-spacing: 0.1em; }
+  .birth-input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--light); font-family: var(--mono); font-size: 0.85rem; padding: 0.85rem 1.1rem; outline: none; transition: border-color 0.3s; -webkit-appearance: none; border-radius: 0; color-scheme: dark; }
+  .birth-input:focus { border-color: var(--gold-dim); }
+  .birth-input::placeholder { color: var(--ash); }
+  .birth-date-row { display: flex; gap: 0.75rem; }
+  .birth-date-row .birth-input { flex: 1; min-width: 0; }
+
   /* ── STATE CHECK SCREEN ── */
   #state-check { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
   #state-check.active { display: flex; }
@@ -260,6 +275,40 @@
   </div>
 </div>
 
+<!-- ── BIRTH DATA ── -->
+<div id="birth-data">
+  <div class="birth-data-inner">
+    <div class="birth-data-label">[ YOUR OPERATING DATA ]</div>
+    <p class="birth-data-sub">This anchors your pattern map to your operating architecture.</p>
+
+    <div class="birth-field">
+      <label class="birth-field-label" for="bd-name">FULL NAME AT BIRTH</label>
+      <input type="text" id="bd-name" class="birth-input" placeholder="As it appears on your birth certificate" autocomplete="name">
+    </div>
+
+    <div class="birth-field">
+      <label class="birth-field-label">BIRTH DATE</label>
+      <div class="birth-date-row">
+        <input type="number" id="bd-day"   class="birth-input" placeholder="DD"   min="1"    max="31">
+        <input type="number" id="bd-month" class="birth-input" placeholder="MM"   min="1"    max="12">
+        <input type="number" id="bd-year"  class="birth-input" placeholder="YYYY" min="1920" max="2010">
+      </div>
+    </div>
+
+    <div class="birth-field">
+      <label class="birth-field-label" for="bd-time">BIRTH TIME <span class="birth-optional">[ OPTIONAL — UNLOCKS MOON AND RISING SIGN ]</span></label>
+      <input type="time" id="bd-time" class="birth-input">
+    </div>
+
+    <div class="birth-field">
+      <label class="birth-field-label" for="bd-city">BIRTH CITY <span class="birth-optional">[ OPTIONAL — NEEDED FOR RISING SIGN ]</span></label>
+      <input type="text" id="bd-city" class="birth-input" placeholder="City, Country" autocomplete="off">
+    </div>
+
+    <button class="btn-state-submit" id="birth-data-submit">CONTINUE</button>
+  </div>
+</div>
+
 <!-- ── INTRO ── -->
 <div id="intro">
   <div class="label">BHAVÉ'S LAB — STUDY YOURSELF</div>
@@ -303,6 +352,7 @@
       <p>Everything that surfaced — mapped across the full sequence.</p>
     </div>
 
+    <div id="birth-data-display"></div>
     <div id="opening-state-display"></div>
 
     <div class="web-label">[ PATTERN WEB — PULL ANY NODE TO SEE WHAT SURFACED THERE ]</div>
@@ -529,6 +579,10 @@ const SECTIONS = [
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let userEmail = '';
+let userName  = '';
+let birthDate = '';
+let birthTime = '';
+let birthCity = '';
 let currentSection = 0;
 let currentQuestion = 0;
 let sessionData = [];
@@ -548,6 +602,32 @@ document.getElementById('begin-btn').addEventListener('click', () => {
   }
   userEmail = email;
   document.getElementById('intro').style.display = 'none';
+  document.getElementById('birth-data').classList.add('active');
+});
+
+// ── BIRTH DATA → SETTLING ────────────────────────────────────────────────────
+document.getElementById('birth-data-submit').addEventListener('click', () => {
+  const name  = document.getElementById('bd-name').value.trim();
+  const day   = document.getElementById('bd-day').value.trim();
+  const month = document.getElementById('bd-month').value.trim();
+  const year  = document.getElementById('bd-year').value.trim();
+
+  if (!name) {
+    document.getElementById('bd-name').style.borderColor = 'rgba(201,169,110,0.6)';
+    document.getElementById('bd-name').focus();
+    return;
+  }
+  if (!day || !month || !year) {
+    document.getElementById('bd-day').style.borderColor = 'rgba(201,169,110,0.6)';
+    return;
+  }
+
+  userName  = name;
+  birthDate = `${day.padStart(2,'0')}/${month.padStart(2,'0')}/${year}`;
+  birthTime = document.getElementById('bd-time').value.trim();
+  birthCity = document.getElementById('bd-city').value.trim();
+
+  document.getElementById('birth-data').classList.remove('active');
   document.getElementById('settling').classList.add('active');
 });
 
@@ -841,6 +921,20 @@ async function showCompletion() {
   document.getElementById('delivery-email').textContent = userEmail;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  if (userName || birthDate) {
+    const parts = [
+      userName,
+      birthDate,
+      birthTime  || null,
+      birthCity  || null,
+    ].filter(Boolean).join(' · ');
+    document.getElementById('birth-data-display').innerHTML = `
+      <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border-left:2px solid rgba(201,169,110,0.4);background:rgba(201,169,110,0.03);">
+        <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:0.75rem;">[ OPERATING DATA ]</div>
+        <div style="font-size:1rem;color:var(--smoke);line-height:1.75;">${parts}</div>
+      </div>`;
+  }
+
   if (openingState) {
     document.getElementById('opening-state-display').innerHTML = `
       <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border-left:2px solid rgba(201,169,110,0.4);background:rgba(201,169,110,0.03);">
@@ -935,6 +1029,8 @@ async function sendPatternMap() {
 function buildEmailBody() {
   const totalAnswers = sessionData.flat().filter(Boolean).length;
   const flagCount = sectionFlags.length;
+  const birthParts = [userName, birthDate, birthTime || null, birthCity || null].filter(Boolean).join(' · ');
+  const birthBlock = birthParts ? `<div style="margin-bottom:32px;padding:20px;background:#0a0a0a;border-left:2px solid rgba(201,169,110,0.4);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">OPERATING DATA</p><p style="font-size:15px;color:#e8e4dc;line-height:1.8;">${birthParts}</p></div>` : '';
   const stateBlock = openingState ? `<div style="margin-bottom:32px;padding:20px;background:#0a0a0a;border-left:2px solid rgba(201,169,110,0.4);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">OPENING STATE</p><p style="font-size:15px;color:#e8e4dc;line-height:1.8;font-style:italic;">${openingState}</p></div>` : '';
 
   const sectionBlocks = SECTIONS.map((s, si) => {
@@ -951,7 +1047,7 @@ function buildEmailBody() {
     return `<div style="margin-bottom:36px;padding-bottom:36px;border-bottom:2px solid rgba(201,169,110,0.12);"><p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:16px;">${s.num} — ${s.title.toUpperCase()} / ${s.layer}</p>${qBlocks}</div>`;
   }).join('');
 
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' signal flags logged.' : 'Full engagement — no signal flags.'}</p></div>${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' signal flags logged.' : 'Full engagement — no signal flags.'}</p></div>${birthBlock}${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
 }
 
 // ── FRAMEWORK DRAWER ─────────────────────────────────────────────────────────
