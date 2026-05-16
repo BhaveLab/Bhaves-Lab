@@ -538,44 +538,6 @@ let openingState = '';
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 
-// ── SESSION PERSISTENCE ───────────────────────────────────────────────────────
-const SESSION_KEY = 'bhave_session_progress';
-
-function saveSession() {
-  try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
-      userEmail, currentSection, currentQuestion,
-      sessionData, sectionFlags, openingState,
-      savedAt: new Date().toISOString()
-    }));
-  } catch (e) {
-    console.warn('[SESSION] save failed:', e);
-  }
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-function restoreSession() {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return false;
-    const s = JSON.parse(raw);
-    userEmail       = s.userEmail       || '';
-    currentSection  = s.currentSection  || 0;
-    currentQuestion = s.currentQuestion || 0;
-    sessionData     = s.sessionData     || SECTIONS.map(() => []);
-    sectionFlags    = s.sectionFlags    || [];
-    openingState    = s.openingState    || '';
-    console.log('[SESSION] Restored — section', currentSection, 'question', currentQuestion);
-    return true;
-  } catch (e) {
-    console.warn('[SESSION] restore failed:', e);
-    return false;
-  }
-}
-
 // ── BEGIN ────────────────────────────────────────────────────────────────────
 document.getElementById('begin-btn').addEventListener('click', () => {
   const email = document.getElementById('user-email').value.trim();
@@ -811,13 +773,11 @@ function advance(sIndex, qIndex) {
   if (qIndex < s.questions.length - 1) {
     currentSection  = sIndex;
     currentQuestion = qIndex + 1;
-    saveSession();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     renderQuestion(currentSection, currentQuestion);
   } else if (sIndex < 9) {
     currentSection  = sIndex + 1;
     currentQuestion = 0;
-    saveSession();
     renderQuestion(currentSection, 0);
   } else {
     showCompletion();
@@ -829,7 +789,6 @@ function recordAnswer(sIndex, qIndex, answer, reflection, movedThrough) {
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
   sessionData[sIndex][qIndex] = { section: s.title, num: s.num, layer: s.layer, questionNum: qIndex + 1, question: q.text, answer, reflection, movedThrough, timestamp: new Date().toISOString() };
-  saveSession();
 }
 
 // ── CALL CLAUDE ──────────────────────────────────────────────────────────────
@@ -876,7 +835,6 @@ function updateProgress(current, total) {
 
 // ── COMPLETION ───────────────────────────────────────────────────────────────
 async function showCompletion() {
-  clearSession();
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('course').style.display = 'none';
   document.getElementById('completion').style.display = 'block';
@@ -1051,15 +1009,6 @@ document.addEventListener('click', e => {
   if (node) openFwDrawer(node.dataset.node);
 });
 
-// ── RESTORE SESSION ON LOAD ───────────────────────────────────────────────────
-(function () {
-  if (!restoreSession()) return;
-  document.getElementById('intro').style.display         = 'none';
-  document.getElementById('settling').classList.remove('active');
-  document.getElementById('state-check').classList.remove('active');
-  document.getElementById('course').style.display        = 'block';
-  renderQuestion(currentSection, currentQuestion);
-}());
 </script>
 
 </div><!-- #course-content -->
