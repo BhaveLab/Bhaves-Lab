@@ -203,17 +203,20 @@
   /* ── BIRTH DATA SCREEN ── */
   #birth-data { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; overflow-y: auto; }
   #birth-data.active { display: block; }
-  .birth-data-inner { width: 100%; max-width: 560px; margin: 0 auto; padding: 6rem 2rem 4rem; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
-  .birth-data-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 2rem; }
-  .birth-data-sub { font-size: 0.9rem; font-style: italic; color: var(--ash); margin-bottom: 2.75rem; line-height: 1.6; }
-  .birth-field { margin-bottom: 1.75rem; }
-  .birth-field-label { display: block; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.16em; color: var(--gold); margin-bottom: 0.65rem; }
-  .birth-optional { color: var(--ash); font-size: 0.52rem; letter-spacing: 0.1em; }
-  .birth-input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--light); font-family: var(--mono); font-size: 0.85rem; padding: 0.85rem 1.1rem; outline: none; transition: border-color 0.3s; -webkit-appearance: none; border-radius: 0; color-scheme: dark; }
-  .birth-input:focus { border-color: var(--gold-dim); }
-  .birth-input::placeholder { color: var(--ash); }
-  .birth-date-row { display: flex; gap: 0.75rem; }
+  .birth-data-inner { width: 100%; max-width: 560px; margin: 0 auto; padding: 5rem 1.5rem 4rem; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .birth-data-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.22em; color: #b8952a; margin-bottom: 1.75rem; }
+  .birth-data-title { font-family: var(--serif); font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 300; color: #e8e4dc; line-height: 1.1; margin-bottom: 1.1rem; }
+  .birth-data-sub { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; color: #5a5a5a; line-height: 1.8; margin-bottom: 2.75rem; }
+  .birth-field { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem; }
+  .birth-field-label { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em; color: #b8952a; display: flex; align-items: center; gap: 0.75rem; }
+  .birth-optional { font-size: 0.55rem; letter-spacing: 0.12em; color: #3a3a3a; }
+  .birth-hint { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.06em; color: #383838; line-height: 1.7; }
+  .birth-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(184,149,42,0.25); color: #e8e4dc; font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.04em; padding: 0.65rem 0; outline: none; transition: border-color 0.25s; -webkit-appearance: none; border-radius: 0; color-scheme: dark; }
+  .birth-input:focus { border-bottom-color: #b8952a; }
+  .birth-input::placeholder { color: #2e2e2e; }
+  .birth-date-row { display: flex; gap: 1rem; }
   .birth-date-row .birth-input { flex: 1; min-width: 0; }
+  #birth-data .btn-state-submit { background: transparent; border: 1px solid rgba(184,149,42,0.35); color: #b8952a; letter-spacing: 0.22em; padding: 0.85rem 2.25rem; width: auto; align-self: flex-start; margin-top: 0.5rem; }
 
   /* ── STATE CHECK SCREEN ── */
   #state-check { display: none; position: fixed; inset: 0; background: var(--void); z-index: 200; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
@@ -279,15 +282,17 @@
 <div id="birth-data">
   <div class="birth-data-inner">
     <div class="birth-data-label">[ YOUR OPERATING DATA ]</div>
-    <p class="birth-data-sub">This anchors your pattern map to your operating architecture.</p>
+    <h2 class="birth-data-title">Before you begin.</h2>
+    <p class="birth-data-sub">This data runs in the background — invisible during the study. When you reach your Pattern Map, it surfaces under Your Operating Architecture.</p>
 
     <div class="birth-field">
-      <label class="birth-field-label" for="bd-name">FULL NAME AT BIRTH</label>
-      <input type="text" id="bd-name" class="birth-input" placeholder="As it appears on your birth certificate" autocomplete="name">
+      <label class="birth-field-label" for="bd-name">Full birth name</label>
+      <input type="text" id="bd-name" class="birth-input" placeholder="e.g. Sarah Marie Johnson" autocomplete="name">
+      <div class="birth-hint">Exactly as it appears on your birth certificate. This is the name the numerology calculates from.</div>
     </div>
 
     <div class="birth-field">
-      <label class="birth-field-label">BIRTH DATE</label>
+      <label class="birth-field-label">Date of birth</label>
       <div class="birth-date-row">
         <input type="number" id="bd-day"   class="birth-input" placeholder="DD"   min="1"    max="31">
         <input type="number" id="bd-month" class="birth-input" placeholder="MM"   min="1"    max="12">
@@ -296,16 +301,18 @@
     </div>
 
     <div class="birth-field">
-      <label class="birth-field-label" for="bd-time">BIRTH TIME <span class="birth-optional">[ OPTIONAL — UNLOCKS MOON AND RISING SIGN ]</span></label>
+      <label class="birth-field-label" for="bd-time">Time of birth <span class="birth-optional">[ optional ]</span></label>
       <input type="time" id="bd-time" class="birth-input">
+      <div class="birth-hint">Unlocks Rising sign. If unknown, leave blank — Sun and Moon still calculate.</div>
     </div>
 
     <div class="birth-field">
-      <label class="birth-field-label" for="bd-city">BIRTH CITY <span class="birth-optional">[ OPTIONAL — NEEDED FOR RISING SIGN ]</span></label>
-      <input type="text" id="bd-city" class="birth-input" placeholder="City, Country" autocomplete="off">
+      <label class="birth-field-label" for="bd-city">Birth location <span class="birth-optional">[ optional ]</span></label>
+      <input type="text" id="bd-city" class="birth-input" placeholder="e.g. Chicago, USA" autocomplete="off">
+      <div class="birth-hint">City and country. Required for Rising sign.</div>
     </div>
 
-    <button class="btn-state-submit" id="birth-data-submit">CONTINUE</button>
+    <button class="btn-state-submit" id="birth-data-submit">Initialize</button>
   </div>
 </div>
 
