@@ -927,6 +927,32 @@ to { opacity: 1; transform: translateY(0); }
 .option-btn { padding: 18px 20px; }
 }
 .nav-logo-img { height: 44px; width: auto; display: block; }
+
+.reflection-path-block {
+margin-top: 28px;
+border-left: 2px solid rgba(201,169,110,0.3);
+padding: 14px 20px;
+}
+.reflection-path-link {
+display: block;
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(15px, 2.5vw, 18px);
+font-weight: 300;
+font-style: italic;
+color: #c9a96e;
+text-decoration: none;
+line-height: 1.7;
+transition: opacity 0.3s;
+}
+.reflection-path-link:hover { opacity: 0.65; }
+.reflection-spam-notice {
+margin-top: 20px;
+font-family: 'Syne', sans-serif;
+font-size: 10px;
+letter-spacing: 0.1em;
+color: rgba(232,224,212,0.18);
+line-height: 1.6;
+}
 </style>
 <script src="/i18n/i18n.js" defer></script>
 <script src="/i18n/strings.en.js" defer></script>
@@ -1000,8 +1026,9 @@ to { opacity: 1; transform: translateY(0); }
       <p class="reflection-text" id="reflection-main"></p>
       <p class="reflection-text" id="reflection-secondary"></p>
     </div>
-    <div class="paths-section">
-      <p class="paths-label">Paths to feel into</p>
+    <div id="reflection-path" class="reflection-path-block" style="display:none;"></div>
+    <p class="reflection-spam-notice">Check your spam folder if the email does not arrive within a few minutes.</p>
+    <div class="paths-section" style="display:none;">
       <div id="paths-container"></div>
     </div>
     <div class="session-cta">
@@ -1157,12 +1184,12 @@ function submitMirrorEmail() {
   .then(data => {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection(data.reflection || null);
+    renderReflection(data.reflection || null, data.pathName, data.pathUrl, data.pathLine);
   })
   .catch(() => {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection(null);
+    renderReflection(null, null, null, null);
   });
 }
 
@@ -1177,12 +1204,19 @@ function calculateScores() {
   scores = { innerMining: 0, auracle: 0, frequency: 0 };
 }
 
-function renderReflection(reflectionText) {
+function renderReflection(reflectionText, pathName, pathUrl, pathLine) {
     document.getElementById('reflection-title').textContent = 'The Mirror';
     document.getElementById('reflection-main').textContent = reflectionText || 'The Mirror has seen what is here.';
     document.getElementById('reflection-secondary').textContent = '';
-    document.getElementById('paths-container').innerHTML = '';
     document.getElementById('cta-text').textContent = '';
+
+    const pathEl = document.getElementById('reflection-path');
+    if (pathName && pathUrl && pathLine) {
+      pathEl.innerHTML = '<a href="' + pathUrl + '" class="reflection-path-link">' + pathLine + '</a>';
+      pathEl.style.display = '';
+    } else {
+      pathEl.style.display = 'none';
+    }
 }
 
 
