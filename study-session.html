@@ -228,7 +228,7 @@ document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(entrie
 
     // what happens
     set('.section .section-label', t('studySession.whatLabel'));
-    set('.section .section-heading', t('studySession.whatH2'));
+    set('.section .section-heading', t('studySession.whatH2'), true);
     set('.section-body', t('studySession.whatBody'));
 
     var flowSteps = qq('.flow-step');
