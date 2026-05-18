@@ -1140,15 +1140,26 @@ function submitMirrorEmail() {
     body: JSON.stringify({ email, source: 'consciousness-mirror', answers: answers.map(a => a || '') })
   });
 
-  // Show reflection
+  // Show loading, fetch Claude reflection
   document.getElementById('email-screen').style.display = 'none';
   document.getElementById('loading-screen').style.display = 'block';
 
-  setTimeout(() => {
+  fetch('https://bhaveslab-backend.vercel.app/api/mirror-reflect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers: answers.map(a => a || '') })
+  })
+  .then(r => r.json())
+  .then(data => {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection();
-  }, 2800);
+    renderReflection(data.reflection || null);
+  })
+  .catch(() => {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('reflection-screen').style.display = 'block';
+    renderReflection(null);
+  });
 }
 
 function goBack() {
@@ -1162,25 +1173,12 @@ function calculateScores() {
   scores = { innerMining: 0, auracle: 0, frequency: 0 };
 }
 
-function renderReflection() {
-    const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
-    const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-
-    const ref = reflections[primary];
-    document.getElementById('reflection-title').textContent = ref.title;
-    document.getElementById('reflection-main').textContent = ref.main;
-    document.getElementById('reflection-secondary').textContent = ref.secondary;
-    document.getElementById('cta-text').textContent = ref.cta;
-
-    const container = document.getElementById('paths-container');
-    container.innerHTML = '';
-    sorted.forEach(([key], idx) => {
-      const path = sessionPaths[key];
-      const card = document.createElement('div');
-      card.className = `path-card ${path.class}${idx === 0 ? ' highlighted' : ''}`;
-      card.innerHTML = `<p class="path-name">${path.name}</p><p class="path-desc">${path.desc}</p><a class="path-link" href="${path.href}">Learn more →</a>`;
-      container.appendChild(card);
-    });
+function renderReflection(reflectionText) {
+    document.getElementById('reflection-title').textContent = 'The Mirror';
+    document.getElementById('reflection-main').textContent = reflectionText || 'The Mirror has seen what is here.';
+    document.getElementById('reflection-secondary').textContent = '';
+    document.getElementById('paths-container').innerHTML = '';
+    document.getElementById('cta-text').textContent = '';
 }
 
 
