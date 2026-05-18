@@ -185,6 +185,27 @@ color: #e8e0d4;
 background: rgba(201,169,110,0.04);
 }
 
+.mirror-textarea {
+width: 100%;
+min-height: 120px;
+background: transparent;
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 0;
+color: #e8e0d4;
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(16px, 2.5vw, 19px);
+font-weight: 300;
+font-style: italic;
+line-height: 1.7;
+padding: 20px 24px;
+resize: vertical;
+outline: none;
+box-sizing: border-box;
+transition: border-color 0.3s ease;
+}
+.mirror-textarea::placeholder { color: rgba(232,224,212,0.2); font-style: italic; }
+.mirror-textarea:focus { border-color: rgba(201,169,110,0.3); }
+
 .nav-row {
 display: flex;
 justify-content: center;
@@ -991,66 +1012,14 @@ to { opacity: 1; transform: translateY(0); }
 
 <script>
 const questions = [
-  {
-    id: 1,
-    text: "When you look at the current version of your life, does it feel like a story you are writing — or a story you are remembering?",
-    options: [
-      { label: "I am writing it. I feel authorship over where it goes.", points: { innerMining: 0, auracle: 1, frequency: 2 } },
-      { label: "Something in between — some parts feel chosen, others feel inherited.", points: { innerMining: 2, auracle: 1, frequency: 0 } },
-      { label: "I am remembering it. Like I am following a script I didn't write.", points: { innerMining: 3, auracle: 0, frequency: 0 } }
-    ],
-    type: "innerMining"
-  },
-  {
-    id: 2,
-    text: "Do you ever notice a way you respond to pressure, change, or repetition that feels almost automatic — like it started somewhere you can't quite see?",
-    options: [
-      { label: "Yes — there is a pattern I keep returning to that I don't fully understand.", points: { innerMining: 3, auracle: 0, frequency: 0 } },
-      { label: "Sometimes — I notice it but I'm not sure it runs that deep.", points: { innerMining: 1, auracle: 2, frequency: 1 } },
-      { label: "Not really — my responses feel mostly intentional.", points: { innerMining: 0, auracle: 1, frequency: 2 } }
-    ],
-    type: "innerMining"
-  },
-  {
-    id: 3,
-    text: "Right now, do you feel more like you're inside your experience — or watching it happen?",
-    options: [
-      { label: "Inside it — fully immersed, sometimes too much.", points: { innerMining: 1, auracle: 2, frequency: 1 } },
-      { label: "Watching it — like I'm observing my own life from a slight distance.", points: { innerMining: 0, auracle: 3, frequency: 1 } },
-      { label: "I move between both, sometimes without choosing to.", points: { innerMining: 2, auracle: 1, frequency: 0 } }
-    ],
-    type: "auracle"
-  },
-  {
-    id: 4,
-    text: "When you slow down, what becomes more noticeable — your body, your thoughts, or something else entirely?",
-    options: [
-      { label: "My body — sensations, tension, physical signals I usually move past.", points: { innerMining: 0, auracle: 3, frequency: 1 } },
-      { label: "My thoughts — the volume and pace of what runs through my mind.", points: { innerMining: 2, auracle: 1, frequency: 0 } },
-      { label: "Something harder to name — a presence, a weight, a frequency.", points: { innerMining: 1, auracle: 1, frequency: 3 } }
-    ],
-    type: "auracle"
-  },
-  {
-    id: 5,
-    text: "Is there something in your life you understand clearly — but it still hasn't shifted?",
-    options: [
-      { label: "Yes — I know what it is but knowing hasn't been enough to move it.", points: { innerMining: 2, auracle: 0, frequency: 3 } },
-      { label: "There is something, but I'm not sure I fully understand it yet.", points: { innerMining: 3, auracle: 1, frequency: 0 } },
-      { label: "Most things that I understand, I've been able to work through.", points: { innerMining: 0, auracle: 2, frequency: 1 } }
-    ],
-    type: "frequency"
-  },
-  {
-    id: 6,
-    text: "Does your current state feel like something you're choosing — or something you've been carrying?",
-    options: [
-      { label: "Choosing — I feel agency over how I show up.", points: { innerMining: 0, auracle: 1, frequency: 3 } },
-      { label: "Carrying — there is a weight that has been with me for a while.", points: { innerMining: 3, auracle: 1, frequency: 0 } },
-      { label: "Both — there are parts I've claimed and parts I haven't yet.", points: { innerMining: 1, auracle: 2, frequency: 1 } }
-    ],
-    type: "frequency"
-  }
+  { id: 1, text: "What is the dominant frequency you have been operating in lately — not a mood, the actual ground condition underneath everything?" },
+  { id: 2, text: "What is the one thing you keep seeing in every situation right now — even when the situations are different?" },
+  { id: 3, text: "What conclusion about yourself feels so obvious it has never needed questioning?" },
+  { id: 4, text: "What do you keep choosing that you already know isn't producing what you want?" },
+  { id: 5, text: "What feeling or physical state keeps returning regardless of what you do to address it?" },
+  { id: 6, text: "What area of your life has stayed exactly the same despite your clearest efforts to change it?" },
+  { id: 7, text: "What brought you here today — not the story, just what is actually active right now?" },
+  { id: 8, text: "If something in this Mirror lands and you want to go deeper — what is the best way to reach you?" }
 ];
 
 const sessionPaths = {
@@ -1123,33 +1092,26 @@ function renderQuestion() {
 
   const grid = document.getElementById('options-grid');
   grid.innerHTML = '';
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn';
-    btn.textContent = opt.label;
-    if (answers[currentQuestion] === i) btn.classList.add('selected');
-    btn.onclick = () => selectOption(i);
-    grid.appendChild(btn);
-  });
+  const ta = document.createElement('textarea');
+  ta.className = 'mirror-textarea';
+  ta.placeholder = 'Write what comes — there is no wrong answer.';
+  ta.value = answers[currentQuestion] || '';
+  ta.oninput = () => {
+    answers[currentQuestion] = ta.value;
+    document.getElementById('next-btn').disabled = !ta.value.trim();
+  };
+  grid.appendChild(ta);
 
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = answers[currentQuestion] === undefined;
+  nextBtn.disabled = !answers[currentQuestion]?.trim();
   nextBtn.textContent = currentQuestion === questions.length - 1 ? 'See Reflection' : 'Continue';
 
   const backBtn = document.getElementById('back-btn');
   backBtn.disabled = currentQuestion === 0;
 }
 
-function selectOption(index) {
-  answers[currentQuestion] = index;
-  document.querySelectorAll('.option-btn').forEach((btn, i) => {
-    btn.classList.toggle('selected', i === index);
-  });
-  document.getElementById('next-btn').disabled = false;
-}
-
 function goNext() {
-  if (answers[currentQuestion] === undefined) return;
+  if (!answers[currentQuestion]?.trim()) return;
 
   if (currentQuestion < questions.length - 1) {
     currentQuestion++;
@@ -1171,27 +1133,11 @@ function submitMirrorEmail() {
     return;
   }
 
-  calculateScores();
-  const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
-  const sessionNames = { innerMining: 'Inner Mining Session', auracle: 'Auracle Session', frequency: 'Frequency Alignment Session' };
-
-  // Build answers summary
-  const answerSummary = answers.map((answerIndex, qIndex) => {
-    if (answerIndex !== undefined) {
-      return `Q${qIndex+1}: ${questions[qIndex].options[answerIndex].label}`;
-    }
-    return '';
-  }).join(' | ');
-
   // Submit to backend
-  const answersArray = answers.map((answerIndex, qIndex) =>
-    answerIndex !== undefined ? questions[qIndex].options[answerIndex].label : null
-  );
-
   fetch('https://bhaveslab-backend.vercel.app/api/notify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, source: 'consciousness-mirror', answers: answersArray })
+    body: JSON.stringify({ email, source: 'consciousness-mirror', answers: answers.map(a => a || '') })
   });
 
   // Show reflection
@@ -1214,14 +1160,6 @@ function goBack() {
 
 function calculateScores() {
   scores = { innerMining: 0, auracle: 0, frequency: 0 };
-  answers.forEach((answerIndex, qIndex) => {
-    if (answerIndex !== undefined) {
-      const pts = questions[qIndex].options[answerIndex].points;
-      scores.innerMining += pts.innerMining;
-      scores.auracle += pts.auracle;
-      scores.frequency += pts.frequency;
-    }
-  });
 }
 
 function renderReflection() {
