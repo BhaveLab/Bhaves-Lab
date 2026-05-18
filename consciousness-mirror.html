@@ -928,23 +928,50 @@ to { opacity: 1; transform: translateY(0); }
 }
 .nav-logo-img { height: 44px; width: auto; display: block; }
 
-.reflection-path-block {
-margin-top: 28px;
-border-left: 2px solid rgba(201,169,110,0.3);
-padding: 14px 20px;
+.mirror-paths-section { margin-top: 32px; }
+.mirror-paths-label {
+font-family: 'Syne', sans-serif;
+font-size: 10px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.4);
+margin-bottom: 14px;
 }
-.reflection-path-link {
-display: block;
+.mirror-path-block {
+border-left: 2px solid rgba(201,169,110,0.35);
+padding: 16px 20px;
+margin-bottom: 10px;
+background: rgba(201,169,110,0.03);
+}
+.mirror-path-name {
+font-family: 'Syne', sans-serif;
+font-size: 10px;
+font-weight: 500;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: #c9a96e;
+margin-bottom: 7px;
+}
+.mirror-path-why {
 font-family: 'Cormorant Garamond', serif;
-font-size: clamp(15px, 2.5vw, 18px);
+font-size: clamp(14px, 2.5vw, 17px);
 font-weight: 300;
 font-style: italic;
+color: rgba(232,224,212,0.55);
+line-height: 1.65;
+margin-bottom: 10px;
+}
+.mirror-path-link {
+font-family: 'Syne', sans-serif;
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
 color: #c9a96e;
 text-decoration: none;
-line-height: 1.7;
+opacity: 0.65;
 transition: opacity 0.3s;
 }
-.reflection-path-link:hover { opacity: 0.65; }
+.mirror-path-link:hover { opacity: 1; }
 .reflection-spam-notice {
 margin-top: 20px;
 font-family: 'Syne', sans-serif;
@@ -1026,7 +1053,7 @@ line-height: 1.6;
       <p class="reflection-text" id="reflection-main"></p>
       <p class="reflection-text" id="reflection-secondary"></p>
     </div>
-    <div id="reflection-path" class="reflection-path-block" style="display:none;"></div>
+    <div id="reflection-paths" class="mirror-paths-section" style="display:none;"></div>
     <p class="reflection-spam-notice">Check your spam folder if the email does not arrive within a few minutes.</p>
     <div class="paths-section" style="display:none;">
       <div id="paths-container"></div>
@@ -1184,12 +1211,12 @@ function submitMirrorEmail() {
   .then(data => {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection(data.reflection || null, data.pathName, data.pathUrl, data.pathLine);
+    renderReflection(data.reflection || null, data.paths || []);
   })
   .catch(() => {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection(null, null, null, null);
+    renderReflection(null, []);
   });
 }
 
@@ -1204,18 +1231,25 @@ function calculateScores() {
   scores = { innerMining: 0, auracle: 0, frequency: 0 };
 }
 
-function renderReflection(reflectionText, pathName, pathUrl, pathLine) {
+function renderReflection(reflectionText, paths) {
     document.getElementById('reflection-title').textContent = 'The Mirror';
     document.getElementById('reflection-main').textContent = reflectionText || 'The Mirror has seen what is here.';
     document.getElementById('reflection-secondary').textContent = '';
     document.getElementById('cta-text').textContent = '';
 
-    const pathEl = document.getElementById('reflection-path');
-    if (pathName && pathUrl && pathLine) {
-      pathEl.innerHTML = '<a href="' + pathUrl + '" class="reflection-path-link">' + pathLine + '</a>';
-      pathEl.style.display = '';
+    const pathsEl = document.getElementById('reflection-paths');
+    if (paths && paths.length) {
+      const blocks = paths.map(function(p) {
+        return '<div class="mirror-path-block">'
+          + '<p class="mirror-path-name">' + p.name + '</p>'
+          + '<p class="mirror-path-why">' + p.why + '</p>'
+          + '<a href="' + p.url + '" class="mirror-path-link">Explore this path →</a>'
+          + '</div>';
+      }).join('');
+      pathsEl.innerHTML = '<p class="mirror-paths-label">Paths available</p>' + blocks;
+      pathsEl.style.display = '';
     } else {
-      pathEl.style.display = 'none';
+      pathsEl.style.display = 'none';
     }
 }
 
