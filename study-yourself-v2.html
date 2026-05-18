@@ -435,7 +435,9 @@ drawCosmos(0);
 setTimeout(spawnShooter, 1000);
 
 // ── EVAL PROMPT ──────────────────────────────────────────────────────────────
-const EVAL_PROMPT = `You are evaluating a course answer for depth and completeness. The question was: {{question}}
+const EVAL_PROMPT = `The student's name is {{userName}}. Address them by their first name directly in your reflection — not they/them. Example: [Name], that answer…
+
+You are evaluating a course answer for depth and completeness. The question was: {{question}}
 The user answered: {{answer}}
 
 Did they actually answer what was asked with specific, embodied detail — not just conceptual language?
@@ -781,6 +783,7 @@ function renderQuestion(sIndex, qIndex) {
 
     try {
       const prompt = EVAL_PROMPT
+        .replace('{{userName}}', userName)
         .replace('{{question}}', q.text)
         .replace('{{answer}}', answer);
 
