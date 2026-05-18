@@ -928,6 +928,23 @@ to { opacity: 1; transform: translateY(0); }
 }
 .nav-logo-img { height: 44px; width: auto; display: block; }
 
+/* PAYMENT GATE */
+.gate-enter-btn {
+display: inline-block;
+font-family: 'Syne', sans-serif;
+font-size: 11px;
+font-weight: 400;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: #0a0a0a;
+background: #c9a96e;
+border: 1px solid #c9a96e;
+padding: 18px 56px;
+text-decoration: none;
+transition: background 0.4s ease, border-color 0.4s ease;
+}
+.gate-enter-btn:hover { background: #e8c98a; border-color: #e8c98a; }
+
 .mirror-paths-section { margin-top: 32px; }
 .mirror-paths-label {
 font-family: 'Syne', sans-serif;
@@ -1031,9 +1048,19 @@ transition: background 0.3s;
 
 <div class="container">
 
+  <!-- PAYMENT GATE -->
+
+  <div id="payment-gate" class="screen" style="display:none; text-align:center; padding:80px 0; animation:fadeUp 1.2s ease forwards;">
+    <p class="lab-label">Bhavé's Lab</p>
+    <h1 class="mirror-title">The <em>Consciousness</em><br>Mirror</h1>
+    <p class="mirror-subtitle">$1 per session</p>
+    <div class="divider"></div>
+    <a href="https://buy.stripe.com/aFadR2180fSidfwaRlbQY05" class="gate-enter-btn">Enter</a>
+  </div>
+
   <!-- INTRO -->
 
-  <div id="intro" class="screen">
+  <div id="intro" class="screen" style="display:none;">
     <p class="lab-label">Bhavé's Lab</p>
     <h1 class="mirror-title">The <em>Consciousness</em><br>Mirror</h1>
     <p class="mirror-subtitle">Six questions. No answers given.<br>Only what is already there — reflected back.</p>
@@ -1107,6 +1134,13 @@ transition: background 0.3s;
 </div>
 
 <script>
+// Payment gate — show mirror only after Stripe success redirect
+(function() {
+  var paid = new URLSearchParams(window.location.search).get('success') === 'true';
+  document.getElementById('payment-gate').style.display = paid ? 'none' : 'block';
+  document.getElementById('intro').style.display = paid ? 'block' : 'none';
+})();
+
 const questions = [
   { id: 1, text: "What is the dominant frequency you have been operating in lately — not a mood, the actual ground condition underneath everything?" },
   { id: 2, text: "What is the one thing you keep seeing in every situation right now — even when the situations are different?" },
