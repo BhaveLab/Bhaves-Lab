@@ -1183,16 +1183,15 @@ function submitMirrorEmail() {
     return '';
   }).join(' | ');
 
-  // Submit to Mailchimp
-  const formData = new FormData();
-  formData.append('EMAIL', email);
-  formData.append('b_037838dfc703ebc26a9667953_128fa75a50', '');
-  formData.append('MERGE2', `Session Type: ${sessionNames[primary]} | ${answerSummary}`);
+  // Submit to backend
+  const answersArray = answers.map((answerIndex, qIndex) =>
+    answerIndex !== undefined ? questions[qIndex].options[answerIndex].label : null
+  );
 
-  fetch('https://lilegoverse.us20.list-manage.com/subscribe/post?u=037838dfc703ebc26a9667953&id=128fa75a50&f_id=00ab88e5f0', {
+  fetch('https://bhaveslab-backend.vercel.app/api/notify', {
     method: 'POST',
-    body: formData,
-    mode: 'no-cors'
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, source: 'consciousness-mirror', answers: answersArray })
   });
 
   // Show reflection
@@ -1246,24 +1245,6 @@ function renderReflection() {
     });
 }
 
-function submitMirrorEmail() {
-  const email = document.getElementById('mirror-email').value;
-  if (!email || !email.includes('@')) return;
-  calculateScores();
-  const primary = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
-  const answerSummary = answers.map((a,i) => a !== undefined ? questions[i].options[a].label : '').join(' | ');
-  const formData = new FormData();
-  formData.append('EMAIL', email);
-  formData.append('b_037838dfc703ebc26a9667953_128fa75a50', '');
-  fetch('https://lilegoverse.us20.list-manage.com/subscribe/post?u=037838dfc703ebc26a9667953&id=128fa75a50&f_id=00ab88e5f0', { method: 'POST', body: formData, mode: 'no-cors' });
-  document.getElementById('email-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('reflection-screen').style.display = 'block';
-    renderReflection();
-  }, 2800);
-}
 
 function showReflection() {
   document.getElementById('question-screen').style.display = 'none';
