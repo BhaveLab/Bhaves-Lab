@@ -399,14 +399,51 @@
 // ── COSMOS ──────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('cosmos');
 const ctx = canvas.getContext('2d');
-let W, H, stars = [], shooters = [];
+let W, H, stars = [], shooters = [], dust = [];
 
 function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 resize();
 window.addEventListener('resize', resize);
 
+// Regular star field
 for (let i = 0; i < 180; i++) {
   stars.push({ x: Math.random(), y: Math.random(), r: Math.random()*0.9+0.2, a: Math.random()*0.5+0.1, blink: Math.random()*4+2, gold: Math.random()<0.08, phase: Math.random()*Math.PI*2 });
+}
+
+// Star clusters — 5 denser groupings of smaller stars at fixed canvas positions
+const CLUSTERS = [];
+const clusterSeeds = [[0.18,0.22],[0.72,0.15],[0.55,0.58],[0.88,0.42],[0.3,0.78]];
+clusterSeeds.forEach(([cx,cy]) => {
+  const count = 20 + Math.floor(Math.random()*14);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random()*Math.PI*2;
+    const dist  = Math.pow(Math.random(), 0.6) * 0.055;
+    CLUSTERS.push({
+      x: cx + Math.cos(angle)*dist, y: cy + Math.sin(angle)*dist,
+      r: Math.random()*0.35+0.08,
+      a: Math.random()*0.14+0.03,
+      blink: Math.random()*7+5, phase: Math.random()*Math.PI*2
+    });
+  }
+});
+
+// Nebulae — 3 large diffuse radial gradients in deep teal, drawn behind stars
+const NEBULAE = [
+  { x: 0.14, y: 0.28, rx: 0.32, ry: 0.22, color: '0,38,44', a: 0.08 },
+  { x: 0.78, y: 0.62, rx: 0.26, ry: 0.30, color: '0,28,36', a: 0.065 },
+  { x: 0.48, y: 0.88, rx: 0.38, ry: 0.18, color: '0,34,40', a: 0.055 },
+];
+
+// Dust layer — ~85 extremely faint particles drifting very slowly
+for (let i = 0; i < 85; i++) {
+  dust.push({
+    x: Math.random(), y: Math.random(),
+    r: Math.random()*0.55+0.15,
+    a: Math.random()*0.035+0.008,
+    vx: (Math.random()-0.5)*0.00009,
+    vy: Math.random()*0.00007+0.00001,
+    blink: Math.random()*12+8, phase: Math.random()*Math.PI*2
+  });
 }
 
 function spawnShooter() {
@@ -416,11 +453,46 @@ function spawnShooter() {
 
 function drawCosmos(t) {
   ctx.clearRect(0,0,W,H);
+
+  // Nebulae — deepest layer, behind everything
+  NEBULAE.forEach(n => {
+    ctx.save();
+    ctx.translate(n.x*W, n.y*H);
+    ctx.scale(n.rx*W, n.ry*H);
+    const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+    g.addColorStop(0,   `rgba(${n.color},${n.a})`);
+    g.addColorStop(0.45,`rgba(${n.color},${(n.a*0.35).toFixed(3)})`);
+    g.addColorStop(1,   `rgba(${n.color},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+
+  // Dust — extremely faint, drifting
+  dust.forEach(d => {
+    d.x += d.vx; d.y += d.vy;
+    if (d.x < 0) d.x += 1; if (d.x > 1) d.x -= 1;
+    if (d.y > 1) d.y -= 1;
+    const da = d.a*(0.4+0.6*Math.sin(t*(1/d.blink)+d.phase));
+    ctx.beginPath(); ctx.arc(d.x*W, d.y*H, d.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(180,174,166,${da.toFixed(3)})`; ctx.fill();
+  });
+
+  // Cluster stars — denser but subtler than regular stars
+  CLUSTERS.forEach(s => {
+    const a = s.a*(0.5+0.5*Math.sin(t*(1/s.blink)+s.phase));
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(208,203,196,${a.toFixed(3)})`; ctx.fill();
+  });
+
+  // Regular stars
   stars.forEach(s => {
     const a = s.a*(0.6+0.4*Math.sin(t*(1/s.blink)+s.phase));
     ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
     ctx.fillStyle = s.gold ? `rgba(201,169,110,${a})` : `rgba(237,232,224,${a*0.7})`; ctx.fill();
   });
+
+  // Shooting stars
   shooters = shooters.filter(s => s.life > 0);
   shooters.forEach(s => {
     s.trail.push({x:s.x,y:s.y}); if(s.trail.length>20) s.trail.shift();
@@ -429,6 +501,7 @@ function drawCosmos(t) {
     const c = s.gold?'201,169,110':'237,232,224';
     for(let i=1;i<s.trail.length;i++){const p=i/s.trail.length;ctx.beginPath();ctx.moveTo(s.trail[i-1].x,s.trail[i-1].y);ctx.lineTo(s.trail[i].x,s.trail[i].y);ctx.strokeStyle=`rgba(${c},${p*s.life*0.7})`;ctx.lineWidth=p*1.5;ctx.stroke();}
   });
+
   requestAnimationFrame(ts => drawCosmos(ts/1000));
 }
 drawCosmos(0);
