@@ -700,6 +700,8 @@ function renderQuestion(sIndex, qIndex) {
     </div>
   `;
 
+  pendingGap = '';
+
   document.getElementById('section-content').innerHTML = `
     ${sectionHeaderHtml}
     <div class="question-block">
@@ -733,7 +735,11 @@ function renderQuestion(sIndex, qIndex) {
     </div>
   `;
 
-  console.log('[renderQuestion] rendered — s' + sIndex + '/q' + qIndex);
+  // Safety reset — ensures no async state from a prior question bleeds onto the fresh button
+  const freshBtn = document.getElementById('submit-btn');
+  if (freshBtn) { freshBtn.disabled = false; freshBtn.style.display = ''; freshBtn.style.opacity = ''; }
+
+  console.log('[renderQuestion] rendered — s' + sIndex + '/q' + qIndex + ' | submit-btn disabled:', freshBtn ? freshBtn.disabled : 'NOT FOUND');
 }
 
 // ── ADVANCE ──────────────────────────────────────────────────────────────────
@@ -758,6 +764,7 @@ function advance(sIndex, qIndex) {
 // buttons. innerHTML replacement destroys child elements but leaves the parent
 // intact, so this listener survives every renderQuestion call.
 document.getElementById('section-content').addEventListener('click', async e => {
+  console.log('[section-content click] target.id:', e.target.id, '| tag:', e.target.tagName, '| s' + currentSection + '/q' + currentQuestion);
   const id = e.target.id;
 
   // ── REFLECT ────────────────────────────────────────────────────────────────
