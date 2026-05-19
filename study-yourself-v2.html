@@ -876,7 +876,7 @@ document.getElementById('section-content').addEventListener('click', async e => 
       const ld  = document.getElementById('loading');
       if (btn) { btn.disabled = false; btn.style.opacity = ''; }
       if (ld)  ld.style.display = 'none';
-      console.log('[REFLECT] submit button unlocked');
+      console.log('[REFLECT] submit button unlocked — s' + sIndex + '/q' + qIndex);
     }
 
     console.log('[REFLECT] API call started');
