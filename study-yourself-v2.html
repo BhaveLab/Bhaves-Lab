@@ -248,7 +248,7 @@
 <canvas id="cosmos"></canvas>
 
 <nav>
-  <a href="/" class="nav-logo-link"><img src="/assets/images/logo-primary.png" alt="Bhavé's Lab" class="nav-logo-img"></a>
+  <a href='/' class='nav-logo'>Bhav<span>é</span>'s Lab</a>
   <a href="https://calendly.com/bhaveslab/30min" class="book" target="_blank">BOOK A SESSION</a>
 </nav>
 
@@ -736,6 +736,8 @@ document.getElementById('state-submit').addEventListener('click', () => {
 
 // ── RENDER QUESTION ───────────────────────────────────────────────────────────
 function renderQuestion(sIndex, qIndex) {
+  if (pendingGap) console.log('[renderQuestion] pendingGap was dirty — clearing. was:', pendingGap.substring(0, 60));
+  pendingGap = '';
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
   const isFirstInSection = qIndex === 0;
@@ -772,8 +774,6 @@ function renderQuestion(sIndex, qIndex) {
       <div class="section-tag">SECTION ${s.num} — ${s.title}</div>
     </div>
   `;
-
-  pendingGap = '';
 
   document.getElementById('section-content').innerHTML = `
     ${sectionHeaderHtml}
@@ -837,7 +837,7 @@ function advance(sIndex, qIndex) {
 // buttons. innerHTML replacement destroys child elements but leaves the parent
 // intact, so this listener survives every renderQuestion call.
 document.getElementById('section-content').addEventListener('click', async e => {
-  console.log('[section-content click] target.id:', e.target.id, '| tag:', e.target.tagName, '| s' + currentSection + '/q' + currentQuestion);
+  console.log('[section-content click] target.id:', e.target.id, '| tag:', e.target.tagName, '| s' + currentSection + '/q' + currentQuestion, '| pendingGap:', !!pendingGap);
   const id = e.target.id;
 
   // ── REFLECT ────────────────────────────────────────────────────────────────
