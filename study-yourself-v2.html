@@ -294,8 +294,9 @@
 const params = new URLSearchParams(window.location.search);
 if (params.get('success') === 'true') {
   sessionStorage.setItem('labAccess', 'true');
+  localStorage.setItem('labAccess', 'true');
 }
-if (!sessionStorage.getItem('labAccess')) {
+if (!sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) {
   window.location.href = '/index.html';
 }
 </script>
