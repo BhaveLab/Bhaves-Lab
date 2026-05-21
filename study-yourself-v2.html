@@ -258,6 +258,20 @@
   .btn-resume:hover { background: var(--gold-faint); border-color: var(--gold); }
   .btn-fresh { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.85rem 1.75rem; border: 1px solid rgba(107,107,107,0.25); background: transparent; color: var(--ash); cursor: pointer; transition: all 0.3s; }
   .btn-fresh:hover { border-color: rgba(107,107,107,0.5); color: var(--smoke); }
+
+  /* ── PWA install gate ── */
+  #pwa-gate { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--void); flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 2rem; text-align: center; overflow-y: auto; }
+  html.show-pwa-gate #pwa-gate { display: flex; }
+  html.show-pwa-gate #course-content { display: none; }
+  #pwa-gate .gate-eyebrow { font-family: var(--mono); font-size: 0.5rem; letter-spacing: 0.45em; color: var(--gold); text-transform: uppercase; margin-bottom: 3rem; }
+  #pwa-gate .gate-title { font-family: var(--serif); font-size: clamp(1.8rem, 6vw, 2.4rem); font-weight: 300; color: var(--light); line-height: 1.2; margin-bottom: 0.4rem; }
+  #pwa-gate .gate-subtitle { font-family: var(--serif); font-size: clamp(1.8rem, 6vw, 2.4rem); font-weight: 300; font-style: italic; color: var(--gold); margin-bottom: 3rem; }
+  #pwa-gate .gate-steps { list-style: none; text-align: left; max-width: 300px; width: 100%; display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem; }
+  #pwa-gate .gate-steps li { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.04em; color: var(--smoke); display: flex; gap: 1rem; line-height: 1.6; }
+  #pwa-gate .gate-steps li span:first-child { color: var(--gold); flex-shrink: 0; }
+  #pwa-gate .gate-icon { border: 1px solid rgba(201,169,110,0.2); padding: 1.5rem 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin-bottom: 2.5rem; }
+  #pwa-gate .gate-icon-label { font-family: var(--mono); font-size: 0.42rem; letter-spacing: 0.2em; color: rgba(201,169,110,0.35); text-transform: uppercase; }
+  #pwa-gate .gate-footer { font-family: var(--serif); font-size: 1rem; font-style: italic; color: rgba(201,169,110,0.45); }
 </style>
 
 <script>
@@ -282,6 +296,15 @@
     }
   });
 </script>
+<script>
+  // PWA gate — runs before paint to prevent flash
+  (function() {
+    var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (!standalone && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      document.documentElement.classList.add('show-pwa-gate');
+    }
+  })();
+</script>
 </head>
 <body>
 <script>
@@ -294,6 +317,27 @@ if (!sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) 
   window.location.href = '/index.html';
 }
 </script>
+
+<div id="pwa-gate">
+  <p class="gate-eyebrow">Bhavé's Lab</p>
+  <h1 class="gate-title">Before you begin —</h1>
+  <p class="gate-subtitle">add this to your Home Screen.</p>
+  <ol class="gate-steps">
+    <li><span>1.</span><span>Tap the share icon at the bottom of your browser</span></li>
+    <li><span>2.</span><span>Tap "Add to Home Screen"</span></li>
+    <li><span>3.</span><span>Tap Add</span></li>
+    <li><span>4.</span><span>Open the Lab from your Home Screen to continue</span></li>
+  </ol>
+  <div class="gate-icon">
+    <svg width="28" height="34" viewBox="0 0 28 34" fill="none" stroke="#C9A96E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="14" y1="1" x2="14" y2="21"/>
+      <polyline points="8,7 14,1 20,7"/>
+      <path d="M8 13 H2 V32 H26 V13 H20"/>
+    </svg>
+    <span class="gate-icon-label">share icon</span>
+  </div>
+  <p class="gate-footer">This is how you return.</p>
+</div>
 
 <div id="course-content">
 
