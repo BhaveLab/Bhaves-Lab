@@ -90,7 +90,13 @@ footer { position: relative; z-index: 2; padding: 3rem 4rem; border-top: 1px sol
 <script src="/i18n/strings.pt.js" defer></script>
 <script src="/i18n/strings.fr.js" defer></script>
 <script src="/lang-switcher.js" defer></script>
-<script src='https://js.memberstack.com/v1/memberstack.js' data-memberstack-app='app_cmpfrmpgm008f0slne6107203'></script>
+<script src="https://unpkg.com/@memberstack/dom@latest/dist/memberstack.umd.js"></script>
+<script>
+  const memberstack = memberstackDOM.init({
+    publicKey: "pk_1b1c25938812037b0c9f",
+    useCookies: true
+  });
+</script>
 </head>
 <body>
 <div class="grain"></div>
