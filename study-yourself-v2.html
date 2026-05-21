@@ -1225,8 +1225,22 @@ function renderFlags() {
 }
 
 // ── DOWNLOAD PATTERN MAP PDF ──────────────────────────────────────────────────
-function downloadPatternMap() {
+async function downloadPatternMap() {
   if (!window.jspdf) { alert('PDF library still loading — try again in a moment.'); return; }
+
+  const btn = document.getElementById('download-pdf-btn');
+  if (btn) { btn.textContent = 'GENERATING...'; btn.disabled = true; }
+
+  // Pre-load logo as base64 so addImage works without CORS issues
+  let logoDataUrl = null;
+  try {
+    const resp = await fetch('/assets/images/logo-primary.png');
+    const blob = await resp.blob();
+    logoDataUrl = await new Promise((res, rej) => {
+      const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob);
+    });
+  } catch(e) { console.warn('[PDF] logo load failed:', e); }
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
@@ -1279,7 +1293,14 @@ function downloadPatternMap() {
 
   // ── PAGE 1 BACKGROUND ──
   fillBg();
-  y = 26;
+  y = 18;
+
+  // ── LOGO ──
+  if (logoDataUrl) {
+    const imgSize = 28;
+    doc.addImage(logoDataUrl, 'PNG', (W - imgSize) / 2, y, imgSize, imgSize);
+    y += imgSize + 8;
+  }
 
   // ── MASTHEAD ──
   write("BHAVE'S LAB", 'courier', 'normal', 7, GOLD);
@@ -1384,8 +1405,6 @@ function downloadPatternMap() {
   if (y + 8 > H - 16) newPage();
   write("BHAVE'S LAB  ·  BHAVESLAB.COM", 'courier', 'normal', 6, ASH);
 
-  const btn = document.getElementById('download-pdf-btn');
-  if (btn) { btn.textContent = 'GENERATING...'; btn.disabled = true; }
   const filename = `pattern-map${userName ? '-' + userName.split(' ')[0].toLowerCase() : ''}.pdf`;
   doc.save(filename);
   if (btn) { btn.textContent = 'DOWNLOAD PATTERN MAP'; btn.disabled = false; }
