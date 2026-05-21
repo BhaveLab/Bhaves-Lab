@@ -239,6 +239,23 @@
     #web-canvas { height: 380px; }
   }
 .nav-logo-img { height: 44px; width: auto; display: block; }
+
+  /* ── ASSISTANCE BUTTON ── */
+  #assistance-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.14em; color: var(--ash); background: var(--deep); border: 1px solid rgba(107,107,107,0.2); padding: 0.5rem 0.9rem; text-decoration: none; transition: all 0.3s; }
+  #assistance-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+  /* ── RESUME PROMPT ── */
+  #resume-prompt { display: none; position: fixed; inset: 0; background: rgba(8,8,8,0.96); z-index: 400; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+  #resume-prompt.active { display: flex; }
+  .resume-inner { width: 100%; max-width: 480px; text-align: center; }
+  .resume-label { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 1.75rem; }
+  .resume-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 300; color: var(--light); margin-bottom: 0.75rem; }
+  .resume-sub { font-size: 0.9rem; font-style: italic; color: var(--ash); margin-bottom: 2.5rem; line-height: 1.65; }
+  .resume-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-resume { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.85rem 1.75rem; border: 1px solid var(--gold-dim); background: transparent; color: var(--gold); cursor: pointer; transition: all 0.3s; }
+  .btn-resume:hover { background: var(--gold-faint); border-color: var(--gold); }
+  .btn-fresh { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.85rem 1.75rem; border: 1px solid rgba(107,107,107,0.25); background: transparent; color: var(--ash); cursor: pointer; transition: all 0.3s; }
+  .btn-fresh:hover { border-color: rgba(107,107,107,0.5); color: var(--smoke); }
 </style>
 </head>
 <body>
@@ -362,6 +379,8 @@
 
     <div id="birth-data-display"></div>
     <div id="opening-state-display"></div>
+
+    <div id="overall-pattern"></div>
 
     <div class="web-label">[ PATTERN WEB — PULL ANY NODE TO SEE WHAT SURFACED THERE ]</div>
     <div id="web-canvas"><svg id="web-svg"></svg></div>
@@ -823,10 +842,12 @@ function advance(sIndex, qIndex) {
     currentSection  = sIndex;
     currentQuestion = qIndex + 1;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    saveProgress();
     renderQuestion(currentSection, currentQuestion);
   } else if (sIndex < 9) {
     currentSection  = sIndex + 1;
     currentQuestion = 0;
+    saveProgress();
     renderQuestion(currentSection, 0);
   } else {
     showCompletion();
@@ -1028,6 +1049,56 @@ async function callClaude(systemPrompt, answer) {
   }
 }
 
+// ── SAVE PROGRESS ────────────────────────────────────────────────────────────
+function saveProgress() {
+  try {
+    localStorage.setItem('bhaveslab-study-progress', JSON.stringify({
+      currentSection, currentQuestion, sessionData,
+      userEmail, userName, birthDate, birthTime, birthCity, openingState,
+      savedAt: new Date().toISOString()
+    }));
+    console.log('[saveProgress] saved — s' + currentSection + '/q' + currentQuestion);
+  } catch(e) { console.warn('[saveProgress] failed:', e); }
+}
+
+// ── CALL CLAUDE (plain text) ──────────────────────────────────────────────────
+async function callClaudeText(systemPrompt, userMessage) {
+  const resp = await fetch(`${BACKEND}/api/reflect`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ systemPrompt, answer: userMessage, max_tokens: 400 })
+  });
+  if (!resp.ok) throw new Error('Backend ' + resp.status);
+  const data = await resp.json();
+  return data.content?.[0]?.text || data.text || '';
+}
+
+// ── OVERALL PATTERN SUMMARY ───────────────────────────────────────────────────
+async function generateOverallPattern() {
+  const el = document.getElementById('overall-pattern');
+  el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.15);background:rgba(201,169,110,0.03);"><div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div><div style="font-size:0.85rem;font-family:var(--mono);color:var(--ash);letter-spacing:0.08em;">Reading the full session&hellip;</div></div>`;
+
+  const summaries = SECTIONS.map((s, i) => {
+    const answers = sessionData[i].filter(Boolean);
+    if (!answers.length) return null;
+    return `SECTION ${s.num} — ${s.title.toUpperCase()}:\n` +
+      answers.map(a => `Q: ${a.question}\nA: ${a.answer}`).join('\n');
+  }).filter(Boolean).join('\n\n');
+
+  const prompt = `You are reading the complete answers from a 10-section self-study. The student's name is ${userName || 'the student'}. Read everything and write one paragraph identifying the single structural thread that ran consistently across the full session — the deepest pattern that connected their responses. Be direct and specific to what was actually in these answers. Do not be generic or affirming. Speak to the structure, not the content.`;
+
+  try {
+    const text = await callClaudeText(prompt, summaries);
+    el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.3);background:rgba(201,169,110,0.04);">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div>
+      <div style="font-size:1.1rem;font-family:var(--serif);font-weight:300;color:var(--light);line-height:1.9;font-style:italic;">${text}</div>
+    </div>`;
+  } catch(e) {
+    console.error('[generateOverallPattern] error:', e);
+    el.innerHTML = '';
+  }
+}
+
 // ── PROGRESS ─────────────────────────────────────────────────────────────────
 function updateProgress(current, total) {
   document.getElementById('progress-fill').style.width = ((current / total) * 100) + '%';
@@ -1065,6 +1136,8 @@ async function showCompletion() {
 
   renderWeb();
   renderFlags();
+  generateOverallPattern();
+  try { localStorage.removeItem('bhaveslab-study-progress'); } catch(e) {}
   try { await sendPatternMap(); } catch(e) { console.log('Email error:', e); }
 }
 
@@ -1225,7 +1298,62 @@ document.addEventListener('click', e => {
   if (node) openFwDrawer(node.dataset.node);
 });
 
+// ── RESUME CHECK ─────────────────────────────────────────────────────────────
+(function checkResume() {
+  try {
+    const raw = localStorage.getItem('bhaveslab-study-progress');
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (!saved || saved.currentSection === undefined) return;
+
+    const sLabel = SECTIONS[saved.currentSection]?.title || '';
+    const qNum   = (saved.currentQuestion || 0) + 1;
+    const savedDate = saved.savedAt ? new Date(saved.savedAt).toLocaleDateString() : '';
+    document.getElementById('resume-sub').textContent =
+      `Section ${Number(saved.currentSection) + 1} — ${sLabel}, Question ${qNum}${savedDate ? ' · saved ' + savedDate : ''}`;
+
+    document.getElementById('resume-prompt').classList.add('active');
+
+    document.getElementById('resume-btn').addEventListener('click', () => {
+      userEmail    = saved.userEmail    || '';
+      userName     = saved.userName     || '';
+      birthDate    = saved.birthDate    || '';
+      birthTime    = saved.birthTime    || '';
+      birthCity    = saved.birthCity    || '';
+      openingState = saved.openingState || '';
+      currentSection  = saved.currentSection  || 0;
+      currentQuestion = saved.currentQuestion || 0;
+      if (Array.isArray(saved.sessionData)) sessionData = saved.sessionData;
+      document.getElementById('resume-prompt').classList.remove('active');
+      document.getElementById('intro').style.display  = 'none';
+      document.getElementById('course').style.display = 'block';
+      renderQuestion(currentSection, currentQuestion);
+    });
+
+    document.getElementById('fresh-btn').addEventListener('click', () => {
+      localStorage.removeItem('bhaveslab-study-progress');
+      document.getElementById('resume-prompt').classList.remove('active');
+    });
+  } catch(e) { console.warn('[checkResume] error:', e); }
+})();
+
 </script>
+
+<!-- ── RESUME PROMPT ── -->
+<div id="resume-prompt">
+  <div class="resume-inner">
+    <div class="resume-label">[ SESSION FOUND ]</div>
+    <div class="resume-title">You have a saved session.</div>
+    <div class="resume-sub" id="resume-sub">A study in progress is waiting.</div>
+    <div class="resume-actions">
+      <button class="btn-resume" id="resume-btn">RESUME SESSION</button>
+      <button class="btn-fresh" id="fresh-btn">START FRESH</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ASSISTANCE BUTTON ── -->
+<a id="assistance-btn" href="mailto:info@bhaveslab.com?subject=Study%20Yourself%20%E2%80%94%20Assistance">ASSISTANCE</a>
 
 </div><!-- #course-content -->
 </body>
