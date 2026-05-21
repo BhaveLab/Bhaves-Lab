@@ -854,7 +854,7 @@ document.getElementById('section-content').addEventListener('click', async e => 
     const claudePanel  = document.getElementById('claude-panel');
     const advanceBlock = document.getElementById('advance-block');
 
-    console.log('[REFLECT] click — s' + sIndex + '/q' + qIndex + ' disabled:', submitBtn.disabled);
+    console.log('[REFLECT] click — s' + sIndex + '/q' + qIndex + ' | disabled:', submitBtn.disabled, '| pendingGap:', JSON.stringify(pendingGap));
     if (submitBtn.disabled) { console.log('[REFLECT] ignored — already in flight'); return; }
 
     const answer = answerInput.value.trim();
