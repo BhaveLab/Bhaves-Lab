@@ -5,6 +5,7 @@
 <link rel="icon" type="image/png" href="/assets/images/logo-primary.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Yourself — Bhavé's Lab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -387,12 +388,8 @@
 
     <div class="pattern-flags" id="pattern-flags"></div>
 
-    <div class="delivery-block">
-      <p>The full session breakdown — every answer, every reflection, every place the system showed itself — has been sent to <span id="delivery-email" style="color:var(--gold)"></span></p>
-      <p style="margin-bottom:0;font-size:0.85rem;color:var(--ash);">If it doesn't arrive within a few minutes, check your spam folder.</p>
-    </div>
-
-    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);">
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:1rem;">
+      <button onclick="downloadPatternMap()" id="download-pdf-btn" style="width:100%;background:var(--gold);color:var(--void);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;padding:1.1rem 2rem;border:none;cursor:pointer;transition:opacity 0.3s;text-align:center;">DOWNLOAD PATTERN MAP</button>
       <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:1.1rem 2rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">BOOK A SESSION — TAKE THIS FURTHER</a>
     </div>
   </div>
@@ -690,7 +687,8 @@ let currentQuestion = 0;
 let sessionData = [];
 let sectionFlags = [];
 let openingState = '';
-let pendingGap   = '';
+let pendingGap        = '';
+let overallPatternText = '';
 
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
@@ -1089,6 +1087,7 @@ async function generateOverallPattern() {
 
   try {
     const text = await callClaudeText(prompt, summaries);
+    overallPatternText = text;
     el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.3);background:rgba(201,169,110,0.04);">
       <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div>
       <div style="font-size:1.1rem;font-family:var(--serif);font-weight:300;color:var(--light);line-height:1.9;font-style:italic;">${text}</div>
@@ -1109,7 +1108,6 @@ async function showCompletion() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('course').style.display = 'none';
   document.getElementById('completion').style.display = 'block';
-  document.getElementById('delivery-email').textContent = userEmail;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (userName || birthDate) {
@@ -1138,7 +1136,6 @@ async function showCompletion() {
   renderFlags();
   generateOverallPattern();
   try { localStorage.removeItem('bhaveslab-study-progress'); } catch(e) {}
-  try { await sendPatternMap(); } catch(e) { console.log('Email error:', e); }
 }
 
 // ── RENDER WEB ────────────────────────────────────────────────────────────────
@@ -1209,38 +1206,171 @@ function renderFlags() {
   container.innerHTML = html;
 }
 
-// ── SEND PATTERN MAP EMAIL ────────────────────────────────────────────────────
-async function sendPatternMap() {
-  await fetch(`${BACKEND}/api/send-pattern-map`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ to: userEmail, from: 'info@bhaveslab.com', subject: 'Your Pattern Map — Study Yourself Session Complete', html: buildEmailBody() })
-  });
-}
+// ── DOWNLOAD PATTERN MAP PDF ──────────────────────────────────────────────────
+function downloadPatternMap() {
+  if (!window.jspdf) { alert('PDF library still loading — try again in a moment.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-// ── BUILD EMAIL ───────────────────────────────────────────────────────────────
-function buildEmailBody() {
+  const W = 210, H = 297, mL = 22, mR = 22;
+  const contentW = W - mL - mR;
+  let y = 0;
+
+  const GOLD  = [201, 169, 110];
+  const LIGHT = [232, 228, 220];
+  const SMOKE = [154, 154, 154];
+  const ASH   = [107, 107, 107];
+  const VOID  = [8,   8,   8  ];
+
+  function fillBg() {
+    doc.setFillColor(...VOID);
+    doc.rect(0, 0, W, H, 'F');
+  }
+
+  function newPage() {
+    doc.addPage();
+    fillBg();
+    y = 20;
+  }
+
+  // Writes wrapped text, inserting page breaks as needed. Returns final y.
+  function write(text, font, style, size, color, xOffset) {
+    doc.setFont(font, style);
+    doc.setFontSize(size);
+    doc.setTextColor(...color);
+    const xPos = mL + (xOffset || 0);
+    const maxW = W - xPos - mR;
+    const lh   = size * 0.42;
+    const lines = doc.splitTextToSize(String(text), maxW);
+    lines.forEach(line => {
+      if (y + lh > H - 16) { newPage(); doc.setFont(font, style); doc.setFontSize(size); doc.setTextColor(...color); }
+      doc.text(line, xPos, y);
+      y += lh;
+    });
+  }
+
+  function rule(color) {
+    doc.setDrawColor(...(color || ASH));
+    doc.setLineWidth(0.2);
+    if (y + 2 > H - 16) newPage();
+    doc.line(mL, y, W - mR, y);
+    y += 5;
+  }
+
+  function gap(mm) { y += mm; if (y > H - 16) newPage(); }
+
+  // ── PAGE 1 BACKGROUND ──
+  fillBg();
+  y = 26;
+
+  // ── MASTHEAD ──
+  write("BHAVE'S LAB", 'courier', 'normal', 7, GOLD);
+  gap(2);
+  write('Your Pattern Map', 'times', 'normal', 26, LIGHT);
+  gap(3);
+  write('Study Yourself — Full Session Readout', 'times', 'italic', 10, ASH);
+  gap(2);
+  write(new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }), 'courier', 'normal', 7, ASH);
+  gap(6);
+  rule(GOLD);
+
+  // ── OPERATING DATA ──
+  const birthParts = [userName, birthDate, birthTime||null, birthCity||null].filter(Boolean).join('  ·  ');
+  if (birthParts) {
+    write('[ OPERATING DATA ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write(birthParts, 'times', 'normal', 10, SMOKE);
+    gap(6);
+  }
+
+  // ── OPENING STATE ──
+  if (openingState) {
+    write('[ OPENING STATE ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write(openingState, 'times', 'italic', 10, SMOKE);
+    gap(6);
+  }
+
+  rule();
+
+  // ── OVERALL PATTERN ──
+  if (overallPatternText) {
+    write('[ OVERALL PATTERN ]', 'courier', 'normal', 7, GOLD);
+    gap(3);
+    write(overallPatternText, 'times', 'italic', 11, LIGHT);
+    gap(8);
+    rule(GOLD);
+  }
+
+  // ── SESSION SUMMARY ──
   const totalAnswers = sessionData.flat().filter(Boolean).length;
-  const flagCount = sectionFlags.length;
-  const birthParts = [userName, birthDate, birthTime || null, birthCity || null].filter(Boolean).join(' · ');
-  const birthBlock = birthParts ? `<div style="margin-bottom:32px;padding:20px;background:#0a0a0a;border-left:2px solid rgba(201,169,110,0.4);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">OPERATING DATA</p><p style="font-size:15px;color:#e8e4dc;line-height:1.8;">${birthParts}</p></div>` : '';
-  const stateBlock = openingState ? `<div style="margin-bottom:32px;padding:20px;background:#0a0a0a;border-left:2px solid rgba(201,169,110,0.4);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">OPENING STATE</p><p style="font-size:15px;color:#e8e4dc;line-height:1.8;font-style:italic;">${openingState}</p></div>` : '';
+  const flagCount    = sectionFlags.length;
+  write('[ SESSION SUMMARY ]', 'courier', 'normal', 7, GOLD);
+  gap(2);
+  write(
+    `${totalAnswers} questions answered across 10 sections.  ` +
+    (flagCount > 0 ? `${flagCount} signal flag${flagCount > 1 ? 's' : ''} logged.` : 'Full engagement — no signal flags.'),
+    'times', 'normal', 10, SMOKE
+  );
+  gap(8);
+  rule();
 
-  const sectionBlocks = SECTIONS.map((s, si) => {
+  // ── SECTIONS ──
+  SECTIONS.forEach((s, si) => {
     const answers = sessionData[si].filter(Boolean);
-    if (answers.length === 0) return '';
-    const qBlocks = answers.map(d => `
-      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(201,169,110,0.08);">
-        <p style="font-family:monospace;font-size:10px;letter-spacing:1px;color:#6b6b6b;margin-bottom:6px;">Q${d.questionNum}</p>
-        <p style="font-size:13px;color:#6b6b6b;font-style:italic;line-height:1.6;margin-bottom:10px;">${d.question}</p>
-        <p style="font-size:15px;color:#e8e4dc;line-height:1.8;margin-bottom:10px;">${d.answer}</p>
-        ${d.reflection ? `<p style="font-size:13px;color:#9a9a9a;line-height:1.7;padding-left:14px;border-left:2px solid rgba(201,169,110,0.25);">${d.reflection}</p>` : ''}
-        ${d.movedThrough ? `<p style="font-family:monospace;font-size:9px;color:#C9A96E;letter-spacing:1px;margin-top:6px;">[ SIGNAL — ADVANCED THROUGH ]</p>` : ''}
-      </div>`).join('');
-    return `<div style="margin-bottom:36px;padding-bottom:36px;border-bottom:2px solid rgba(201,169,110,0.12);"><p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;margin-bottom:16px;">${s.num} — ${s.title.toUpperCase()} / ${s.layer}</p>${qBlocks}</div>`;
-  }).join('');
+    if (!answers.length) return;
 
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#080808;color:#e8e4dc;font-family:'Georgia',serif;max-width:640px;margin:0 auto;padding:48px 32px;"><p style="font-family:monospace;font-size:11px;letter-spacing:3px;color:#C9A96E;margin-bottom:8px;">BHAVÉ'S LAB</p><h1 style="font-size:32px;font-weight:300;color:#e8e4dc;margin-bottom:8px;line-height:1.2;">Your Pattern Map</h1><p style="font-size:14px;color:#6b6b6b;font-style:italic;margin-bottom:40px;">Study Yourself — Full Session Readout</p><div style="margin-bottom:32px;padding:24px;background:#0f0f0f;border:1px solid rgba(201,169,110,0.15);"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:8px;">SESSION SUMMARY</p><p style="font-size:14px;color:#9a9a9a;line-height:1.7;">${totalAnswers} questions answered across 10 sections. ${flagCount > 0 ? flagCount + ' signal flags logged.' : 'Full engagement — no signal flags.'}</p></div>${birthBlock}${stateBlock}<div style="margin-bottom:40px;"><p style="font-family:monospace;font-size:10px;letter-spacing:2px;color:#C9A96E;margin-bottom:24px;">FULL SESSION</p>${sectionBlocks}</div><div style="padding:24px;border:1px solid rgba(201,169,110,0.2);"><p style="font-size:14px;color:#9a9a9a;line-height:1.7;margin-bottom:16px;">This session produced a map of where your system showed up — and where it moved quickly. What you do with that is the work.</p><a href="https://calendly.com/bhaveslab/30min" style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#C9A96E;text-decoration:none;">BOOK A SESSION — TAKE THIS FURTHER</a></div><p style="font-family:monospace;font-size:10px;color:#3a3a3a;margin-top:40px;letter-spacing:1px;">BHAVÉ'S LAB · BHAVESLAB.COM</p></body></html>`;
+    if (y + 18 > H - 16) newPage();
+    write(`${s.num}  —  ${s.title.toUpperCase()}`, 'courier', 'normal', 8, GOLD);
+    gap(1);
+    write(s.layer, 'courier', 'normal', 6, ASH);
+    gap(5);
+
+    answers.forEach(d => {
+      if (y + 14 > H - 16) newPage();
+      write(`Q${d.questionNum}`, 'courier', 'normal', 6, ASH);
+      gap(1);
+      write(d.question, 'times', 'italic', 9, ASH);
+      gap(2);
+      write(d.answer, 'times', 'normal', 10, LIGHT);
+      if (d.reflection) {
+        gap(2);
+        write(d.reflection, 'times', 'italic', 9, SMOKE, 5);
+      }
+      if (d.movedThrough) {
+        gap(1);
+        write('[ SIGNAL — ADVANCED THROUGH ]', 'courier', 'normal', 6, GOLD);
+      }
+      gap(5);
+    });
+
+    rule();
+  });
+
+  // ── PATTERN FLAGS ──
+  if (sectionFlags.length > 0) {
+    if (y + 16 > H - 16) newPage();
+    write('[ PATTERN FLAGS ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write('Questions where the system moved quickly.', 'times', 'italic', 9, ASH);
+    gap(4);
+    sectionFlags.forEach(f => {
+      write(`SIGNAL  —  Section ${f.num} ${f.section}  /  Question ${f.question}`, 'courier', 'normal', 7, SMOKE);
+      gap(2);
+    });
+    gap(4);
+    rule();
+  }
+
+  // ── FOOTER ──
+  if (y + 8 > H - 16) newPage();
+  write("BHAVE'S LAB  ·  BHAVESLAB.COM", 'courier', 'normal', 6, ASH);
+
+  const btn = document.getElementById('download-pdf-btn');
+  if (btn) { btn.textContent = 'GENERATING...'; btn.disabled = true; }
+  const filename = `pattern-map${userName ? '-' + userName.split(' ')[0].toLowerCase() : ''}.pdf`;
+  doc.save(filename);
+  if (btn) { btn.textContent = 'DOWNLOAD PATTERN MAP'; btn.disabled = false; }
 }
 
 // ── FRAMEWORK DRAWER ─────────────────────────────────────────────────────────
