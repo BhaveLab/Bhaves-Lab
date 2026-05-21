@@ -883,9 +883,9 @@ document.getElementById('section-content').addEventListener('click', async e => 
     console.log('[REFLECT] API call started');
     try {
       const prompt = EVAL_PROMPT
-        .replace('{{userName}}', userName)
-        .replace('{{question}}', q.text)
-        .replace('{{answer}}', answer);
+        .replace('{{userName}}', () => userName)
+        .replace('{{question}}', () => q.text)
+        .replace('{{answer}}',   () => answer);
 
       console.log('[REFLECT] answer to send (length ' + answer.length + '):', answer.substring(0, 80));
       const result = await callClaude(prompt, answer);
@@ -917,9 +917,15 @@ document.getElementById('section-content').addEventListener('click', async e => 
     } catch (err) {
       console.error('[REFLECT] error:', err.name, err.message, '\n', err.stack);
       unlockSubmit();
-      recordAnswer(sIndex, qIndex, answer, '', false);
-      const advBlock = document.getElementById('advance-block');
-      if (advBlock) advBlock.style.display = 'block';
+      if (err.isBodyTimeout) {
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) { loadingEl.textContent = 'Response timed out — try again'; loadingEl.style.display = 'block'; }
+        console.warn('[REFLECT] body timeout — submit unlocked for retry');
+      } else {
+        recordAnswer(sIndex, qIndex, answer, '', false);
+        const advBlock = document.getElementById('advance-block');
+        if (advBlock) advBlock.style.display = 'block';
+      }
     }
     return;
   }
@@ -991,7 +997,20 @@ async function callClaude(systemPrompt, answer) {
     throw new Error('Backend ' + response.status + ': ' + errText);
   }
 
-  const rawBody = await response.text();
+  const bodyController = new AbortController();
+  const bodyTimer = setTimeout(() => {
+    console.warn('[callClaude] 45s body-read timeout — aborting');
+    bodyController.abort();
+  }, 45000);
+  let rawBody;
+  try {
+    rawBody = await response.clone().text();
+  } catch(e) {
+    clearTimeout(bodyTimer);
+    console.error('[callClaude] body read failed or timed out:', e.message);
+    throw Object.assign(new Error('BODY_TIMEOUT'), { isBodyTimeout: true });
+  }
+  clearTimeout(bodyTimer);
   console.log('[callClaude] raw response body (length ' + rawBody.length + '):', rawBody.substring(0, 400));
   let data;
   try { data = JSON.parse(rawBody); } catch(e) {
