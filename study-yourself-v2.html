@@ -914,7 +914,7 @@ document.getElementById('section-content').addEventListener('click', async e => 
         console.log('[REFLECT] advance-block shown');
       }
     } catch (err) {
-      console.error('[REFLECT] error:', err.name, err.message);
+      console.error('[REFLECT] error:', err.name, err.message, '\n', err.stack);
       unlockSubmit();
       recordAnswer(sIndex, qIndex, answer, '', false);
       const advBlock = document.getElementById('advance-block');
@@ -990,13 +990,22 @@ async function callClaude(systemPrompt, answer) {
     throw new Error('Backend ' + response.status + ': ' + errText);
   }
 
-  const data = await response.json();
-  console.log('[callClaude] raw data:', JSON.stringify(data));
+  const rawBody = await response.text();
+  console.log('[callClaude] raw response body (length ' + rawBody.length + '):', rawBody.substring(0, 400));
+  let data;
+  try { data = JSON.parse(rawBody); } catch(e) {
+    console.error('[callClaude] response.json parse failed:', e.message, '| raw was:', rawBody.substring(0, 200));
+    throw e;
+  }
+  console.log('[callClaude] parsed response:', JSON.stringify(data));
   let text = data.content?.[0]?.text || data.text || '';
   console.log('[callClaude] extracted text:', text);
   text = text.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
-  console.log('[callClaude] cleaned text:', text);
-  return JSON.parse(text);
+  console.log('[callClaude] cleaned text before JSON.parse:', text);
+  try { return JSON.parse(text); } catch(e) {
+    console.error('[callClaude] inner JSON.parse failed:', e.message, '| text was:', text);
+    throw e;
+  }
 }
 
 // ── PROGRESS ─────────────────────────────────────────────────────────────────
