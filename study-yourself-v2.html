@@ -49,6 +49,9 @@
   .nav-logo span { color: var(--gold); }
   nav a.book { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; color: var(--gold); text-decoration: none; border: 1px solid var(--gold-dim); padding: 0.45rem 1rem; transition: all 0.3s; }
   nav a.book:hover { background: rgba(201,169,110,0.08); border-color: var(--gold); }
+  .nav-right-v2 { display: flex; align-items: center; gap: 1.25rem; }
+  .ms-auth-btn { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; color: var(--ash); background: transparent; border: 1px solid rgba(107,107,107,0.2); padding: 0.45rem 0.9rem; cursor: pointer; transition: all 0.3s; }
+  .ms-auth-btn:hover { color: var(--light); border-color: rgba(107,107,107,0.45); }
 
   /* ── WRAPPER ── */
   .wrapper { position: relative; z-index: 10; max-width: 720px; margin: 0 auto; padding: 7rem 2rem 6rem; }
@@ -256,6 +259,29 @@
   .btn-fresh { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.85rem 1.75rem; border: 1px solid rgba(107,107,107,0.25); background: transparent; color: var(--ash); cursor: pointer; transition: all 0.3s; }
   .btn-fresh:hover { border-color: rgba(107,107,107,0.5); color: var(--smoke); }
 </style>
+<script src='https://js.memberstack.com/v1/memberstack.js' data-memberstack-id='pk_1b1c25938812037b0c9f'></script>
+<script>
+  document.body.style.visibility = 'hidden';
+  window.MemberStack.onReady.then(function(member) {
+    var planId = 'pln_the-study–ohka08iz';
+    if (!member || !member.id) {
+      window.location.replace('/study-yourself.html');
+      return;
+    }
+    var hasPlan = Array.isArray(member.plans) && member.plans.some(function(p) { return p.id === planId; });
+    if (!hasPlan) {
+      window.location.replace('/study-yourself.html');
+      return;
+    }
+    document.body.style.visibility = '';
+    var btn = document.getElementById('ms-auth-btn');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        MemberStack.logout().then(function() { window.location.href = '/study-yourself.html'; });
+      });
+    }
+  });
+</script>
 </head>
 <body>
 
@@ -265,7 +291,10 @@
 
 <nav>
   <a href='/' class='nav-logo'>Bhav<span>é</span>'s Lab</a>
-  <a href="https://calendly.com/bhaveslab/30min" class="book" target="_blank">BOOK A SESSION</a>
+  <div class="nav-right-v2">
+    <a href="https://calendly.com/bhaveslab/30min" class="book" target="_blank">BOOK A SESSION</a>
+    <button id="ms-auth-btn" class="ms-auth-btn">LOG OUT</button>
+  </div>
 </nav>
 
 <div class="progress-track">

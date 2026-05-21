@@ -94,6 +94,9 @@ nav a.nav-cta {
 
 nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); }
 
+button.ms-auth-btn { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; color: var(--ash); background: transparent; border: 1px solid rgba(107,107,107,0.2); padding: 0.45rem 0.9rem; cursor: pointer; transition: all 0.3s; }
+button.ms-auth-btn:hover { color: var(--gold); border-color: rgba(107,107,107,0.4); }
+
 /* ── HERO ── */
 .hero {
   position: relative;
@@ -671,6 +674,7 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
 <script src="/i18n/strings.pt.js" defer></script>
 <script src="/i18n/strings.fr.js" defer></script>
 <script src="/lang-switcher.js" defer></script>
+<script src='https://js.memberstack.com/v1/memberstack.js' data-memberstack-id='pk_1b1c25938812037b0c9f'></script>
 </head>
 <body>
 
@@ -681,6 +685,7 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
   <div class="nav-right">
     <a href="/consciousness-mirror" class="nav-link">MIRROR</a>
     <a href="https://calendly.com/bhaveslab/30min" class="nav-cta" target="_blank">BOOK A SESSION</a>
+    <button id="ms-auth-btn" class="ms-auth-btn"></button>
   </div>
 </nav>
 
@@ -694,7 +699,7 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
       <strong>$25</strong>
       ONE-TIME ACCESS
     </div>
-    <a href="https://buy.stripe.com/aFafZa8AsaxYgrI8JdbQY0a" class="btn-enter">ENTER THE STUDY</a>
+    <a href="#" data-ms-plan:add="pln_the-study–ohka08iz" class="btn-enter">ENTER THE STUDY</a>
   </div>
   <div class="hero-note">[ NO SUBSCRIPTION — ACCESS DOES NOT EXPIRE ]</div>
 </section>
@@ -890,9 +895,9 @@ nav a.nav-cta:hover { background: var(--gold-faint); border-color: var(--gold); 
         <div class="cta-price-amount">$25</div>
         <div class="cta-price-sub">NO SUBSCRIPTION — NO EXPIRY</div>
       </div>
-      <a href="https://buy.stripe.com/aFafZa8AsaxYgrI8JdbQY0a" class="btn-enter-large">ENTER THE STUDY</a>
+      <a href="#" data-ms-plan:add="pln_the-study–ohka08iz" class="btn-enter-large">ENTER THE STUDY</a>
     </div>
-    <div class="cta-note">After payment you go directly into The Study. No account required.</div>
+    <div class="cta-note">After payment your account is created automatically and you go directly into The Study.</div>
   </section>
 
 </div>
@@ -1080,6 +1085,36 @@ document.addEventListener('click', e => {
   }
   document.addEventListener('bhave:languageChanged', safeApply);
 })();
+</script>
+
+<script>
+window.MemberStack.onReady.then(function(member) {
+  var planId = 'pln_the-study–ohka08iz';
+  var hasPlan = member && member.id && Array.isArray(member.plans) && member.plans.some(function(p) { return p.id === planId; });
+  var btn = document.getElementById('ms-auth-btn');
+  if (btn) {
+    if (hasPlan) {
+      btn.textContent = 'ACCESS COURSE';
+      btn.addEventListener('click', function() { window.location.href = '/study-yourself-v2.html'; });
+    } else if (member && member.id) {
+      btn.textContent = 'LOG OUT';
+      btn.addEventListener('click', function() { MemberStack.logout(); });
+    } else {
+      btn.textContent = 'LOG IN';
+      btn.addEventListener('click', function() { MemberStack.showModal('LOGIN'); });
+    }
+  }
+  document.querySelectorAll('[data-ms-plan\\:add]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (hasPlan) {
+        window.location.href = '/study-yourself-v2.html';
+      } else {
+        MemberStack.showModal('SIGNUP', {plan: planId});
+      }
+    });
+  });
+});
 </script>
 
 </body>
