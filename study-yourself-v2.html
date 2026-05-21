@@ -259,13 +259,7 @@
   .btn-fresh { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; padding: 0.85rem 1.75rem; border: 1px solid rgba(107,107,107,0.25); background: transparent; color: var(--ash); cursor: pointer; transition: all 0.3s; }
   .btn-fresh:hover { border-color: rgba(107,107,107,0.5); color: var(--smoke); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@memberstack/dom/dist/memberstack.umd.js"></script>
-<script>
-  const memberstack = memberstackDOM.init({
-    publicKey: "pk_1b1c25938812037b0c9f",
-    useCookies: true
-  });
-</script>
+
 <script>
   document.body.style.visibility = 'hidden';
   window.MemberStack.onReady.then(function(member) {
