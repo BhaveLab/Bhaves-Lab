@@ -266,7 +266,7 @@
 <canvas id="cosmos"></canvas>
 
 <nav>
-  <a href='/' class='nav-logo'>Bhav<span>é</span>'s Lab</a>
+  <a href='/' class='nav-logo'><img src='/assets/images/logo-primary.png' alt="Bhavé's Lab" class='nav-logo-img' style='max-height:40px;width:auto;display:block;'></a>
   <a href="https://calendly.com/bhaveslab/30min" class="book" target="_blank">BOOK A SESSION</a>
 </nav>
 
@@ -749,6 +749,7 @@ document.getElementById('state-submit').addEventListener('click', () => {
   openingState = state;
   document.getElementById('state-check').classList.remove('active');
   document.getElementById('course').style.display = 'block';
+  document.getElementById('save-progress-btn').style.display = 'block';
   renderQuestion(0, 0);
 });
 
@@ -1047,6 +1048,22 @@ async function callClaude(systemPrompt, answer) {
   }
 }
 
+// ── MANUAL SAVE PROGRESS ─────────────────────────────────────────────────────
+function manualSaveProgress() {
+  saveProgress();
+  const btn = document.getElementById('save-progress-btn');
+  if (!btn) return;
+  const prev = btn.textContent;
+  btn.textContent = 'Progress saved.';
+  btn.style.color = 'var(--gold)';
+  btn.style.borderColor = 'var(--gold-dim)';
+  setTimeout(() => {
+    btn.textContent = prev;
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }, 2000);
+}
+
 // ── SAVE PROGRESS ────────────────────────────────────────────────────────────
 function saveProgress() {
   try {
@@ -1108,6 +1125,7 @@ async function showCompletion() {
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('course').style.display = 'none';
   document.getElementById('completion').style.display = 'block';
+  document.getElementById('save-progress-btn').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (userName || birthDate) {
@@ -1457,6 +1475,7 @@ document.addEventListener('click', e => {
       document.getElementById('resume-prompt').classList.remove('active');
       document.getElementById('intro').style.display  = 'none';
       document.getElementById('course').style.display = 'block';
+      document.getElementById('save-progress-btn').style.display = 'block';
       renderQuestion(currentSection, currentQuestion);
     });
 
@@ -1481,6 +1500,9 @@ document.addEventListener('click', e => {
     </div>
   </div>
 </div>
+
+<!-- ── SAVE PROGRESS BUTTON ── -->
+<button id="save-progress-btn" onclick="manualSaveProgress()" style="display:none;position:fixed;bottom:1.5rem;left:1.5rem;z-index:300;font-family:var(--mono);font-size:0.55rem;letter-spacing:0.14em;color:var(--ash);background:var(--deep);border:1px solid rgba(107,107,107,0.2);padding:0.5rem 0.9rem;cursor:pointer;transition:all 0.3s;">SAVE PROGRESS</button>
 
 <!-- ── ASSISTANCE BUTTON ── -->
 <a id="assistance-btn" href="mailto:info@bhaveslab.com?subject=Study%20Yourself%20%E2%80%94%20Assistance">ASSISTANCE</a>
