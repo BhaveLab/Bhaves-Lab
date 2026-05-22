@@ -307,16 +307,6 @@
 </script>
 </head>
 <body>
-<script>
-const params = new URLSearchParams(window.location.search);
-if (params.get('success') === 'true') {
-  sessionStorage.setItem('labAccess', 'true');
-  localStorage.setItem('labAccess', 'true');
-}
-if (!sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) {
-  window.location.href = '/index.html';
-}
-</script>
 
 <div id="pwa-gate">
   <p class="gate-eyebrow">Bhavé's Lab</p>
@@ -774,11 +764,20 @@ let overallPatternText = '';
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 
-// ── TOKEN ACCESS ──────────────────────────────────────────────────────────
-// On load: read ?token= from URL → store in localStorage → validate against
-// backend → merge server progress if newer → then run resume check.
+// ── TOKEN ACCESS + GATE ───────────────────────────────────────────────────
+// Owns the full access check. The old synchronous gate is removed — we only
+// redirect AFTER async token validation completes, so a fresh ?token= link
+// is never bounced before the backend can confirm it.
 (async function initToken() {
   const urlParams = new URLSearchParams(window.location.search);
+
+  // ?success=true from Stripe redirect — persist access flag
+  if (urlParams.get('success') === 'true') {
+    sessionStorage.setItem('labAccess', 'true');
+    localStorage.setItem('labAccess', 'true');
+  }
+
+  // Store token from URL, then clean it from the address bar
   const urlToken = urlParams.get('token');
   if (urlToken) {
     localStorage.setItem('bhaveslab-token', urlToken);
@@ -786,6 +785,8 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
   }
 
   const token = localStorage.getItem('bhaveslab-token');
+  let tokenValid = false;
+
   if (token) {
     try {
       const res = await fetch(`${BACKEND}/api/lab-access?action=validate-token`, {
@@ -798,29 +799,41 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
       if (!data.valid) {
         console.warn('[initToken] token invalid — clearing');
         localStorage.removeItem('bhaveslab-token');
-      } else if (data.progress) {
-        // Use server progress if it is newer than anything stored locally
-        const localRaw = localStorage.getItem('bhaveslab-study-progress');
-        let useServer = true;
-        if (localRaw) {
-          try {
-            const local = JSON.parse(localRaw);
-            const localTime  = local.savedAt       ? new Date(local.savedAt).getTime()       : 0;
-            const serverTime = data.progress.savedAt ? new Date(data.progress.savedAt).getTime() : 0;
-            if (localTime >= serverTime) useServer = false;
-          } catch {}
-        }
-        if (useServer) {
-          localStorage.setItem('bhaveslab-study-progress', JSON.stringify(data.progress));
-          console.log('[initToken] server progress loaded');
+      } else {
+        tokenValid = true;
+        localStorage.setItem('labAccess', 'true'); // valid token counts as access
+        if (data.progress) {
+          // Use server progress only if it is newer than local
+          const localRaw = localStorage.getItem('bhaveslab-study-progress');
+          let useServer = true;
+          if (localRaw) {
+            try {
+              const local = JSON.parse(localRaw);
+              const localTime  = local.savedAt         ? new Date(local.savedAt).getTime()         : 0;
+              const serverTime = data.progress.savedAt ? new Date(data.progress.savedAt).getTime() : 0;
+              if (localTime >= serverTime) useServer = false;
+            } catch {}
+          }
+          if (useServer) {
+            localStorage.setItem('bhaveslab-study-progress', JSON.stringify(data.progress));
+            console.log('[initToken] server progress loaded');
+          }
         }
       }
     } catch (e) {
+      // Network error — fall through to local storage check so users aren't
+      // locked out by a backend outage
       console.warn('[initToken] validation failed:', e.message);
     }
   }
 
-  // Resume check runs after server sync so it sees the latest progress
+  // Gate: only redirect if token is invalid AND no local access flag exists
+  if (!tokenValid && !sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) {
+    window.location.href = '/index.html';
+    return;
+  }
+
+  // Resume check runs after server sync so it sees the most current progress
   checkResume();
 })();
 
