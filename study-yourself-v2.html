@@ -840,16 +840,6 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
     return;
   }
 
-  // ?skipto=end — jump straight to the pattern map completion screen for testing
-  if (urlParams.get('skipto') === 'end') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => showCompletion());
-    } else {
-      showCompletion();
-    }
-    return;
-  }
-
   // Resume check runs after server sync so it sees the most current progress
   checkResume();
 })();
@@ -916,15 +906,8 @@ document.getElementById('state-submit').addEventListener('click', () => {
 
 // ── RENDER QUESTION ───────────────────────────────────────────────────────────
 function renderQuestion(sIndex, qIndex) {
-  // Hard-reset all cross-question state so nothing from a prior reflect leaks in.
-  const prevBtn = document.getElementById('submit-btn');
-  console.log('[renderQuestion] START s' + sIndex + '/q' + qIndex
-    + ' | isReflecting=' + isReflecting
-    + ' | prev submit-btn: ' + (prevBtn ? 'EXISTS disabled=' + prevBtn.disabled : 'NOT IN DOM'));
-
   isReflecting = false;   // clear in-flight flag regardless of how prior question ended
-  if (pendingGap) console.log('[renderQuestion] pendingGap was dirty — clearing. was:', pendingGap.substring(0, 60));
-  pendingGap = '';
+  pendingGap   = '';
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
   const isFirstInSection = qIndex === 0;
@@ -1004,9 +987,6 @@ function renderQuestion(sIndex, qIndex) {
     submitEl.style.display = '';
     submitEl.style.opacity = '';
     submitEl.onclick       = handleReflectClick;
-    console.log('[renderQuestion] submit-btn wired via onclick — s' + sIndex + '/q' + qIndex + ' | disabled:', submitEl.disabled, '| onclick set:', !!submitEl.onclick);
-  } else {
-    console.warn('[renderQuestion] submit-btn NOT FOUND after innerHTML set — s' + sIndex + '/q' + qIndex);
   }
 
   const reAnswerEl = document.getElementById('re-answer-btn');
@@ -1017,7 +997,6 @@ function renderQuestion(sIndex, qIndex) {
     if (sitPanel)    sitPanel.style.display   = 'none';
     if (answerInput) { answerInput.value = ''; answerInput.focus(); }
     if (btn)         { btn.disabled = false; btn.style.opacity = ''; btn.style.display = ''; }
-    console.log('[REFLECT] re-answer clicked — button re-enabled');
   });
 
   const advanceAnywayEl = document.getElementById('advance-anyway-btn');
@@ -1061,9 +1040,6 @@ function advance(sIndex, qIndex) {
 async function handleReflectClick() {
   const sIndex = currentSection;
   const qIndex = currentQuestion;
-  console.log('REFLECT CLICKED s' + sIndex + '/q' + qIndex);
-  console.log('isReflecting:', isReflecting);
-  console.log('submitBtn.disabled:', document.getElementById('submit-btn') ? document.getElementById('submit-btn').disabled : 'BUTTON NOT FOUND');
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
 
@@ -1074,8 +1050,7 @@ async function handleReflectClick() {
   const claudePanel  = document.getElementById('claude-panel');
   const advanceBlock = document.getElementById('advance-block');
 
-  console.log('[REFLECT] click — s' + sIndex + '/q' + qIndex + ' | disabled:', submitBtn.disabled, '| isReflecting:', isReflecting, '| pendingGap:', JSON.stringify(pendingGap));
-  if (submitBtn.disabled || isReflecting) { console.log('[REFLECT] ignored — disabled or in flight'); return; }
+  if (submitBtn.disabled || isReflecting) return;
 
   const answer = answerInput.value.trim();
   if (answer.length < 15) {
@@ -1093,12 +1068,9 @@ async function handleReflectClick() {
   advanceBlock.style.display = 'none';
 
   function unlockSubmit() {
-    console.log('[unlockSubmit] called for s' + sIndex + '/q' + qIndex
-      + ' | active now: s' + currentSection + '/q' + currentQuestion);
-    // Guard: if the user has already advanced to a different question, a late-
-    // returning API call from the old question must not touch the new button.
+    // Guard: if the user has already advanced, a late-returning API call from
+    // the old question must not touch the new button.
     if (sIndex !== currentSection || qIndex !== currentQuestion) {
-      console.warn('[unlockSubmit] stale — skipping unlock (question has changed)');
       isReflecting = false;   // still clear the flag so the new question isn't blocked
       return;
     }
@@ -1107,22 +1079,17 @@ async function handleReflectClick() {
     const ld  = document.getElementById('loading');
     if (btn) { btn.disabled = false; btn.style.opacity = ''; }
     if (ld)  ld.style.display = 'none';
-    console.log('[unlockSubmit] button unlocked — s' + sIndex + '/q' + qIndex);
   }
 
-  console.log('[REFLECT] API call started');
   try {
     const prompt = EVAL_PROMPT
       .replace('{{userName}}', () => userName)
       .replace('{{question}}', () => q.text)
       .replace('{{answer}}',   () => answer);
 
-    console.log('[REFLECT] answer to send (length ' + answer.length + '):', answer.substring(0, 80));
     const result = await callClaude(prompt, answer);
-    console.log('[REFLECT] API response received:', JSON.stringify(result));
 
     const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
-    console.log('[REFLECT] isIncomplete:', isIncomplete, '| gap:', result.gap, '| mirror:', result.mirror);
 
     unlockSubmit();
 
@@ -1132,17 +1099,14 @@ async function handleReflectClick() {
       const sitTextEl = document.getElementById('sit-text');
       if (sitTextEl) sitTextEl.textContent = pendingGap;
       sitPanel.style.display = 'block';
-      console.log('[REFLECT] gap path — sit-panel shown');
     } else {
       const mirrorText = result.mirror || '';
       const claudeTextEl = document.getElementById('claude-text');
       if (claudeTextEl) claudeTextEl.textContent = mirrorText;
       claudePanel.style.display = 'block';
-      console.log('[REFLECT] mirror path — claude-panel shown, text:', mirrorText);
       submitBtn.style.display = 'none';
       recordAnswer(sIndex, qIndex, answer, mirrorText, false);
       advanceBlock.style.display = 'block';
-      console.log('[REFLECT] advance-block shown');
     }
   } catch (err) {
     console.error('[REFLECT] error:', err.name, err.message, '\n', err.stack);
@@ -1150,7 +1114,6 @@ async function handleReflectClick() {
     if (err.isBodyTimeout) {
       const loadingEl = document.getElementById('loading');
       if (loadingEl) { loadingEl.textContent = 'Response timed out — try again'; loadingEl.style.display = 'block'; }
-      console.warn('[REFLECT] body timeout — submit unlocked for retry');
     } else {
       recordAnswer(sIndex, qIndex, answer, '', false);
       const advBlock = document.getElementById('advance-block');
