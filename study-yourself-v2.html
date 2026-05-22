@@ -978,9 +978,9 @@ function renderQuestion(sIndex, qIndex) {
     </div>
   `;
 
-  // ── Wire button listeners fresh on every render ──────────────────────────────
-  // Use onclick= (not addEventListener) so there can never be more than one
-  // handler on the button — assignment overwrites, addEventListener stacks.
+  // ── Reset button state on every render ───────────────────────────────────────
+  // Event handling is done via a single delegated listener on #section-content
+  // (see DOMContentLoaded block at bottom of script) — no binding needed here.
   const submitEl = document.getElementById('submit-btn');
   if (submitEl) {
     submitEl.disabled          = false;
@@ -988,7 +988,6 @@ function renderQuestion(sIndex, qIndex) {
     submitEl.style.opacity     = '';
     submitEl.style.position    = 'relative';
     submitEl.style.zIndex      = '9999';
-    submitEl.addEventListener('pointerdown', handleReflectClick);
   }
 
   const reAnswerEl = document.getElementById('re-answer-btn');
@@ -1668,6 +1667,34 @@ function checkResume() {
     });
   } catch(e) { console.warn('[checkResume] error:', e); }
 }
+
+// ── REFLECT BUTTON — DELEGATED EVENT LISTENER ────────────────────────────────
+// Attached once on DOMContentLoaded to #section-content, which is a stable
+// element that is never itself replaced (only its innerHTML changes on each
+// renderQuestion call). This survives every question transition.
+//
+// touchend fires before the synthetic click on mobile — preventDefault stops
+// the browser from generating the duplicate click, so handleReflectClick runs
+// exactly once per tap regardless of platform.
+document.addEventListener('DOMContentLoaded', function() {
+  const sc = document.getElementById('section-content');
+  if (!sc) return;
+
+  function isSubmitBtn(target) {
+    return target.id === 'submit-btn' || !!target.closest('#submit-btn');
+  }
+
+  sc.addEventListener('touchend', function(e) {
+    if (!isSubmitBtn(e.target)) return;
+    e.preventDefault();          // suppress the subsequent synthetic click
+    handleReflectClick();
+  }, { passive: false });
+
+  sc.addEventListener('click', function(e) {
+    if (!isSubmitBtn(e.target)) return;
+    handleReflectClick();
+  });
+});
 
 </script>
 
