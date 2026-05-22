@@ -985,7 +985,12 @@ function renderQuestion(sIndex, qIndex) {
   // Direct binding (not delegation) so a fresh listener is always attached to the
   // freshly-injected button elements regardless of when the script first ran.
   const submitEl = document.getElementById('submit-btn');
-  if (submitEl) submitEl.addEventListener('click', handleReflectClick);
+  if (submitEl) {
+    submitEl.addEventListener('click', handleReflectClick);
+    console.log('[renderQuestion] submit-btn listener attached — s' + sIndex + '/q' + qIndex);
+  } else {
+    console.warn('[renderQuestion] submit-btn NOT FOUND after innerHTML set — s' + sIndex + '/q' + qIndex);
+  }
 
   const reAnswerEl = document.getElementById('re-answer-btn');
   if (reAnswerEl) reAnswerEl.addEventListener('click', () => {
@@ -1037,6 +1042,7 @@ function advance(sIndex, qIndex) {
 // Declared as a named async function so renderQuestion can attach it directly
 // to each freshly-rendered #submit-btn after every innerHTML replacement.
 async function handleReflectClick() {
+  console.log('[handleReflectClick] FIRED — s' + currentSection + '/q' + currentQuestion + ' | readyState:', document.readyState);
   const sIndex = currentSection;
   const qIndex = currentQuestion;
   const s = SECTIONS[sIndex];
