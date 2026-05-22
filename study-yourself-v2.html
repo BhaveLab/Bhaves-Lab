@@ -1094,20 +1094,28 @@ async function handleReflectClick() {
 
     unlockSubmit();
 
+    // Re-query all panels after the await — the stale pre-await references may
+    // point to detached nodes if anything replaced innerHTML while the API call
+    // was in flight.
+    const sitPanelEl    = document.getElementById('sit-panel');
+    const claudePanelEl = document.getElementById('claude-panel');
+    const submitBtnEl   = document.getElementById('submit-btn');
+    const advanceBlockEl = document.getElementById('advance-block');
+
     if (isIncomplete) {
       sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
       pendingGap = result.gap || 'There is more here — sit with the question again.';
       const sitTextEl = document.getElementById('sit-text');
       if (sitTextEl) sitTextEl.textContent = pendingGap;
-      sitPanel.style.display = 'block';
+      if (sitPanelEl) sitPanelEl.style.display = 'block';
     } else {
       const mirrorText = result.mirror || '';
       const claudeTextEl = document.getElementById('claude-text');
       if (claudeTextEl) claudeTextEl.textContent = mirrorText;
-      claudePanel.style.display = 'block';
-      submitBtn.style.display = 'none';
+      if (claudePanelEl) claudePanelEl.style.display = 'block';
+      if (submitBtnEl)   submitBtnEl.style.display = 'none';
       recordAnswer(sIndex, qIndex, answer, mirrorText, false);
-      advanceBlock.style.display = 'block';
+      if (advanceBlockEl) advanceBlockEl.style.display = 'block';
     }
   } catch (err) {
     console.error('[REFLECT] error:', err.name, err.message, '\n', err.stack);
