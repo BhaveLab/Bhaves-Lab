@@ -1079,12 +1079,21 @@ async function handleReflectClick() {
   advanceBlock.style.display = 'none';
 
   function unlockSubmit() {
+    console.log('[unlockSubmit] called for s' + sIndex + '/q' + qIndex
+      + ' | active now: s' + currentSection + '/q' + currentQuestion);
+    // Guard: if the user has already advanced to a different question, a late-
+    // returning API call from the old question must not touch the new button.
+    if (sIndex !== currentSection || qIndex !== currentQuestion) {
+      console.warn('[unlockSubmit] stale — skipping unlock (question has changed)');
+      isReflecting = false;   // still clear the flag so the new question isn't blocked
+      return;
+    }
     isReflecting = false;
     const btn = document.getElementById('submit-btn');
     const ld  = document.getElementById('loading');
     if (btn) { btn.disabled = false; btn.style.opacity = ''; }
     if (ld)  ld.style.display = 'none';
-    console.log('[REFLECT] submit button unlocked — s' + sIndex + '/q' + qIndex);
+    console.log('[unlockSubmit] button unlocked — s' + sIndex + '/q' + qIndex);
   }
 
   console.log('[REFLECT] API call started');
