@@ -1028,29 +1028,27 @@ async function handleReflectClick() {
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
 
-  const submitBtn    = document.getElementById('submit-btn');
-  const answerInput  = document.getElementById('answer-input');
-  const loading      = document.getElementById('loading');
-  const sitPanel     = document.getElementById('sit-panel');
-  const claudePanel  = document.getElementById('claude-panel');
-  const advanceBlock = document.getElementById('advance-block');
+  // All element references are fresh getElementById calls — no pre-stored panel refs.
+  const submitBtn   = document.getElementById('submit-btn');
+  const answerInput = document.getElementById('answer-input');
+  const loading     = document.getElementById('loading');
 
-  if (submitBtn.disabled || isReflecting) return;
+  if (!submitBtn || submitBtn.disabled || isReflecting) return;
 
-  const answer = answerInput.value.trim();
+  const answer = answerInput ? answerInput.value.trim() : '';
   if (answer.length < 15) {
-    answerInput.style.borderColor = 'rgba(201,169,110,0.5)';
-    answerInput.focus();
+    if (answerInput) { answerInput.style.borderColor = 'rgba(201,169,110,0.5)'; answerInput.focus(); }
     return;
   }
 
-  isReflecting             = true;
-  submitBtn.disabled       = true;
-  submitBtn.style.opacity  = '0.4';
-  loading.style.display    = 'block';
-  sitPanel.style.display   = 'none';
-  claudePanel.style.display  = 'none';
-  advanceBlock.style.display = 'none';
+  isReflecting            = true;
+  submitBtn.disabled      = true;
+  submitBtn.style.opacity = '0.4';
+  if (loading) loading.style.display = 'block';
+  // Hide panels fresh — never rely on pre-stored references across the await boundary
+  const _sp = document.getElementById('sit-panel');    if (_sp) _sp.style.display = 'none';
+  const _cp = document.getElementById('claude-panel'); if (_cp) _cp.style.display = 'none';
+  const _ab = document.getElementById('advance-block'); if (_ab) _ab.style.display = 'none';
 
   function unlockSubmit() {
     // Guard: if the user has already advanced, a late-returning API call from
