@@ -903,6 +903,12 @@ document.getElementById('state-submit').addEventListener('click', () => {
 
 // ── RENDER QUESTION ───────────────────────────────────────────────────────────
 function renderQuestion(sIndex, qIndex) {
+  // Log the OLD button's state BEFORE innerHTML wipes it — reveals whether a
+  // prior question's async handler left disabled=true on the wrong element.
+  const prevBtn = document.getElementById('submit-btn');
+  console.log('[renderQuestion] START s' + sIndex + '/q' + qIndex
+    + ' | prev submit-btn: ' + (prevBtn ? 'EXISTS disabled=' + prevBtn.disabled : 'NOT IN DOM'));
+
   if (pendingGap) console.log('[renderQuestion] pendingGap was dirty — clearing. was:', pendingGap.substring(0, 60));
   pendingGap = '';
   const s = SECTIONS[sIndex];
@@ -980,6 +986,9 @@ function renderQuestion(sIndex, qIndex) {
   // the listener — so nothing from a prior question's async handler can interfere.
   const submitEl = document.getElementById('submit-btn');
   if (submitEl) {
+    // Log raw state immediately after innerHTML — BEFORE we force-reset it.
+    // If this shows disabled=true, something in the HTML template is setting it.
+    console.log('[renderQuestion] submit-btn raw after innerHTML — disabled:', submitEl.disabled, '| display:', submitEl.style.display, '| opacity:', submitEl.style.opacity);
     submitEl.disabled      = false;
     submitEl.style.display = '';
     submitEl.style.opacity = '';
