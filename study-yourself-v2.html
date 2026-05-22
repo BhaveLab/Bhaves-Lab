@@ -774,6 +774,56 @@ let overallPatternText = '';
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 
+// ── TOKEN ACCESS ──────────────────────────────────────────────────────────
+// On load: read ?token= from URL → store in localStorage → validate against
+// backend → merge server progress if newer → then run resume check.
+(async function initToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlToken = urlParams.get('token');
+  if (urlToken) {
+    localStorage.setItem('bhaveslab-token', urlToken);
+    history.replaceState(null, '', window.location.pathname);
+  }
+
+  const token = localStorage.getItem('bhaveslab-token');
+  if (token) {
+    try {
+      const res = await fetch(`${BACKEND}/api/validate-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+
+      if (!data.valid) {
+        console.warn('[initToken] token invalid — clearing');
+        localStorage.removeItem('bhaveslab-token');
+      } else if (data.progress) {
+        // Use server progress if it is newer than anything stored locally
+        const localRaw = localStorage.getItem('bhaveslab-study-progress');
+        let useServer = true;
+        if (localRaw) {
+          try {
+            const local = JSON.parse(localRaw);
+            const localTime  = local.savedAt       ? new Date(local.savedAt).getTime()       : 0;
+            const serverTime = data.progress.savedAt ? new Date(data.progress.savedAt).getTime() : 0;
+            if (localTime >= serverTime) useServer = false;
+          } catch {}
+        }
+        if (useServer) {
+          localStorage.setItem('bhaveslab-study-progress', JSON.stringify(data.progress));
+          console.log('[initToken] server progress loaded');
+        }
+      }
+    } catch (e) {
+      console.warn('[initToken] validation failed:', e.message);
+    }
+  }
+
+  // Resume check runs after server sync so it sees the latest progress
+  checkResume();
+})();
+
 // ── BEGIN ────────────────────────────────────────────────────────────────────
 document.getElementById('begin-btn').addEventListener('click', () => {
   const email = document.getElementById('user-email').value.trim();
@@ -1147,14 +1197,29 @@ function manualSaveProgress() {
 
 // ── SAVE PROGRESS ────────────────────────────────────────────────────────────
 function saveProgress() {
+  const data = {
+    currentSection, currentQuestion, sessionData,
+    userEmail, userName, birthDate, birthTime, birthCity, openingState,
+    savedAt: new Date().toISOString()
+  };
+  // Always save locally first
   try {
-    localStorage.setItem('bhaveslab-study-progress', JSON.stringify({
-      currentSection, currentQuestion, sessionData,
-      userEmail, userName, birthDate, birthTime, birthCity, openingState,
-      savedAt: new Date().toISOString()
-    }));
-    console.log('[saveProgress] saved — s' + currentSection + '/q' + currentQuestion);
-  } catch(e) { console.warn('[saveProgress] failed:', e); }
+    localStorage.setItem('bhaveslab-study-progress', JSON.stringify(data));
+    console.log('[saveProgress] local — s' + currentSection + '/q' + currentQuestion);
+  } catch(e) { console.warn('[saveProgress] local failed:', e); }
+  // Sync to backend if a token exists (fire-and-forget)
+  const token = localStorage.getItem('bhaveslab-token');
+  if (token) {
+    fetch(`${BACKEND}/api/save-progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, progress: data }),
+    })
+      .then(r => r.ok
+        ? console.log('[saveProgress] backend synced')
+        : console.warn('[saveProgress] backend returned', r.status))
+      .catch(e => console.warn('[saveProgress] backend error:', e.message));
+  }
 }
 
 // ── CALL CLAUDE (plain text) ──────────────────────────────────────────────────
@@ -1547,7 +1612,8 @@ document.addEventListener('click', e => {
 });
 
 // ── RESUME CHECK ─────────────────────────────────────────────────────────────
-(function checkResume() {
+// Called by initToken() after server sync so it sees the most current progress.
+function checkResume() {
   try {
     const raw = localStorage.getItem('bhaveslab-study-progress');
     if (!raw) return;
@@ -1584,7 +1650,7 @@ document.addEventListener('click', e => {
       document.getElementById('resume-prompt').classList.remove('active');
     });
   } catch(e) { console.warn('[checkResume] error:', e); }
-})();
+}
 
 </script>
 
