@@ -987,6 +987,9 @@ function renderQuestion(sIndex, qIndex) {
     submitEl.style.display = '';
     submitEl.style.opacity = '';
     submitEl.onclick       = handleReflectClick;
+    // Mobile: touchend fires before the synthetic click; preventDefault stops
+    // the browser generating a duplicate click, so the handler runs exactly once.
+    submitEl.ontouchend = function(e) { e.preventDefault(); handleReflectClick(); };
   }
 
   const reAnswerEl = document.getElementById('re-answer-btn');
