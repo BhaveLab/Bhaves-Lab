@@ -885,6 +885,13 @@ document.getElementById('state-submit').addEventListener('click', () => {
 function renderQuestion(sIndex, qIndex) {
   isReflecting = false;   // clear in-flight flag regardless of how prior question ended
   pendingGap   = '';
+
+  // ── Reset all response panels before rendering new HTML ─────────────────────
+  // Guards against leftover state from the previous question bleeding through.
+  ['sit-panel', 'claude-panel', 'advance-block', 'sit-text', 'claude-text'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
   const isFirstInSection = qIndex === 0;
