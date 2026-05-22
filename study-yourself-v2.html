@@ -273,31 +273,6 @@
   #pwa-gate .gate-icon-label { font-family: var(--mono); font-size: 0.42rem; letter-spacing: 0.2em; color: rgba(201,169,110,0.35); text-transform: uppercase; }
   #pwa-gate .gate-footer { font-family: var(--serif); font-size: 1rem; font-style: italic; color: rgba(201,169,110,0.45); }
 </style>
-
-<script>
-  if (document.body) document.body.style.visibility = 'hidden';
-  try {
-    window.MemberStack.onReady.then(function(member) {
-      var planId = 'pln_the-study–ohka08iz';
-      if (!member || !member.id) {
-        window.location.replace('/study-yourself.html');
-        return;
-      }
-      var hasPlan = Array.isArray(member.plans) && member.plans.some(function(p) { return p.id === planId; });
-      if (!hasPlan) {
-        window.location.replace('/study-yourself.html');
-        return;
-      }
-      document.body.style.visibility = '';
-      var btn = document.getElementById('ms-auth-btn');
-      if (btn) {
-        btn.addEventListener('click', function() {
-          MemberStack.logout().then(function() { window.location.href = '/study-yourself.html'; });
-        });
-      }
-    });
-  } catch(e) {}
-</script>
 <script>
   // PWA gate — runs before paint to prevent flash.
   // Skipped entirely when a ?token= is present so the gate never blocks
