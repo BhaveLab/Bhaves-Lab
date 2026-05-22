@@ -1045,6 +1045,7 @@ async function handleReflectClick() {
   if (answer.length < 15) {
     console.log('EARLY RETURN: answer too short (' + answer.length + ' chars)');
     if (answerInput) { answerInput.style.borderColor = 'rgba(201,169,110,0.5)'; answerInput.focus(); }
+    console.log('short-answer-msg element:', document.getElementById('short-answer-msg'));
     const msg = document.getElementById('short-answer-msg');
     if (msg) {
       msg.style.display = 'block';
