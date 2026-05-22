@@ -1093,15 +1093,30 @@ async function handleReflectClick() {
       pendingGap = result.gap || 'There is more here — sit with the question again.';
       const sitTextEl = document.getElementById('sit-text');
       if (sitTextEl) sitTextEl.textContent = pendingGap;
-      if (sitPanelEl) sitPanelEl.style.display = 'block';
+      if (sitPanelEl) {
+        sitPanelEl.classList.remove('hidden');
+        sitPanelEl.style.display    = 'block';
+        sitPanelEl.style.visibility = 'visible';
+        sitPanelEl.style.opacity    = '1';
+      }
     } else {
       const mirrorText = result.mirror || '';
       const claudeTextEl = document.getElementById('claude-text');
       if (claudeTextEl) claudeTextEl.textContent = mirrorText;
-      if (claudePanelEl) claudePanelEl.style.display = 'block';
-      if (submitBtnEl)   submitBtnEl.style.display = 'none';
+      if (claudePanelEl) {
+        claudePanelEl.classList.remove('hidden');
+        claudePanelEl.style.display    = 'block';
+        claudePanelEl.style.visibility = 'visible';
+        claudePanelEl.style.opacity    = '1';
+      }
+      if (submitBtnEl) submitBtnEl.style.display = 'none';
       recordAnswer(sIndex, qIndex, answer, mirrorText, false);
-      if (advanceBlockEl) advanceBlockEl.style.display = 'block';
+      if (advanceBlockEl) {
+        advanceBlockEl.classList.remove('hidden');
+        advanceBlockEl.style.display    = 'block';
+        advanceBlockEl.style.visibility = 'visible';
+        advanceBlockEl.style.opacity    = '1';
+      }
     }
   } catch (err) {
     console.error('[REFLECT] error:', err.name, err.message, '\n', err.stack);
