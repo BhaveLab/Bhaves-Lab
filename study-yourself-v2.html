@@ -442,6 +442,7 @@
     <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:1rem;">
       <button onclick="downloadPatternMap()" id="download-pdf-btn" style="width:100%;background:var(--gold);color:var(--void);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;padding:1.1rem 2rem;border:none;cursor:pointer;transition:opacity 0.3s;text-align:center;">DOWNLOAD PATTERN MAP</button>
       <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:1.1rem 2rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">BOOK A SESSION — TAKE THIS FURTHER</a>
+      <button onclick="(function(){ localStorage.clear(); sessionStorage.clear(); window.location.href='/index.html'; })()" style="width:100%;background:transparent;color:var(--ash);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.16em;padding:0.85rem 2rem;border:1px solid rgba(107,107,107,0.25);cursor:pointer;transition:opacity 0.3s;text-align:center;">LOG OUT</button>
     </div>
   </div>
 </div>
