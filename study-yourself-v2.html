@@ -1066,6 +1066,7 @@ async function handleReflectClick() {
       .replace('{{answer}}',   () => answer);
 
     const result = await callClaude(prompt, answer);
+    console.log('API response:', JSON.stringify(result));
 
     const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
 
