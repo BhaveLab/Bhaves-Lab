@@ -1190,13 +1190,13 @@ async function callClaude(systemPrompt, answer) {
   console.log('[callClaude] parsed response:', JSON.stringify(data));
   let text = data.content?.[0]?.text || data.text || '';
   console.log('[callClaude] extracted text:', text);
-  text = text
-    .replace(/```json\s*/gi, '')  // remove ```json / ```JSON and any trailing whitespace/newline
-    .replace(/```/g, '')           // remove any remaining triple backtick fences
-    .trim();
-  console.log('[callClaude] cleaned text before JSON.parse:', text);
-  try { return JSON.parse(text); } catch(e) {
-    console.error('[callClaude] inner JSON.parse failed:', e.message, '| text was:', text);
+  let cleaned = text;
+  cleaned = cleaned.replace(/```json/gi, '');
+  cleaned = cleaned.replace(/```/g, '');
+  cleaned = cleaned.trim();
+  console.log('[callClaude] cleaned text before JSON.parse:', cleaned);
+  try { return JSON.parse(cleaned); } catch(e) {
+    console.error('[callClaude] inner JSON.parse failed:', e.message, '| cleaned was:', cleaned);
     throw e;
   }
 }
