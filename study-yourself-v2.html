@@ -148,7 +148,7 @@
   .btn-advance:hover { background: rgba(201,169,110,0.06); border-color: var(--gold); }
 
   /* ── SUBMIT ── */
-  .btn-submit { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--void); background: var(--gold); border: none; padding: 0.85rem 2rem; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; }
+  .btn-submit { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--void); background: var(--gold); border: none; padding: 0.85rem 2rem; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; pointer-events: auto; position: relative; z-index: 10; }
   .btn-submit:hover { opacity: 0.88; }
   .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -764,6 +764,7 @@ let sectionFlags = [];
 let openingState = '';
 let pendingGap        = '';
 let overallPatternText = '';
+let isReflecting      = false;  // true while an API call is in-flight; reset by renderQuestion
 
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
@@ -903,12 +904,13 @@ document.getElementById('state-submit').addEventListener('click', () => {
 
 // ── RENDER QUESTION ───────────────────────────────────────────────────────────
 function renderQuestion(sIndex, qIndex) {
-  // Log the OLD button's state BEFORE innerHTML wipes it — reveals whether a
-  // prior question's async handler left disabled=true on the wrong element.
+  // Hard-reset all cross-question state so nothing from a prior reflect leaks in.
   const prevBtn = document.getElementById('submit-btn');
   console.log('[renderQuestion] START s' + sIndex + '/q' + qIndex
+    + ' | isReflecting=' + isReflecting
     + ' | prev submit-btn: ' + (prevBtn ? 'EXISTS disabled=' + prevBtn.disabled : 'NOT IN DOM'));
 
+  isReflecting = false;   // clear in-flight flag regardless of how prior question ended
   if (pendingGap) console.log('[renderQuestion] pendingGap was dirty — clearing. was:', pendingGap.substring(0, 60));
   pendingGap = '';
   const s = SECTIONS[sIndex];
@@ -982,18 +984,15 @@ function renderQuestion(sIndex, qIndex) {
   `;
 
   // ── Wire button listeners fresh on every render ──────────────────────────────
-  // disabled=false is reset HERE — on the exact same element reference that gets
-  // the listener — so nothing from a prior question's async handler can interfere.
+  // Use onclick= (not addEventListener) so there can never be more than one
+  // handler on the button — assignment overwrites, addEventListener stacks.
   const submitEl = document.getElementById('submit-btn');
   if (submitEl) {
-    // Log raw state immediately after innerHTML — BEFORE we force-reset it.
-    // If this shows disabled=true, something in the HTML template is setting it.
-    console.log('[renderQuestion] submit-btn raw after innerHTML — disabled:', submitEl.disabled, '| display:', submitEl.style.display, '| opacity:', submitEl.style.opacity);
     submitEl.disabled      = false;
     submitEl.style.display = '';
     submitEl.style.opacity = '';
-    submitEl.addEventListener('click', handleReflectClick);
-    console.log('[renderQuestion] submit-btn wired — s' + sIndex + '/q' + qIndex + ' | disabled:', submitEl.disabled);
+    submitEl.onclick       = handleReflectClick;
+    console.log('[renderQuestion] submit-btn wired via onclick — s' + sIndex + '/q' + qIndex + ' | disabled:', submitEl.disabled, '| onclick set:', !!submitEl.onclick);
   } else {
     console.warn('[renderQuestion] submit-btn NOT FOUND after innerHTML set — s' + sIndex + '/q' + qIndex);
   }
@@ -1061,8 +1060,8 @@ async function handleReflectClick() {
   const claudePanel  = document.getElementById('claude-panel');
   const advanceBlock = document.getElementById('advance-block');
 
-  console.log('[REFLECT] click — s' + sIndex + '/q' + qIndex + ' | disabled:', submitBtn.disabled, '| pendingGap:', JSON.stringify(pendingGap));
-  if (submitBtn.disabled) { console.log('[REFLECT] ignored — already in flight'); return; }
+  console.log('[REFLECT] click — s' + sIndex + '/q' + qIndex + ' | disabled:', submitBtn.disabled, '| isReflecting:', isReflecting, '| pendingGap:', JSON.stringify(pendingGap));
+  if (submitBtn.disabled || isReflecting) { console.log('[REFLECT] ignored — disabled or in flight'); return; }
 
   const answer = answerInput.value.trim();
   if (answer.length < 15) {
@@ -1071,6 +1070,7 @@ async function handleReflectClick() {
     return;
   }
 
+  isReflecting             = true;
   submitBtn.disabled       = true;
   submitBtn.style.opacity  = '0.4';
   loading.style.display    = 'block';
@@ -1079,6 +1079,7 @@ async function handleReflectClick() {
   advanceBlock.style.display = 'none';
 
   function unlockSubmit() {
+    isReflecting = false;
     const btn = document.getElementById('submit-btn');
     const ld  = document.getElementById('loading');
     if (btn) { btn.disabled = false; btn.style.opacity = ''; }
