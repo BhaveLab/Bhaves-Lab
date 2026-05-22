@@ -275,7 +275,7 @@
 </style>
 
 <script>
-  document.body.style.visibility = 'hidden';
+  if (document.body) document.body.style.visibility = 'hidden';
   window.MemberStack.onReady.then(function(member) {
     var planId = 'pln_the-study–ohka08iz';
     if (!member || !member.id) {
