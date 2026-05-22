@@ -1080,6 +1080,9 @@ async function handleReflectClick() {
     // Re-query all panels after the await — the stale pre-await references may
     // point to detached nodes if anything replaced innerHTML while the API call
     // was in flight.
+    console.log('sit-panel exists:', !!document.getElementById('sit-panel'));
+    console.log('claude-panel exists:', !!document.getElementById('claude-panel'));
+
     const sitPanelEl    = document.getElementById('sit-panel');
     const claudePanelEl = document.getElementById('claude-panel');
     const submitBtnEl   = document.getElementById('submit-btn');
