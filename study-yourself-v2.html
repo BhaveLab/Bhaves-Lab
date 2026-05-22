@@ -1685,12 +1685,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   sc.addEventListener('touchend', function(e) {
+    console.log('[delegate touchend] target:', e.target.id || e.target.tagName, '| s' + currentSection + '/q' + currentQuestion + ' | isSubmitBtn:', isSubmitBtn(e.target));
     if (!isSubmitBtn(e.target)) return;
     e.preventDefault();          // suppress the subsequent synthetic click
     handleReflectClick();
   }, { passive: false });
 
   sc.addEventListener('click', function(e) {
+    console.log('[delegate click] target:', e.target.id || e.target.tagName, '| s' + currentSection + '/q' + currentQuestion + ' | isSubmitBtn:', isSubmitBtn(e.target));
     if (!isSubmitBtn(e.target)) return;
     handleReflectClick();
   });
