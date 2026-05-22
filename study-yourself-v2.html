@@ -1288,7 +1288,7 @@ async function generateOverallPattern() {
       answers.map(a => `Q: ${a.question}\nA: ${a.answer}`).join('\n');
   }).filter(Boolean).join('\n\n');
 
-  const prompt = `You are reading the complete answers from a 10-section self-study. The student's name is ${userName || 'the student'}. Read everything and write one paragraph identifying the single structural thread that ran consistently across the full session — the deepest pattern that connected their responses. Be direct and specific to what was actually in these answers. Do not be generic or affirming. Speak to the structure, not the content.`;
+  const prompt = `You are reading the complete answers from a 10-section self-study. The student's name is ${userName || 'the student'}. Read everything and write as many paragraphs as the pattern requires — do not truncate. The depth of the read should match the depth of the data. Identify the single structural thread that ran consistently across the full session — the deepest pattern that connected their responses. Be direct and specific to what was actually in these answers. Do not be generic or affirming. Speak to the structure, not the content.`;
 
   try {
     const text = await callClaudeText(prompt, summaries);
@@ -1487,7 +1487,7 @@ async function downloadPatternMap() {
   if (logoDataUrl) {
     const imgSize = 28;
     doc.addImage(logoDataUrl, 'PNG', (W - imgSize) / 2, y, imgSize, imgSize);
-    y += imgSize + 8;
+    y += imgSize + 16;  // 16mm gap — prevents the 26pt heading baseline from overlapping the logo
   }
 
   // ── MASTHEAD ──
