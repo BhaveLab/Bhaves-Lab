@@ -148,7 +148,7 @@
   .btn-advance:hover { background: rgba(201,169,110,0.06); border-color: var(--gold); }
 
   /* ── SUBMIT ── */
-  .btn-submit { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--void); background: var(--gold); border: none; padding: 0.85rem 2rem; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; pointer-events: auto; position: relative; z-index: 10; }
+  .btn-submit { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.14em; color: var(--void); background: var(--gold); border: none; padding: 0.85rem 2rem; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; pointer-events: auto; position: relative; z-index: 9999; }
   .btn-submit:hover { opacity: 0.88; }
   .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -983,9 +983,11 @@ function renderQuestion(sIndex, qIndex) {
   // handler on the button — assignment overwrites, addEventListener stacks.
   const submitEl = document.getElementById('submit-btn');
   if (submitEl) {
-    submitEl.disabled      = false;
-    submitEl.style.display = '';
-    submitEl.style.opacity = '';
+    submitEl.disabled          = false;
+    submitEl.style.display     = '';
+    submitEl.style.opacity     = '';
+    submitEl.style.position    = 'relative';
+    submitEl.style.zIndex      = '9999';
     submitEl.addEventListener('pointerdown', handleReflectClick);
   }
 
