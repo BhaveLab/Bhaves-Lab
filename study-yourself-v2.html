@@ -1637,26 +1637,50 @@ function checkResume() {
 
     document.getElementById('resume-prompt').classList.add('active');
 
+    const mainActions   = document.getElementById('resume-main-actions');
+    const confirmPanel  = document.getElementById('resume-confirm');
+    const confirmText   = document.getElementById('resume-confirm-text');
+    const confirmYesBtn = document.getElementById('confirm-yes-btn');
+    const confirmNoBtn  = document.getElementById('confirm-no-btn');
+
+    function showConfirm(message, onYes) {
+      confirmText.textContent = message;
+      mainActions.style.display  = 'none';
+      confirmPanel.style.display = 'block';
+      // Replace listeners each time to avoid stacking
+      confirmYesBtn.replaceWith(confirmYesBtn.cloneNode(true));
+      confirmNoBtn.replaceWith(confirmNoBtn.cloneNode(true));
+      document.getElementById('confirm-yes-btn').addEventListener('click', onYes);
+      document.getElementById('confirm-no-btn').addEventListener('click', () => {
+        confirmPanel.style.display = 'none';
+        mainActions.style.display  = '';
+      });
+    }
+
     document.getElementById('resume-btn').addEventListener('click', () => {
-      userEmail    = saved.userEmail    || '';
-      userName     = saved.userName     || '';
-      birthDate    = saved.birthDate    || '';
-      birthTime    = saved.birthTime    || '';
-      birthCity    = saved.birthCity    || '';
-      openingState = saved.openingState || '';
-      currentSection  = saved.currentSection  || 0;
-      currentQuestion = saved.currentQuestion || 0;
-      if (Array.isArray(saved.sessionData)) sessionData = saved.sessionData;
-      document.getElementById('resume-prompt').classList.remove('active');
-      document.getElementById('intro').style.display  = 'none';
-      document.getElementById('course').style.display = 'block';
-      document.getElementById('save-progress-btn').style.display = 'block';
-      renderQuestion(currentSection, currentQuestion);
+      showConfirm('You will return to where you left off — confirm?', () => {
+        userEmail    = saved.userEmail    || '';
+        userName     = saved.userName     || '';
+        birthDate    = saved.birthDate    || '';
+        birthTime    = saved.birthTime    || '';
+        birthCity    = saved.birthCity    || '';
+        openingState = saved.openingState || '';
+        currentSection  = saved.currentSection  || 0;
+        currentQuestion = saved.currentQuestion || 0;
+        if (Array.isArray(saved.sessionData)) sessionData = saved.sessionData;
+        document.getElementById('resume-prompt').classList.remove('active');
+        document.getElementById('intro').style.display  = 'none';
+        document.getElementById('course').style.display = 'block';
+        document.getElementById('save-progress-btn').style.display = 'block';
+        renderQuestion(currentSection, currentQuestion);
+      });
     });
 
     document.getElementById('fresh-btn').addEventListener('click', () => {
-      localStorage.removeItem('bhaveslab-study-progress');
-      document.getElementById('resume-prompt').classList.remove('active');
+      showConfirm('This will clear all your progress — are you sure?', () => {
+        localStorage.removeItem('bhaveslab-study-progress');
+        document.getElementById('resume-prompt').classList.remove('active');
+      });
     });
   } catch(e) { console.warn('[checkResume] error:', e); }
 }
@@ -1699,9 +1723,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="resume-label">[ SESSION FOUND ]</div>
     <div class="resume-title">You have a saved session.</div>
     <div class="resume-sub" id="resume-sub">A study in progress is waiting.</div>
-    <div class="resume-actions">
+    <div class="resume-actions" id="resume-main-actions">
       <button class="btn-resume" id="resume-btn">RESUME SESSION</button>
       <button class="btn-fresh" id="fresh-btn">START FRESH</button>
+    </div>
+    <div id="resume-confirm" style="display:none;">
+      <div class="resume-sub" id="resume-confirm-text" style="margin-bottom:1.75rem;"></div>
+      <div class="resume-actions">
+        <button class="btn-resume" id="confirm-yes-btn">YES</button>
+        <button class="btn-resume" id="confirm-no-btn">NO</button>
+      </div>
     </div>
   </div>
 </div>
