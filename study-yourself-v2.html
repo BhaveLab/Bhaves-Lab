@@ -840,6 +840,16 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
     return;
   }
 
+  // ?skipto=end — jump straight to the pattern map completion screen for testing
+  if (urlParams.get('skipto') === 'end') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => showCompletion());
+    } else {
+      showCompletion();
+    }
+    return;
+  }
+
   // Resume check runs after server sync so it sees the most current progress
   checkResume();
 })();
