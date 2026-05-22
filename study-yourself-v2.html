@@ -276,25 +276,27 @@
 
 <script>
   if (document.body) document.body.style.visibility = 'hidden';
-  window.MemberStack.onReady.then(function(member) {
-    var planId = 'pln_the-study–ohka08iz';
-    if (!member || !member.id) {
-      window.location.replace('/study-yourself.html');
-      return;
-    }
-    var hasPlan = Array.isArray(member.plans) && member.plans.some(function(p) { return p.id === planId; });
-    if (!hasPlan) {
-      window.location.replace('/study-yourself.html');
-      return;
-    }
-    document.body.style.visibility = '';
-    var btn = document.getElementById('ms-auth-btn');
-    if (btn) {
-      btn.addEventListener('click', function() {
-        MemberStack.logout().then(function() { window.location.href = '/study-yourself.html'; });
-      });
-    }
-  });
+  try {
+    window.MemberStack.onReady.then(function(member) {
+      var planId = 'pln_the-study–ohka08iz';
+      if (!member || !member.id) {
+        window.location.replace('/study-yourself.html');
+        return;
+      }
+      var hasPlan = Array.isArray(member.plans) && member.plans.some(function(p) { return p.id === planId; });
+      if (!hasPlan) {
+        window.location.replace('/study-yourself.html');
+        return;
+      }
+      document.body.style.visibility = '';
+      var btn = document.getElementById('ms-auth-btn');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          MemberStack.logout().then(function() { window.location.href = '/study-yourself.html'; });
+        });
+      }
+    });
+  } catch(e) {}
 </script>
 <script>
   // PWA gate — runs before paint to prevent flash.
