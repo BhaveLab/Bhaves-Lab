@@ -1098,6 +1098,7 @@ async function handleReflectClick() {
         sitPanelEl.style.display    = 'block';
         sitPanelEl.style.visibility = 'visible';
         sitPanelEl.style.opacity    = '1';
+        console.log('sit-panel computed display:', window.getComputedStyle(document.getElementById('sit-panel')).display);
       }
     } else {
       const mirrorText = result.mirror || '';
