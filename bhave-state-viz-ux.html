@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhavé's Lab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080808;
+}
+
+/* Canvas sits at base layer */
+#cv {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* Overlay — sits above field, fades in after delay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 48px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
+.brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 15px;
+  letter-spacing: 0.38em;
+  color: rgba(201, 168, 76, 0.55);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(
+    to bottom,
+    rgba(201, 168, 76, 0),
+    rgba(201, 168, 76, 0.25),
+    rgba(201, 168, 76, 0)
+  );
+  margin-bottom: 16px;
+}
+
+.enter-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: all;
+}
+
+.enter-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 300;
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  color: rgba(201, 168, 76, 0.35);
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: all;
+  cursor: pointer;
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  padding: 8px 18px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.enter-link:hover {
+  color: rgba(201, 168, 76, 0.75);
+  border-color: rgba(201, 168, 76, 0.28);
+}
+
+/* Minimal seed indicator — invisible, for internal reference only */
+.seed-ref {
+  position: fixed;
+  bottom: 10px;
+  right: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.04);
+  z-index: 20;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div id="cv"></div>
+
+<div class="overlay" id="overlay">
+  <div class="brand">Bhavé's Lab</div>
+  <div class="divider"></div>
+  <div class="enter-links">
+    <a class="enter-link" href="consciousness-mirror.html">Enter the Mirror</a>
+    <a class="enter-link" href="study-yourself-v2.html">Study Yourself</a>
+    <a class="enter-link" href="index.html">Enter the Realm</a>
+  </div>
+</div>
+
+<div class="seed-ref" id="seed-ref">SEED_12345</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// BHAVÉ'S LAB — STATE VISUALIZATION (UX)
+//
+// The framework runs silently. No controls. No labels.
+// Users enter a living field — they do not read about one.
+//
+// STATE → PERCEPTION → FORMATION → DECISION → EXPERIENCE →
+// REALITY → SOURCE → CURIOSITY → STATE
+//
+// Cursor creates a gentle void around the user.
+// The field parts. It flows back in.
+// ════════════════════════════════════════════════════════════════════════
+
+const STAGES = [
+  { name: 'STATE',       color: [78,  205, 196], isCenter: false },
+  { name: 'PERCEPTION',  color: [90,  208, 175], isCenter: false },
+  { name: 'FORMATION',   color: [115, 210, 148], isCenter: false },
+  { name: 'DECISION',    color: [158, 207, 108], isCenter: false },
+  { name: 'EXPERIENCE',  color: [193, 188,  85], isCenter: false },
+  { name: 'REALITY',     color: [201, 168,  76], isCenter: false },
+  { name: 'SOURCE',      color: [225, 208, 125], isCenter: true  },
+  { name: 'CURIOSITY',   color: [88,  212, 200], isCenter: false },
+];
+
+// Hardcoded — no controls in UX build
+const CFG = {
+  seed:          42,
+  particleCount: 1800,
+  flowSpeed:     2.2,
+  noiseScale:    0.0038,
+  trailLength:   24,
+  attraction:    0.082,
+  // Cursor repulsion
+  cursorRadius:  95,
+  cursorForce:   0.22,
+};
+
+let particles   = [];
+let stagePos    = [];
+let stageCounts = new Array(8).fill(0);
+
+// ── STAGE POSITIONS ───────────────────────────────────────────────────
+function computeStagePos() {
+  const cx = width  / 2;
+  const cy = height / 2;
+  // On wider screens pull the ring out more; maintain proportions
+  const r  = min(width, height) * 0.36;
+
+  stagePos = [];
+  let ringIdx = 0;
+  for (let i = 0; i < 8; i++) {
+    if (STAGES[i].isCenter) {
+      stagePos.push({ x: cx, y: cy });
+    } else {
+      const angle = -HALF_PI + (ringIdx * TWO_PI / 7);
+      stagePos.push({
+        x: cx + r * cos(angle),
+        y: cy + r * sin(angle),
+      });
+      ringIdx++;
+    }
+  }
+}
+
+// ── SETUP ─────────────────────────────────────────────────────────────
+function setup() {
+  const cv = createCanvas(windowWidth, windowHeight);
+  cv.parent('cv');
+  colorMode(RGB, 255, 255, 255, 255);
+  smooth();
+
+  randomSeed(CFG.seed);
+  noiseSeed(CFG.seed);
+  computeStagePos();
+
+  for (let i = 0; i < CFG.particleCount; i++) {
+    particles.push(new Particle(true));
+  }
+
+  background(8, 8, 8);
+
+  // Fade in overlay after field has a moment to breathe
+  setTimeout(() => {
+    document.getElementById('overlay').classList.add('visible');
+  }, 2200);
+
+  document.getElementById('seed-ref').textContent = `SEED_${CFG.seed}`;
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  randomSeed(CFG.seed);
+  noiseSeed(CFG.seed);
+  computeStagePos();
+  for (let pt of particles) pt.resetToScattered();
+  background(8, 8, 8);
+}
+
+// ── DRAW ──────────────────────────────────────────────────────────────
+function draw() {
+  // Void fade
+  fill(8, 8, 8, 16);
+  noStroke();
+  rect(0, 0, width, height);
+
+  drawPaths();
+  drawNodes();
+
+  stageCounts = new Array(8).fill(0);
+  for (let pt of particles) {
+    pt.update();
+    pt.draw();
+    stageCounts[pt.si]++;
+  }
+}
+
+// ── PATH LINES ────────────────────────────────────────────────────────
+// Barely visible — the sequence exists as structural truth, not a diagram
+function drawPaths() {
+  const seq = [0, 1, 2, 3, 4, 5, 6, 7, 0];
+  noFill();
+  for (let i = 0; i < seq.length - 1; i++) {
+    const a  = seq[i], b = seq[i + 1];
+    const pa = stagePos[a], pb = stagePos[b];
+    const col = STAGES[a].color;
+    const dens = stageCounts[a] / max(CFG.particleCount * 0.14, 1);
+    const alpha = constrain(3 + dens * 14, 2, 20);
+    stroke(col[0], col[1], col[2], alpha);
+    strokeWeight(0.35);
+    line(pa.x, pa.y, pb.x, pb.y);
+  }
+}
+
+// ── STAGE NODES ───────────────────────────────────────────────────────
+// In UX build: nodes are felt, not seen. Labels ghost in with activity.
+function drawNodes() {
+  for (let i = 0; i < 8; i++) {
+    const s       = STAGES[i];
+    const pos     = stagePos[i];
+    const count   = stageCounts[i];
+    const density = count / max(CFG.particleCount / 8, 1);
+    const col     = s.color;
+    const isSrc   = s.isCenter;
+
+    // Outer glow — nearly invisible at rest, brightens with density
+    const glowR = (isSrc ? 20 : 8) + density * 14;
+    const glowA = constrain(4 + density * 40, 3, 55);
+    noFill();
+    stroke(col[0], col[1], col[2], glowA);
+    strokeWeight(0.4);
+    ellipse(pos.x, pos.y, glowR * 2, glowR * 2);
+
+    if (isSrc) {
+      // SOURCE breathes
+      stroke(col[0], col[1], col[2], glowA * 0.3);
+      ellipse(pos.x, pos.y, (glowR + 20) * 2, (glowR + 20) * 2);
+      const pulse = sin(frameCount * 0.035) * 6;
+      stroke(col[0], col[1], col[2], glowA * 0.12);
+      ellipse(pos.x, pos.y, (glowR + 40 + pulse) * 2, (glowR + 40 + pulse) * 2);
+    }
+
+    // Core — barely there at rest
+    const coreR = isSrc ? 4 : 2.5;
+    const coreA = constrain(30 + density * 150, 25, 200);
+    fill(col[0], col[1], col[2], coreA);
+    noStroke();
+    ellipse(pos.x, pos.y, coreR * 2, coreR * 2);
+
+    // Stage labels — emerge only with particle density
+    // At rest: ~5% opacity. Under particle cluster: ~35% max.
+    // Users may never consciously read them. The system doesn't announce itself.
+    const labelA = constrain(5 + density * 55, 4, 60);
+    fill(col[0], col[1], col[2], labelA);
+    textFont('JetBrains Mono, monospace');
+    textSize(isSrc ? 7.5 : 6.5);
+    textAlign(CENTER, CENTER);
+
+    let lx = pos.x, ly = pos.y;
+    if (!isSrc) {
+      const cx = width / 2;
+      const cy = height / 2;
+      const dx = pos.x - cx;
+      const dy = pos.y - cy;
+      const d  = sqrt(dx * dx + dy * dy);
+      lx = pos.x + (dx / d) * 21;
+      ly = pos.y + (dy / d) * 21;
+    } else {
+      ly = pos.y + 26;
+    }
+
+    text(s.name, lx, ly);
+  }
+}
+
+// ── PARTICLE ──────────────────────────────────────────────────────────
+class Particle {
+  constructor(scattered = false) {
+    this.si     = 0;
+    this.maxAge = 0;
+    this.age    = 0;
+    this.sz     = 0;
+    this.vx     = 0;
+    this.vy     = 0;
+    this.x      = 0;
+    this.y      = 0;
+    this.trail  = [];
+    if (scattered) this.resetToScattered();
+    else           this.resetToState();
+  }
+
+  resetToScattered() {
+    this.si     = floor(random(8));
+    this.maxAge = random(320, 820);
+    this.age    = random(0, this.maxAge);
+    this.sz     = random(0.35, 1.55);
+    this.vx     = 0;
+    this.vy     = 0;
+    this.trail  = [];
+    const sp    = stagePos[this.si];
+    this.x      = sp.x + random(-70, 70);
+    this.y      = sp.y + random(-70, 70);
+  }
+
+  resetToState() {
+    this.si     = 0;
+    this.maxAge = random(320, 820);
+    this.age    = 0;
+    this.sz     = random(0.35, 1.55);
+    this.vx     = 0;
+    this.vy     = 0;
+    this.trail  = [];
+    const sp    = stagePos[0];
+    this.x      = sp.x + random(-22, 22);
+    this.y      = sp.y + random(-22, 22);
+  }
+
+  update() {
+    const tgt    = stagePos[this.si];
+    const dx     = tgt.x - this.x;
+    const dy     = tgt.y - this.y;
+    const dist   = sqrt(dx * dx + dy * dy);
+    const capR   = (this.si === 6) ? 16 : 30;
+
+    if (dist < capR) {
+      this.si = (this.si + 1) % 8;
+    }
+
+    // Stage behavior
+    let attrMod  = 1.0;
+    let noiseMod = 0.28;
+    if (this.si === 1) { attrMod = 0.50; noiseMod = 0.92; }
+    if (this.si === 2) { attrMod = 0.72; noiseMod = 0.42; }
+    if (this.si === 6) { attrMod = 2.65; noiseMod = 0.05; }
+    if (this.si === 7) { attrMod = 1.55; noiseMod = 0.18; }
+
+    // Noise field
+    const ns     = CFG.noiseScale;
+    const t      = frameCount * 0.0020;
+    const nAng   = noise(this.x * ns, this.y * ns, t) * TWO_PI * 3;
+    const attr   = CFG.attraction;
+
+    if (dist > 0) {
+      this.vx += (dx / dist) * attr * attrMod + cos(nAng) * noiseMod * attr;
+      this.vy += (dy / dist) * attr * attrMod + sin(nAng) * noiseMod * attr;
+    }
+
+    // Cursor repulsion — the void opens around the user
+    const cdx  = this.x - mouseX;
+    const cdy  = this.y - mouseY;
+    const cd   = sqrt(cdx * cdx + cdy * cdy);
+    if (cd < CFG.cursorRadius && cd > 0) {
+      const strength = ((CFG.cursorRadius - cd) / CFG.cursorRadius) * CFG.cursorForce;
+      this.vx += (cdx / cd) * strength;
+      this.vy += (cdy / cd) * strength;
+    }
+
+    // Speed cap
+    const spd  = sqrt(this.vx * this.vx + this.vy * this.vy);
+    const maxS = CFG.flowSpeed;
+    if (spd > maxS) {
+      this.vx = (this.vx / spd) * maxS;
+      this.vy = (this.vy / spd) * maxS;
+    }
+
+    this.vx *= 0.91;
+    this.vy *= 0.91;
+    this.x  += this.vx;
+    this.y  += this.vy;
+
+    this.trail.push({ x: this.x, y: this.y, si: this.si });
+    if (this.trail.length > CFG.trailLength) this.trail.shift();
+
+    this.age++;
+
+    const oob = (this.x < -60 || this.x > width + 60 || this.y < -60 || this.y > height + 60);
+    if (this.age > this.maxAge || oob) {
+      this.resetToState();
+    }
+  }
+
+  draw() {
+    const lifeT = 1 - this.age / this.maxAge;
+
+    for (let i = 1; i < this.trail.length; i++) {
+      const t   = i / this.trail.length;
+      const col = STAGES[this.trail[i].si].color;
+      stroke(col[0], col[1], col[2], t * 118 * lifeT);
+      strokeWeight(this.sz * t * 1.05);
+      line(this.trail[i - 1].x, this.trail[i - 1].y, this.trail[i].x, this.trail[i].y);
+    }
+
+    const col = STAGES[this.si].color;
+    fill(col[0], col[1], col[2], 190 * lifeT);
+    noStroke();
+    ellipse(this.x, this.y, this.sz * 2.3, this.sz * 2.3);
+  }
+}
+</script>
+</body>
+</html>
