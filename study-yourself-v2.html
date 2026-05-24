@@ -813,7 +813,7 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
   // ?dev=true bypasses the gate entirely for local testing.
   const devBypass = urlParams.get('dev') === 'true';
   if (!devBypass && !tokenValid && !sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) {
-    window.location.href = '/index.html';
+    window.location.href = '/study-yourself-landing.html';
     return;
   }
 
