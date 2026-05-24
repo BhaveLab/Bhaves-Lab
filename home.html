@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/assets/images/logo-primary.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhavé's Lab — A Place Where You Study Yourself</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+--obsidian: #080808;
+--deep: #0d0d0d;
+--charcoal: #1a1a1a;
+--smoke: #2a2a2a;
+--gold: #c9a96e;
+--gold-light: #e8c98a;
+--gold-dim: #8a6e3e;
+--ash: #888888;
+--mist: #cccccc;
+--white: #f5f3ef;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+background: var(--obsidian);
+color: var(--white);
+font-family: 'Tenor Sans', sans-serif;
+overflow-x: hidden;
+cursor: none;
+}
+
+.cursor {
+position: fixed;
+width: 8px;
+height: 8px;
+background: var(--gold);
+border-radius: 50%;
+pointer-events: none;
+z-index: 9999;
+transition: transform 0.1s ease;
+mix-blend-mode: difference;
+}
+.cursor-ring {
+position: fixed;
+width: 36px;
+height: 36px;
+border: 1px solid rgba(201,169,110,0.4);
+border-radius: 50%;
+pointer-events: none;
+z-index: 9998;
+transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), width 0.3s, height 0.3s;
+}
+.cursor-ring.hovering {
+width: 60px;
+height: 60px;
+border-color: var(--gold);
+}
+
+#cosmos {
+position: fixed;
+top: 0; left: 0;
+width: 100%; height: 100%;
+pointer-events: none;
+z-index: 1;
+}
+
+nav {
+position: fixed;
+top: 0; left: 0; right: 0;
+z-index: 100;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 2rem 4rem;
+}
+nav::before {
+content: '';
+position: absolute;
+inset: 0;
+background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+pointer-events: none;
+}
+.nav-logo {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.1rem;
+font-weight: 300;
+letter-spacing: 0.3em;
+color: var(--white);
+text-transform: uppercase;
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s ease 0.5s forwards;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links {
+display: flex;
+gap: 3rem;
+list-style: none;
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s ease 0.7s forwards;
+}
+.nav-links a {
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+letter-spacing: 0.2em;
+color: var(--ash);
+text-decoration: none;
+text-transform: uppercase;
+transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-cta {
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s ease 0.9s forwards;
+}
+.nav-cta a {
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+letter-spacing: 0.2em;
+color: var(--gold);
+text-decoration: none;
+text-transform: uppercase;
+border: 1px solid rgba(201,169,110,0.4);
+padding: 0.6rem 1.4rem;
+transition: all 0.3s;
+}
+.nav-cta a:hover {
+background: var(--gold);
+color: var(--obsidian);
+}
+
+/* HERO */
+.hero {
+position: relative;
+height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+z-index: 2;
+overflow: hidden;
+padding-top: 6rem;
+}
+.nebula {
+position: absolute;
+border-radius: 50%;
+pointer-events: none;
+filter: blur(80px);
+}
+.nebula-1 {
+width: 600px; height: 500px;
+background: radial-gradient(ellipse, rgba(201,169,110,0.07) 0%, transparent 70%);
+top: 10%; left: 20%;
+animation: nebulaDrift 18s ease-in-out infinite;
+}
+.nebula-2 {
+width: 500px; height: 400px;
+background: radial-gradient(ellipse, rgba(80,60,120,0.06) 0%, transparent 70%);
+top: 30%; right: 15%;
+animation: nebulaDrift 24s ease-in-out infinite reverse;
+}
+.nebula-3 {
+width: 400px; height: 350px;
+background: radial-gradient(ellipse, rgba(201,169,110,0.04) 0%, transparent 70%);
+bottom: 20%; left: 30%;
+animation: nebulaDrift 20s ease-in-out infinite 4s;
+}
+@keyframes nebulaDrift {
+0%, 100% { transform: translate(0,0) scale(1); opacity: 0.8; }
+33% { transform: translate(30px,-20px) scale(1.05); opacity: 1; }
+66% { transform: translate(-20px,15px) scale(0.97); opacity: 0.7; }
+}
+
+.ring-outer {
+position: absolute;
+width: 600px; height: 600px;
+border: 1px solid rgba(201,169,110,0.08);
+border-radius: 50%;
+animation: rotateSlow 40s linear infinite;
+}
+.ring-outer::before {
+content: '';
+position: absolute;
+top: -2px; left: 50%;
+width: 4px; height: 4px;
+background: var(--gold);
+border-radius: 50%;
+box-shadow: 0 0 12px var(--gold);
+transform: translateX(-50%);
+}
+.ring-inner {
+position: absolute;
+width: 420px; height: 420px;
+border: 1px solid rgba(201,169,110,0.05);
+border-radius: 50%;
+animation: rotateSlow 28s linear infinite reverse;
+}
+.ring-inner::before {
+content: '';
+position: absolute;
+bottom: -2px; left: 50%;
+width: 3px; height: 3px;
+background: rgba(201,169,110,0.6);
+border-radius: 50%;
+transform: translateX(-50%);
+}
+.ring-micro {
+position: absolute;
+width: 260px; height: 260px;
+border: 1px solid rgba(201,169,110,0.12);
+border-radius: 50%;
+animation: rotateSlow 18s linear infinite;
+}
+@keyframes rotateSlow {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+.hero-eyebrow {
+font-family: 'Space Mono', monospace;
+font-size: 0.6rem;
+letter-spacing: 0.4em;
+color: var(--gold);
+text-transform: uppercase;
+opacity: 0;
+animation: fadeUp 1s ease 1.2s forwards;
+margin-bottom: 2rem;
+position: relative;
+z-index: 5;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+content: '—';
+margin: 0 1rem;
+color: var(--gold-dim);
+}
+.hero-title {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(3.5rem, 8vw, 7.5rem);
+font-weight: 300;
+line-height: 1.0;
+letter-spacing: -0.01em;
+color: var(--white);
+position: relative;
+z-index: 5;
+opacity: 0;
+animation: fadeUp 1.2s ease 1.4s forwards;
+}
+.hero-title em { font-style: italic; color: var(--gold-light); }
+.hero-title .line-2 { display: block; padding-left: 3rem; }
+.hero-subtitle {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(1rem, 2vw, 1.35rem);
+font-weight: 300;
+font-style: italic;
+color: var(--ash);
+margin-top: 2rem;
+letter-spacing: 0.05em;
+position: relative;
+z-index: 5;
+opacity: 0;
+animation: fadeUp 1s ease 1.8s forwards;
+max-width: 480px;
+}
+.hero-divider {
+width: 1px; height: 60px;
+background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+margin: 2.5rem auto;
+position: relative;
+z-index: 5;
+opacity: 0;
+animation: fadeUp 1s ease 2s forwards;
+}
+.hero-cta-group {
+display: flex;
+gap: 1.5rem;
+align-items: center;
+position: relative;
+z-index: 5;
+opacity: 0;
+animation: fadeUp 1s ease 2.2s forwards;
+}
+.btn-primary {
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(--obsidian);
+background: var(--gold);
+padding: 1rem 2.5rem;
+text-decoration: none;
+display: inline-block;
+transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+position: relative;
+overflow: hidden;
+}
+.btn-primary::before {
+content: '';
+position: absolute;
+inset: 0;
+background: var(--gold-light);
+transform: translateX(-100%);
+transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+.btn-ghost {
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(--ash);
+text-decoration: none;
+padding: 1rem 0;
+border-bottom: 1px solid transparent;
+transition: all 0.3s;
+}
+.btn-ghost:hover { color: var(--white); border-color: var(--gold-dim); }
+
+.scroll-indicator {
+position: absolute;
+bottom: 2.5rem; left: 50%;
+transform: translateX(-50%);
+z-index: 5;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.5rem;
+opacity: 0;
+animation: fadeUp 1s ease 2.8s forwards;
+}
+.scroll-indicator span {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.3em;
+color: var(--ash);
+text-transform: uppercase;
+}
+.scroll-line {
+width: 1px; height: 40px;
+background: linear-gradient(to bottom, var(--gold-dim), transparent);
+animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+0%, 100% { opacity: 0.3; transform: scaleY(1); }
+50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* CONSOLE */
+.section-console {
+position: relative;
+z-index: 2;
+padding: 10rem 4rem;
+max-width: 1200px;
+margin: 0 auto;
+}
+.section-label {
+font-family: 'Space Mono', monospace;
+font-size: 0.6rem;
+letter-spacing: 0.4em;
+color: var(--gold-dim);
+text-transform: uppercase;
+margin-bottom: 1rem;
+}
+.section-heading {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(2.5rem, 5vw, 4.5rem);
+font-weight: 300;
+line-height: 1.1;
+color: var(--white);
+margin-bottom: 3rem;
+}
+.section-heading em { font-style: italic; color: var(--gold-light); }
+
+.console-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1px;
+background: rgba(201,169,110,0.1);
+margin-top: 5rem;
+}
+.console-item {
+background: var(--obsidian);
+padding: 3rem;
+position: relative;
+transition: background 0.4s;
+overflow: hidden;
+}
+.console-item::before {
+content: '';
+position: absolute;
+top: 0; left: 0;
+width: 100%; height: 2px;
+background: var(--gold);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.console-item:hover::before { transform: scaleX(1); }
+.console-item:hover { background: rgba(201,169,110,0.03); }
+.console-num {
+font-family: 'Space Mono', monospace;
+font-size: 0.55rem;
+color: var(--gold-dim);
+letter-spacing: 0.3em;
+margin-bottom: 1.5rem;
+}
+.console-title {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.5rem;
+font-weight: 300;
+color: var(--white);
+margin-bottom: 0.8rem;
+}
+.console-desc {
+font-family: 'Tenor Sans', sans-serif;
+font-size: 0.85rem;
+color: var(--ash);
+line-height: 1.8;
+}
+
+/* FRAMEWORK */
+.section-framework {
+position: relative;
+z-index: 2;
+padding: 8rem 4rem;
+background: var(--deep);
+}
+.framework-inner {
+max-width: 900px;
+margin: 0 auto;
+text-align: center;
+}
+.framework-nodes {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0;
+margin-top: 5rem;
+flex-wrap: wrap;
+}
+.node {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.8rem;
+cursor: none;
+}
+.node-circle {
+width: 64px; height: 64px;
+border: 1px solid rgba(201,169,110,0.3);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+transition: all 0.4s;
+}
+.node-circle::before {
+content: '';
+position: absolute;
+inset: -4px;
+border-radius: 50%;
+border: 1px solid transparent;
+transition: border-color 0.4s;
+}
+.node:hover .node-circle,
+.node.active .node-circle {
+background: rgba(201,169,110,0.08);
+border-color: var(--gold);
+}
+.node.active .node-circle {
+background: rgba(201,169,110,0.14);
+box-shadow: 0 0 20px rgba(201,169,110,0.15);
+}
+.node:hover .node-circle::before,
+.node.active .node-circle::before {
+border-color: rgba(201,169,110,0.2);
+}
+.node-dot {
+width: 6px; height: 6px;
+background: var(--gold);
+border-radius: 50%;
+box-shadow: 0 0 10px var(--gold);
+}
+.node-label {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.2em;
+color: var(--ash);
+text-transform: uppercase;
+text-align: center;
+max-width: 60px;
+transition: color 0.3s;
+}
+.node.active .node-label { color: var(--gold); }
+.node-connector {
+width: 40px; height: 1px;
+background: linear-gradient(to right, var(--gold-dim), rgba(201,169,110,0.3));
+margin-bottom: 2.2rem;
+}
+
+/* NODE DEFINITION PANEL */
+.node-def-panel {
+max-height: 0;
+overflow: hidden;
+transition: max-height 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+opacity: 0;
+margin-top: 3rem;
+}
+.node-def-panel.open {
+max-height: 400px;
+opacity: 1;
+}
+.node-def-inner {
+border: 1px solid rgba(201,169,110,0.15);
+padding: 2rem 2.5rem;
+text-align: center;
+position: relative;
+}
+.node-def-inner::before {
+content: '';
+position: absolute;
+top: 0; left: 50%;
+transform: translateX(-50%);
+width: 40px; height: 1px;
+background: var(--gold);
+}
+.node-def-label {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.3em;
+color: var(--gold);
+text-transform: uppercase;
+margin-bottom: 1rem;
+}
+.node-def-text {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.1rem;
+font-weight: 300;
+font-style: italic;
+color: var(--ash);
+line-height: 1.9;
+max-width: 520px;
+margin: 0 auto;
+}
+
+/* OFFERS */
+.section-offers {
+position: relative;
+z-index: 2;
+padding: 10rem 4rem;
+max-width: 1200px;
+margin: 0 auto;
+}
+.offers-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 2px;
+background: rgba(201,169,110,0.08);
+margin-top: 5rem;
+}
+.offer-card {
+background: var(--obsidian);
+padding: 3.5rem 2.5rem;
+position: relative;
+overflow: hidden;
+transition: all 0.4s;
+}
+.offer-card.featured { background: var(--charcoal); }
+.offer-card::after {
+content: '';
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at bottom left, rgba(201,169,110,0.05), transparent 60%);
+opacity: 0;
+transition: opacity 0.4s;
+pointer-events: none;
+}
+.offer-card:hover::after { opacity: 1; }
+.offer-tag {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.3em;
+color: var(--gold);
+text-transform: uppercase;
+margin-bottom: 2rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+.offer-tag::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+.offer-name {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.8rem;
+font-weight: 300;
+color: var(--white);
+line-height: 1.2;
+margin-bottom: 1.5rem;
+}
+.offer-desc {
+font-size: 0.82rem;
+color: var(--ash);
+line-height: 1.9;
+margin-bottom: 2.5rem;
+}
+.offer-price {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.1rem;
+color: var(--gold-light);
+margin-bottom: 2rem;
+font-style: italic;
+}
+.offer-link {
+font-family: 'Space Mono', monospace;
+font-size: 0.6rem;
+letter-spacing: 0.2em;
+color: var(--ash);
+text-decoration: none;
+text-transform: uppercase;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+transition: color 0.3s;
+}
+.offer-link::after { content: '→'; transition: transform 0.3s; }
+.offer-link:hover { color: var(--gold); }
+.offer-link:hover::after { transform: translateX(4px); }
+
+/* DIGITAL TOOLS SECTION */
+.section-digital {
+position: relative;
+z-index: 2;
+padding: 10rem 4rem;
+background: var(--deep);
+}
+.digital-inner {
+max-width: 1200px;
+margin: 0 auto;
+}
+.digital-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2px;
+background: rgba(201,169,110,0.08);
+margin-top: 5rem;
+}
+.digital-card {
+background: var(--obsidian);
+padding: 3.5rem 2.5rem;
+position: relative;
+overflow: hidden;
+transition: background 0.4s;
+text-decoration: none;
+color: var(--white);
+display: block;
+cursor: none;
+}
+.digital-card::before {
+content: '';
+position: absolute;
+top: 0; left: 0;
+width: 100%; height: 2px;
+background: var(--gold);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.digital-card:hover::before { transform: scaleX(1); }
+.digital-card:hover { background: rgba(201,169,110,0.03); }
+.digital-tag {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.3em;
+color: var(--gold);
+text-transform: uppercase;
+margin-bottom: 2rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+.digital-tag::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+.digital-name {
+font-family: 'Cormorant Garamond', serif;
+font-size: 2rem;
+font-weight: 300;
+color: var(--white);
+line-height: 1.2;
+margin-bottom: 1.5rem;
+}
+.digital-name em { font-style: italic; color: var(--gold-light); }
+.digital-desc {
+font-size: 0.82rem;
+color: var(--ash);
+line-height: 1.9;
+margin-bottom: 2.5rem;
+}
+.digital-price {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.1rem;
+color: var(--gold-light);
+margin-bottom: 2rem;
+font-style: italic;
+}
+.digital-link {
+font-family: 'Space Mono', monospace;
+font-size: 0.6rem;
+letter-spacing: 0.2em;
+color: var(--ash);
+text-transform: uppercase;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+transition: color 0.3s;
+}
+.digital-link::after { content: '→'; transition: transform 0.3s; }
+.digital-card:hover .digital-link { color: var(--gold); }
+.digital-card:hover .digital-link::after { transform: translateX(4px); }
+
+/* WORKSHOPS SECTION */
+.section-workshops {
+position: relative;
+z-index: 2;
+padding: 10rem 4rem;
+max-width: 1200px;
+margin: 0 auto;
+}
+.workshop-card {
+margin-top: 5rem;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1px;
+background: rgba(201,169,110,0.1);
+}
+.workshop-left {
+background: var(--obsidian);
+padding: 4rem;
+position: relative;
+overflow: hidden;
+}
+.workshop-left::before {
+content: '';
+position: absolute;
+top: 0; left: 0;
+width: 2px; height: 100%;
+background: linear-gradient(to bottom, var(--gold), transparent);
+}
+.workshop-num {
+font-family: 'Space Mono', monospace;
+font-size: 0.5rem;
+letter-spacing: 0.3em;
+color: var(--gold-dim);
+text-transform: uppercase;
+margin-bottom: 1.5rem;
+}
+.workshop-name {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(2rem, 4vw, 3rem);
+font-weight: 300;
+color: var(--white);
+line-height: 1.1;
+margin-bottom: 2rem;
+}
+.workshop-name em { font-style: italic; color: var(--gold-light); }
+.workshop-desc {
+font-size: 0.85rem;
+color: var(--ash);
+line-height: 2;
+margin-bottom: 2.5rem;
+max-width: 420px;
+}
+.workshop-cta {
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(--obsidian);
+background: var(--gold);
+padding: 1rem 2.5rem;
+text-decoration: none;
+display: inline-block;
+transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+position: relative;
+overflow: hidden;
+cursor: none;
+}
+.workshop-cta::before {
+content: '';
+position: absolute;
+inset: 0;
+background: var(--gold-light);
+transform: translateX(-100%);
+transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.workshop-cta:hover::before { transform: translateX(0); }
+.workshop-cta span { position: relative; z-index: 1; }
+
+.workshop-right {
+background: var(--charcoal);
+padding: 4rem;
+display: flex;
+flex-direction: column;
+gap: 2rem;
+}
+.workshop-detail {
+border-bottom: 1px solid rgba(201,169,110,0.08);
+padding-bottom: 1.5rem;
+}
+.workshop-detail:last-child { border-bottom: none; padding-bottom: 0; }
+.workshop-detail-label {
+font-family: 'Space Mono', monospace;
+font-size: 0.48rem;
+letter-spacing: 0.3em;
+color: var(--gold-dim);
+text-transform: uppercase;
+margin-bottom: 0.5rem;
+}
+.workshop-detail-value {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1.1rem;
+font-weight: 300;
+color: var(--white);
+font-style: italic;
+}
+.workshop-detail-sub {
+font-size: 0.78rem;
+color: var(--ash);
+margin-top: 0.3rem;
+line-height: 1.7;
+}
+
+/* REALM TEASER */
+.section-realm {
+position: relative;
+z-index: 2;
+padding: 10rem 4rem;
+text-align: center;
+overflow: hidden;
+}
+.realm-bg {
+position: absolute;
+inset: 0;
+background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201,169,110,0.04) 0%, transparent 70%), var(--deep);
+}
+.realm-ring-1 {
+position: absolute;
+width: 800px; height: 800px;
+border: 1px solid rgba(201,169,110,0.04);
+border-radius: 50%;
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+animation: rotateSlow 60s linear infinite;
+}
+.realm-ring-2 {
+position: absolute;
+width: 560px; height: 560px;
+border: 1px solid rgba(201,169,110,0.06);
+border-radius: 50%;
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+animation: rotateSlow 40s linear infinite reverse;
+}
+.realm-content {
+position: relative;
+z-index: 2;
+max-width: 600px;
+margin: 0 auto;
+}
+.realm-title {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(2.5rem, 5vw, 4rem);
+font-weight: 300;
+font-style: italic;
+color: var(--white);
+margin: 2rem 0;
+letter-spacing: 0.05em;
+}
+.realm-desc {
+font-family: 'Cormorant Garamond', serif;
+font-style: italic;
+font-size: 1.1rem;
+color: var(--ash);
+line-height: 2;
+margin-bottom: 3rem;
+}
+.realm-input-group {
+display: flex;
+max-width: 400px;
+margin: 0 auto;
+border: 1px solid rgba(201,169,110,0.2);
+}
+.realm-input {
+flex: 1;
+background: transparent;
+border: none;
+padding: 1rem 1.5rem;
+font-family: 'Space Mono', monospace;
+font-size: 0.65rem;
+color: var(--white);
+letter-spacing: 0.1em;
+outline: none;
+}
+.realm-input::placeholder { color: var(--smoke); }
+.realm-btn {
+background: var(--gold);
+border: none;
+padding: 1rem 1.5rem;
+font-family: 'Space Mono', monospace;
+font-size: 0.6rem;
+letter-spacing: 0.2em;
+color: var(--obsidian);
+text-transform: uppercase;
+cursor: none;
+transition: background 0.3s;
+}
+.realm-btn:hover { background: var(--gold-light); }
+
+/* FOOTER */
+footer {
+position: relative;
+z-index: 2;
+padding: 4rem;
+border-top: 1px solid rgba(201,169,110,0.1);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.footer-logo {
+font-family: 'Cormorant Garamond', serif;
+font-size: 1rem;
+font-weight: 300;
+letter-spacing: 0.3em;
+color: var(--ash);
+}
+.footer-logo span { color: var(--gold); }
+.footer-copy {
+font-family: 'Space Mono', monospace;
+font-size: 0.55rem;
+color: var(--smoke);
+letter-spacing: 0.15em;
+}
+.footer-links {
+display: flex;
+gap: 2rem;
+list-style: none;
+}
+.footer-links a {
+font-family: 'Space Mono', monospace;
+font-size: 0.55rem;
+letter-spacing: 0.2em;
+color: var(--ash);
+text-decoration: none;
+text-transform: uppercase;
+transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--gold); }
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(24px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.grain {
+position: fixed;
+inset: 0;
+z-index: 0;
+pointer-events: none;
+opacity: 0.025;
+background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+background-repeat: repeat;
+background-size: 128px;
+mix-blend-mode: overlay;
+}
+
+.reveal {
+opacity: 0;
+transform: translateY(32px);
+transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+nav { padding: 1.5rem 2rem; }
+.nav-links { display: none; }
+.section-console, .section-offers, .section-digital, .section-workshops, .section-realm { padding: 6rem 2rem; }
+.console-grid, .offers-grid, .digital-grid, .workshop-card { grid-template-columns: 1fr; }
+footer { flex-direction: column; gap: 2rem; text-align: center; }
+.framework-nodes { gap: 0; }
+.node-connector { width: 20px; }
+}
+</style>
+<script src="/i18n/i18n.js" defer></script>
+<script src="/i18n/strings.en.js" defer></script>
+<script src="/i18n/strings.es.js" defer></script>
+<script src="/i18n/strings.pt.js" defer></script>
+<script src="/i18n/strings.fr.js" defer></script>
+<script src="/lang-switcher.js" defer></script>
+
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<canvas id="cosmos"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">Bhav<span>é</span>'s Lab</a>
+  <ul class="nav-links">
+    <li><a href="#work">The Work</a></li>
+    <li><a href="#framework">Framework</a></li>
+    <li><a href="#workshops">Workshops</a></li>
+    <li><a href="#realm">The Realm</a></li>
+  </ul>
+  <div class="nav-cta"><a href="https://calendly.com/bhaveslab/30min" target="_blank">Book a Session</a></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+  <div class="ring-outer"></div>
+  <div class="ring-inner"></div>
+  <div class="ring-micro"></div>
+
+  <p class="hero-eyebrow">Bhavé's Lab</p>
+  <h1 class="hero-title">
+    A place where<br>
+    you <em>study</em>
+    <span class="line-2">yourself.</span>
+  </h1>
+  <p class="hero-subtitle">Through structured awareness and real-time reflection.</p>
+  <div class="hero-divider"></div>
+  <div class="hero-cta-group">
+    <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-primary"><span>Book a Study Session</span></a>
+    <a href="#framework" class="btn-ghost">See the Framework</a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- THE CONSOLE -->
+<section class="section-console" id="work">
+  <p class="section-label reveal">The Console</p>
+  <h2 class="section-heading reveal">The Lab operates<br>from a <em>full console.</em></h2>
+
+  <div class="console-grid">
+    <div class="console-item reveal">
+      <p class="console-num">01 — Framework</p>
+      <h3 class="console-title">The Pattern Map</h3>
+      <p class="console-desc">State → Perception → Formation → Decision → Experience → Reality. Every pattern you carry lives somewhere in this sequence. The Lab finds it.</p>
+    </div>
+    <div class="console-item reveal">
+      <p class="console-num">02 — Hypnosis</p>
+      <h3 class="console-title">Deep Reprogramming</h3>
+      <p class="console-desc">Accessing the substructure beneath conscious thought. Where the pattern was written is where it must be rewritten.</p>
+    </div>
+    <div class="console-item reveal">
+      <p class="console-num">03 — HeartMath</p>
+      <h3 class="console-title">Coherence Training</h3>
+      <p class="console-desc">Real-time biofeedback that shows you when your heart and nervous system are in alignment — and trains you to find that state on command.</p>
+    </div>
+    <div class="console-item reveal">
+      <p class="console-num">04 — Muse + Bio Well</p>
+      <h3 class="console-title">Brainwave & Energy Mapping</h3>
+      <p class="console-desc">See your brain states and energy field during session. Not theory — live data about what is actually happening inside you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FRAMEWORK -->
+<section class="section-framework" id="framework">
+  <div class="framework-inner">
+    <p class="section-label reveal">The Architecture</p>
+    <h2 class="section-heading reveal">Your reality is not random.<br>It follows a <em>sequence.</em></h2>
+    <p class="reveal" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ash);line-height:2;font-style:italic;max-width:560px;margin:0 auto;">Change happens at the level of State. Not at the level of behavior. The Lab works where the pattern actually originates.</p>
+
+    <div class="framework-nodes reveal">
+
+      <div class="node" data-label="State" data-def="The operating condition of the system before interpretation begins. Not a mood. Not a feeling. The ground everything else is built on.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">State</span>
+      </div>
+      <div class="node-connector"></div>
+
+      <div class="node" data-label="Perception" data-def="The reading of what State has produced, processed through a lens built from what has already happened. Not sight. Not direct contact. The archive rendering itself as the present.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">Perception</span>
+      </div>
+      <div class="node-connector"></div>
+
+      <div class="node" data-label="Formation" data-def="The layer where meaning is assigned before the man is aware he is assigning it. It produces the thought that feels obvious. It decides what the decision will execute. It runs below the conversation.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">Formation</span>
+      </div>
+      <div class="node-connector"></div>
+
+      <div class="node" data-label="Decision" data-def="The behavioral execution of whatever Formation produced. Not a free choice. The system's conclusion, delivered to consciousness as though the man arrived at it himself.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">Decision</span>
+      </div>
+      <div class="node-connector"></div>
+
+      <div class="node" data-label="Experience" data-def="The output of the sequence. Not what happened. What the system generated from what it was told happened. Always downstream of State.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">Experience</span>
+      </div>
+      <div class="node-connector"></div>
+
+      <div class="node" data-label="Reality" data-def="The feedback the sequence produces after long enough repetition. Not truth. Not fixed. What unexamined architecture looks like from the inside when it has been practiced into invisibility.">
+        <div class="node-circle"><div class="node-dot"></div></div>
+        <span class="node-label">Reality</span>
+      </div>
+
+    </div>
+
+    <!-- Definition panel — populated by JS -->
+    <div class="node-def-panel" id="nodeDefPanel">
+      <div class="node-def-inner">
+        <p class="node-def-label" id="nodeDefLabel"></p>
+        <p class="node-def-text" id="nodeDefText"></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- OFFERS -->
+<section class="section-offers" id="session">
+  <p class="section-label reveal">Where To Begin</p>
+  <h2 class="section-heading reveal">The Lab meets you <em>where the pattern lives.</em></h2>
+
+  <div class="offers-grid">
+    <div class="offer-card reveal">
+      <p class="offer-tag">Entry</p>
+      <h3 class="offer-name">The Study Session</h3>
+      <p class="offer-desc">90 minutes. One pattern. You leave knowing exactly what is driving the experience you keep having — and what the next true move is.</p>
+      <p class="offer-price">$225</p>
+      <a href="study-session.html" class="offer-link">Learn More</a>
+    </div>
+    <div class="offer-card reveal">
+      <p class="offer-tag">Inner Mining</p>
+      <h3 class="offer-name">Hypnosis-based pattern work</h3>
+      <p class="offer-desc">Accessing the substructure beneath conscious thought. Where the pattern was written is where it must be rewritten.</p>
+      <p class="offer-price">From $500</p>
+      <a href="hypnosis.html" class="offer-link">Learn More</a>
+    </div>
+    <div class="offer-card featured reveal">
+      <p class="offer-tag">Core Program</p>
+      <h3 class="offer-name">Pattern Immersion</h3>
+      <p class="offer-desc">4–6 weeks. Framework mapping, hypnosis, and live biofeedback working as one continuous process. This is not understanding a pattern. This is moving through it.</p>
+      <p class="offer-price">From $2,400</p>
+      <a href="pattern-immersion.html" class="offer-link">Learn More</a>
+    </div>
+    <div class="offer-card reveal">
+      <p class="offer-tag">Group</p>
+      <h3 class="offer-name">The Lab Workshop</h3>
+      <p class="offer-desc">Pop-up, one-off sessions open to anyone. Live Q&A, HeartMath demos, Muse brainwave readings, Bio-Well energy mapping. See the tools in action before committing to a full session.</p>
+      <p class="offer-price">From $75</p>
+      <a href="events.html" class="offer-link">See Upcoming</a>
+    </div>
+  </div>
+</section>
+
+<!-- DIGITAL TOOLS -->
+<section class="section-digital" id="digital">
+  <div class="digital-inner">
+    <p class="section-label reveal">The Digital Layer</p>
+    <h2 class="section-heading reveal">The work continues <em>between sessions.</em></h2>
+
+    <div class="digital-grid">
+      <div class="digital-card reveal" id="sy-card">
+        <p class="digital-tag">The Study</p>
+        <h3 class="digital-name">Study <em>Yourself</em></h3>
+        <p class="digital-desc">Ten sections. One framework. A structured move through the full sequence — State to Reality — using your own life as the material. Self-directed. No session required.</p>
+        <p class="digital-price">$25 — one time</p>
+        <a href="https://buy.stripe.com/aFafZa8AsaxYgrI8JdbQY0a" class="digital-link">Get Access</a>
+      </div>
+      <a href="consciousness-mirror.html" class="digital-card reveal">
+        <p class="digital-tag">$1 per session</p>
+        <h3 class="digital-name">Consciousness <em>Mirror</em></h3>
+        <p class="digital-desc">A real-time reflection environment. Enter what is present. The system reflects your own patterns back without interpretation or instruction. No sign-in required.</p>
+        <p class="digital-price">$1</p>
+        <span class="digital-link">Enter</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PAYWALL MODAL -->
+<div id="paywall" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+  <div style="width:min(480px,92vw);border:1px solid rgba(201,169,110,0.2);background:#0d0d0d;padding:52px 48px;text-align:center;position:relative;">
+    <button id="pw-close" style="position:absolute;top:18px;right:22px;background:none;border:none;color:#888;font-size:20px;cursor:none;line-height:1;transition:color .2s;" onmouseover="this.style.color='#f5f3ef'" onmouseout="this.style.color='#888'">×</button>
+    <p style="font-family:'Space Mono',monospace;font-size:0.5rem;letter-spacing:.3em;text-transform:uppercase;color:#c9a96e;margin-bottom:2rem;">Where would you like to go?</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <a href="consciousness-mirror.html" style="display:block;width:100%;padding:16px;background:#c9a96e;border:1px solid #c9a96e;color:#080808;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:.22em;text-transform:uppercase;box-sizing:border-box;text-align:center;text-decoration:none;">Enter the Mirror</a>
+      <a href="study-yourself-v2.html" style="display:block;width:100%;padding:16px;background:transparent;border:1px solid rgba(201,169,110,0.4);color:#c9a96e;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:.22em;text-transform:uppercase;box-sizing:border-box;text-align:center;text-decoration:none;">Study Yourself</a>
+      <a href="index.html" style="display:block;width:100%;padding:16px;background:transparent;border:1px solid rgba(201,169,110,0.4);color:#c9a96e;font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:.22em;text-transform:uppercase;box-sizing:border-box;text-align:center;text-decoration:none;">Enter the Realm</a>
+    </div>
+  </div>
+</div>
+
+<!-- WORKSHOPS -->
+<section class="section-workshops" id="workshops">
+  <p class="section-label reveal">Live Experiences</p>
+  <h2 class="section-heading reveal">The framework, <em>in the room.</em></h2>
+
+  <div class="workshop-card reveal">
+    <div class="workshop-left">
+      <p class="workshop-num">Workshop I</p>
+      <h3 class="workshop-name">The Gospel <em>Workshop</em></h3>
+      <p class="workshop-desc">A live experience built around one question: what is actually running underneath your life right now. Workshop I is where the sequence becomes visible. Two days. Small group. No performance — only observation.</p>
+      <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="workshop-cta"><span>Apply for a Spot</span></a>
+    </div>
+    <div class="workshop-right">
+      <div class="workshop-detail">
+        <p class="workshop-detail-label">Investment</p>
+        <p class="workshop-detail-value">$1,500</p>
+        <p class="workshop-detail-sub">All-inclusive. You cover airfare only.</p>
+      </div>
+      <div class="workshop-detail">
+        <p class="workshop-detail-label">Format</p>
+        <p class="workshop-detail-value">2-Day Immersion</p>
+        <p class="workshop-detail-sub">6 meals. Luxury accommodations. Full environment provided.</p>
+      </div>
+      <div class="workshop-detail">
+        <p class="workshop-detail-label">Experience</p>
+        <p class="workshop-detail-value">Small Group</p>
+        <p class="workshop-detail-sub">Framework mapping, live observation, and real-time pattern work. Collective and personal at once.</p>
+      </div>
+      <div class="workshop-detail">
+        <p class="workshop-detail-label">Dates</p>
+        <p class="workshop-detail-value">Contact to Inquire</p>
+        <p class="workshop-detail-sub">Availability is limited. Apply to receive current schedule.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REALM TEASER -->
+<section class="section-realm" id="realm">
+  <div class="realm-bg"></div>
+  <div class="realm-ring-1"></div>
+  <div class="realm-ring-2"></div>
+
+  <div class="realm-content">
+    <p class="section-label reveal">Enter</p>
+    <h2 class="realm-title reveal">The Realm</h2>
+    <p class="realm-desc reveal">The digital layer of the Lab. Where the work continues between sessions — and eventually, on its own terms. Something is being built here.</p>
+    <div class="realm-input-group reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="consciousness-mirror.html" class="realm-btn" style="text-decoration:none;display:inline-block;">Enter the Mirror</a>
+      <a href="index.html" class="realm-btn" style="text-decoration:none;display:inline-block;background:transparent;border:1px solid var(--gold);color:var(--gold);">Enter the Realm</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Bhav<span>é</span>'s Lab</div>
+  <p class="footer-copy">© 2026 Bhavé's Lab LLC — Everywhere it is needed</p>
+  <ul class="footer-links">
+    <li><a href="#session">Sessions</a></li>
+    <li><a href="#workshops">Workshops</a></li>
+    <li><a href="#realm">The Realm</a></li>
+    <li><a href="mailto:hello@bhaveslab.com">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursor.style.left = mouseX - 4 + 'px';
+  cursor.style.top = mouseY - 4 + 'px';
+});
+
+function animateRing() {
+  ringX += (mouseX - ringX - 18) * 0.12;
+  ringY += (mouseY - ringY - 18) * 0.12;
+  ring.style.left = ringX + 'px';
+  ring.style.top = ringY + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .console-item, .offer-card, .node, .digital-card, .workshop-cta').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
+});
+
+// COSMOS ENGINE
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [], shooters = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  initStars();
+}
+
+function initStars() {
+  stars = [];
+  const count = Math.floor((W * H) / 6000);
+  for (let i = 0; i < count; i++) {
+    const isGold = Math.random() < 0.18;
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.2,
+      baseOpacity: Math.random() * 0.5 + 0.1,
+      opacity: 0,
+      pulseSpeed: Math.random() * 0.8 + 0.3,
+      pulseOffset: Math.random() * Math.PI * 2,
+      gold: isGold,
+      twinkle: Math.random() * 0.4 + 0.3
+    });
+  }
+}
+
+function spawnShooter() {
+  const angle = (Math.random() * 30 + 15) * (Math.PI / 180);
+  const startX = Math.random() * W * 0.7;
+  const startY = Math.random() * H * 0.4;
+  const speed = Math.random() * 6 + 5;
+  const isGold = Math.random() < 0.3;
+  shooters.push({
+    x: startX, y: startY,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    length: Math.random() * 180 + 80,
+    opacity: 1,
+    trail: [],
+    gold: isGold,
+    life: 1,
+    decay: Math.random() * 0.015 + 0.012
+  });
+}
+
+setInterval(() => { if (Math.random() < 0.7) spawnShooter(); }, 2200);
+setInterval(() => {
+  const burst = Math.floor(Math.random() * 2) + 1;
+  for (let i = 0; i < burst; i++) setTimeout(spawnShooter, i * 180);
+}, 8000);
+
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+
+  stars.forEach(s => {
+    const pulse = Math.sin(t * s.pulseSpeed + s.pulseOffset);
+    s.opacity = s.baseOpacity + pulse * s.twinkle * 0.4;
+    s.opacity = Math.max(0.02, Math.min(1, s.opacity));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    if (s.gold) {
+      ctx.fillStyle = `rgba(201,169,110,${s.opacity})`;
+      if (s.opacity > 0.5 && s.r > 0.9) { ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(201,169,110,0.5)'; }
+    } else {
+      ctx.fillStyle = `rgba(237,232,224,${s.opacity * 0.7})`;
+      ctx.shadowBlur = 0;
+    }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+
+  shooters = shooters.filter(s => s.life > 0);
+  shooters.forEach(s => {
+    s.trail.push({ x: s.x, y: s.y });
+    if (s.trail.length > 22) s.trail.shift();
+    s.x += s.vx; s.y += s.vy; s.life -= s.decay;
+    if (s.trail.length < 2) return;
+    const color = s.gold ? '201,169,110' : '237,232,224';
+    for (let i = 1; i < s.trail.length; i++) {
+      const prog = i / s.trail.length;
+      const alpha = prog * s.life * (s.gold ? 0.9 : 0.6);
+      ctx.beginPath();
+      ctx.moveTo(s.trail[i-1].x, s.trail[i-1].y);
+      ctx.lineTo(s.trail[i].x, s.trail[i].y);
+      ctx.strokeStyle = `rgba(${color},${alpha})`;
+      ctx.lineWidth = prog * 2.2;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.gold ? 2 : 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${color},${s.life * (s.gold ? 1 : 0.8)})`;
+    if (s.gold) { ctx.shadowBlur = 12; ctx.shadowColor = `rgba(${color},0.8)`; }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+
+  requestAnimationFrame(ts => draw(ts / 1000));
+}
+
+resize();
+window.addEventListener('resize', resize);
+draw(0);
+setTimeout(spawnShooter, 800);
+setTimeout(spawnShooter, 1800);
+setTimeout(spawnShooter, 3200);
+
+// FRAMEWORK NODES — click to expand definition
+const nodes = document.querySelectorAll('.node');
+const defPanel = document.getElementById('nodeDefPanel');
+const defLabel = document.getElementById('nodeDefLabel');
+const defText  = document.getElementById('nodeDefText');
+let activeNode = null;
+
+nodes.forEach(node => {
+  node.addEventListener('click', () => {
+    if (activeNode === node) {
+      node.classList.remove('active');
+      defPanel.classList.remove('open');
+      activeNode = null;
+      return;
+    }
+    nodes.forEach(n => n.classList.remove('active'));
+    node.classList.add('active');
+    defLabel.textContent = node.dataset.label;
+    defText.textContent  = node.dataset.def;
+    defPanel.classList.add('open');
+    activeNode = node;
+  });
+});
+
+// STUDY YOURSELF — paywall modal
+const syCard  = document.getElementById('sy-card');
+const paywall = document.getElementById('paywall');
+const pwClose = document.getElementById('pw-close');
+
+syCard.addEventListener('click', () => {
+  paywall.style.display = 'flex';
+});
+pwClose.addEventListener('click', () => {
+  paywall.style.display = 'none';
+});
+paywall.addEventListener('click', e => {
+  if (e.target === paywall) paywall.style.display = 'none';
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') paywall.style.display = 'none';
+});
+
+// SCROLL REVEAL
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// STUDY YOURSELF WAITLIST
+function submitSyWaitlist() {
+  const input = document.getElementById('sy-waitlist-email');
+  const msg   = document.getElementById('sy-waitlist-msg');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) { msg.textContent = 'Enter a valid email.'; return; }
+  msg.textContent = '...';
+  fetch('https://bhaveslab-backend.vercel.app/api/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, source: 'study-yourself-waitlist' })
+  })
+  .then(() => { msg.textContent = "You're on the list."; input.value = ''; })
+  .catch(() => { msg.textContent = 'Something went wrong — try again.'; });
+}
+</script>
+<script>
+(function() {
+  function applyI18n() {
+    // Guard: bail if BhaveI18n isn't loaded or has no strings registered yet.
+    // This leaves the original hardcoded text intact as the fallback so the
+    // page never shows raw key names (e.g. heroEyebrow, heroH1).
+    if (!window.BhaveI18n || typeof window.BhaveI18n.t !== 'function') return;
+    if (!window.BhaveI18n.available || !window.BhaveI18n.available().length) return;
+    var t = window.BhaveI18n.t.bind(window.BhaveI18n);
+    var q = function(sel) { return document.querySelector(sel); };
+    var set = function(sel, val, html) { var el=q(sel); if(el && val){ if(html) el.innerHTML=val; else el.textContent=val; } };
+
+    // nav
+    set('.nav-cta a', t('nav.bookSession'));
+
+    // hero
+    set('.hero-eyebrow', t('home.heroEyebrow'));
+    set('.hero-title', t('home.heroH1'), true);
+    set('.hero-subtitle', t('home.heroSubtitle'));
+    set('.btn-primary span', t('home.ctaPrimary'));
+    set('.btn-ghost', t('home.ctaGhost'));
+
+    // console
+    set('.section-console .section-label', t('home.consoleLabel'));
+    set('.section-console .section-heading', t('home.consoleH2'), true);
+    var consoleItems = document.querySelectorAll('.console-item');
+    if(consoleItems[0]){ consoleItems[0].querySelector('.console-num').textContent=t('home.console01Num'); consoleItems[0].querySelector('.console-title').textContent=t('home.console01Title'); consoleItems[0].querySelector('.console-desc').textContent=t('home.console01Desc'); }
+    if(consoleItems[1]){ consoleItems[1].querySelector('.console-num').textContent=t('home.console02Num'); consoleItems[1].querySelector('.console-title').textContent=t('home.console02Title'); consoleItems[1].querySelector('.console-desc').textContent=t('home.console02Desc'); }
+    if(consoleItems[2]){ consoleItems[2].querySelector('.console-num').textContent=t('home.console03Num'); consoleItems[2].querySelector('.console-title').textContent=t('home.console03Title'); consoleItems[2].querySelector('.console-desc').textContent=t('home.console03Desc'); }
+    if(consoleItems[3]){ consoleItems[3].querySelector('.console-num').textContent=t('home.console04Num'); consoleItems[3].querySelector('.console-title').textContent=t('home.console04Title'); consoleItems[3].querySelector('.console-desc').textContent=t('home.console04Desc'); }
+
+    // framework
+    set('.section-framework .section-label', t('home.frameworkLabel'));
+    set('.section-framework .section-heading', t('home.frameworkH2'), true);
+    set('.section-framework p[style]', t('home.frameworkSub'));
+
+    // offers
+    set('.section-offers .section-label', t('home.offersLabel'));
+    set('.section-offers .section-heading', t('home.offersH2'), true);
+  }
+  function safeApply() { try { applyI18n(); } catch(e) { console.warn('[i18n]', e); } }
+  window.__i18nPatch = safeApply;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', safeApply);
+  } else {
+    safeApply();
+  }
+  document.addEventListener('bhave:languageChanged', safeApply);
+})();
+</script>
+
+</body>
+</html>
