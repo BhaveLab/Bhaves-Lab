@@ -230,8 +230,8 @@ new p5(function(p) {
     let m = Math.min(W,H); innerR = m*0.27; outerR = m*0.44;
     _innerR = innerR;
     for (let i=0;i<120;i++) bgParticles.push({ x:p.random(W), y:p.random(H), vx:p.random(-0.15,0.15), vy:p.random(-0.15,0.15), sz:p.random(0.3,1.2), alpha:p.random(8,35), col:p.random()>0.5?[201,168,76]:[78,205,196] });
-    for (let i=0;i<60;i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(10,55) });
-    for (let i=0;i<50;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.4), al:p.random(5,30) }); }
+    for (let i=0;i<120;i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(10,55) });
+    for (let i=0;i<120;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
   };
 
   p.windowResized = function() {
@@ -240,18 +240,18 @@ new p5(function(p) {
     let m=Math.min(W,H); innerR=m*0.27; outerR=m*0.44;
     _innerR = innerR;
     streamParticles = [];
-    for (let i=0;i<50;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.4), al:p.random(5,30) }); }
+    for (let i=0;i<120;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
   };
 
   p.draw = function() {
     p.background(8,8,8,30); t+=0.006;
     for (let bp of bgParticles) { bp.x+=bp.vx; bp.y+=bp.vy; if(bp.x<0)bp.x=W; if(bp.x>W)bp.x=0; if(bp.y<0)bp.y=H; if(bp.y>H)bp.y=0; p.noStroke(); p.fill(bp.col[0],bp.col[1],bp.col[2],bp.alpha); p.ellipse(bp.x,bp.y,bp.sz,bp.sz); }
     for (let s of twinkleStars) { let a=(p.sin(t*s.spd+s.phase)*0.5+0.5)*s.base; p.noStroke(); p.fill(201,168,76,a); p.ellipse(s.x,s.y,s.sz,s.sz); }
-    if(p.random()<0.004) { let ang=p.random(p.TWO_PI), spd=p.random(8,20); shootingStars.push({x:cx+p.random(-W*0.48,W*0.48),y:cy+p.random(-H*0.48,H*0.48),vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:0,maxLife:Math.floor(p.random(22,52)),len:p.random(45,130)}); }
+    if(p.random()<0.014) { let ang=p.random(p.TWO_PI), spd=p.random(8,20); shootingStars.push({x:cx+p.random(-W*0.48,W*0.48),y:cy+p.random(-H*0.48,H*0.48),vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:0,maxLife:Math.floor(p.random(22,52)),len:p.random(45,130)}); }
     for(let i=shootingStars.length-1;i>=0;i--) { let s=shootingStars[i]; let al=(1-s.life/s.maxLife)*150; p.stroke(228,210,130,al); p.strokeWeight(0.7); let tailLen=s.len*(s.life/s.maxLife); p.line(s.x,s.y,s.x-s.vx*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5),s.y-s.vy*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5)); s.x+=s.vx; s.y+=s.vy; s.life++; if(s.life>=s.maxLife)shootingStars.splice(i,1); }
     for (let s of streamParticles) { s.a+=s.da; p.noStroke(); p.fill(201,168,76,s.al); p.ellipse(cx+s.r*Math.cos(s.a),cy+s.r*Math.sin(s.a),s.sz,s.sz); }
-    p.noFill(); p.stroke(201,168,76,10); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
-    p.stroke(78,205,196,7); p.ellipse(cx,cy,outerR*2,outerR*2);
+    p.noFill(); p.stroke(201,168,76,6); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
+    p.stroke(78,205,196,4); p.ellipse(cx,cy,outerR*2,outerR*2);
     let p2=p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
     let p1=p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
     p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
