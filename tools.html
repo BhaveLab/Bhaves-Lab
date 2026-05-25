@@ -209,6 +209,15 @@ const OUTER_PLANETS = [
   { id:'workshops', name:'Workshops', orbit:'OUTER · GROUP', desc:'Group sessions. The framework applied in a collective field. Dates and formats announced as they form.', cta:'View Workshops', href:'home.html#workshops', price:'Variable', color:[88,212,200], angle:Math.PI-Math.PI/4, live:true }
 ];
 
+let pulses = [];
+let _innerR = 0;
+function triggerSourcePulse() {
+  let sR = _innerR * 0.22, mR = sR + _innerR * 0.6;
+  pulses.push({ r:sR, startR:sR, maxR:mR });
+  setTimeout(()=>pulses.push({ r:sR, startR:sR, maxR:mR }), 180);
+  setTimeout(()=>pulses.push({ r:sR, startR:sR, maxR:mR }), 360);
+}
+
 new p5(function(p) {
   const NAV_H = 50;
   let W, H, cx, cy, innerR, outerR, bgParticles = [], hoveredPlanet = null, t = 0;
@@ -219,6 +228,7 @@ new p5(function(p) {
     p.colorMode(p.RGB,255,255,255,255); p.smooth();
     cx = W/2; cy = H/2;
     let m = Math.min(W,H); innerR = m*0.27; outerR = m*0.44;
+    _innerR = innerR;
     for (let i=0;i<120;i++) bgParticles.push({ x:p.random(W), y:p.random(H), vx:p.random(-0.15,0.15), vy:p.random(-0.15,0.15), sz:p.random(0.3,1.2), alpha:p.random(8,35), col:p.random()>0.5?[201,168,76]:[78,205,196] });
   };
 
@@ -226,6 +236,7 @@ new p5(function(p) {
     W = window.innerWidth; H = window.innerHeight - NAV_H;
     p.resizeCanvas(W,H); cx=W/2; cy=H/2;
     let m=Math.min(W,H); innerR=m*0.27; outerR=m*0.44;
+    _innerR = innerR;
   };
 
   p.draw = function() {
@@ -238,6 +249,7 @@ new p5(function(p) {
     p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
     p.fill(228,210,130,200); p.noStroke(); p.ellipse(cx,cy,6,6);
     p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+innerR*0.22+14);
+    for (let i=pulses.length-1;i>=0;i--) { let pu=pulses[i]; let prog=(pu.r-pu.startR)/(pu.maxR-pu.startR); p.noFill(); p.stroke(228,210,130,(1-prog)*70); p.strokeWeight(1); p.ellipse(cx,cy,pu.r*2,pu.r*2); pu.r+=pu.maxR*0.022; if(pu.r>=pu.maxR)pulses.splice(i,1); }
     drawPlanets(INNER_PLANETS,innerR,0.004,8); drawPlanets(OUTER_PLANETS,outerR,-0.003,6);
   };
 
@@ -257,22 +269,32 @@ new p5(function(p) {
 
   p.mouseMoved = function() {
     hoveredPlanet=null;
+    if(Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2))<innerR*0.22+44){document.body.style.cursor='pointer';return;}
     for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2))<pl._r+16){hoveredPlanet=pl.id;document.body.style.cursor='pointer';return;} }
     document.body.style.cursor='default';
   };
 
   p.mousePressed = function() {
+    if(Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2))<innerR*0.22+44){triggerSourcePulse();openSourcePanel();return false;}
     for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2))<pl._r+18){openPanel(pl);return false;} }
   };
 
   p.touchStarted = function() {
     if(document.getElementById('planet-panel').classList.contains('open'))return;
     let tx=p.touches.length>0?p.touches[0].x:p.mouseX, ty=p.touches.length>0?p.touches[0].y:p.mouseY;
+    if(Math.sqrt(Math.pow(tx-cx,2)+Math.pow(ty-cy,2))<innerR*0.22+44){triggerSourcePulse();openSourcePanel();return false;}
     for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(tx-pl._px,2)+Math.pow(ty-pl._py,2))<pl._r+22){openPanel(pl);return false;} }
   };
 
 }, document.getElementById('cv-container'));
 
+function openSourcePanel() {
+  document.getElementById('panel-orbit').textContent = '';
+  document.getElementById('panel-name').textContent = 'SOURCE';
+  document.getElementById('panel-desc').textContent = 'I Am';
+  document.getElementById('panel-actions').innerHTML = '';
+  document.getElementById('planet-panel').classList.add('open');
+}
 function openPanel(pl) {
   document.getElementById('panel-orbit').textContent = pl.orbit;
   document.getElementById('panel-name').textContent = pl.name;
