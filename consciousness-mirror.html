@@ -1031,6 +1031,35 @@ padding: 0.55rem 1.2rem;
 transition: background 0.3s;
 }
 .mirror-nav .nav-book:hover { background: rgba(201,169,110,0.08); }
+
+/* ── BL NAV ─────────────────────────────────────────────── */
+.bl-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.08); }
+.bl-nav-brand { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 13px; letter-spacing: 0.3em; color: rgba(201,168,76,0.7); text-transform: uppercase; text-decoration: none; }
+.bl-hamburger { background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-direction: column; gap: 5px; z-index: 1001; }
+.bl-hamburger span { display: block; width: 22px; height: 1px; background: rgba(201,168,76,0.6); transition: all 0.3s ease; transform-origin: center; }
+.bl-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); background: rgba(201,168,76,0.9); }
+.bl-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.bl-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: rgba(201,168,76,0.9); }
+.bl-menu { position: fixed; inset: 0; z-index: 999; background: rgba(8,8,8,0.97); display: flex; flex-direction: column; justify-content: center; padding: 80px 32px 48px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.bl-menu.open { opacity: 1; pointer-events: all; }
+.bl-nav-section { margin-bottom: 28px; opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.bl-menu.open .bl-nav-section:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
+.bl-menu.open .bl-nav-section:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.bl-menu.open .bl-nav-section:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
+.bl-menu.open .bl-nav-section:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.bl-menu.open .bl-nav-section:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
+.bl-menu.open .bl-nav-section:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.bl-nav-main { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 26px; letter-spacing: 0.06em; color: rgba(201,168,76,0.85); text-decoration: none; display: block; margin-bottom: 10px; transition: color 0.2s; }
+.bl-nav-main:hover { color: #c9a84c; }
+.bl-nav-subs { display: flex; flex-direction: column; gap: 6px; padding-left: 16px; border-left: 1px solid rgba(201,168,76,0.12); }
+.bl-nav-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: rgba(201,168,76,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+.bl-nav-sub:hover { color: rgba(201,168,76,0.7); }
+.bl-nav-divider { width: 100%; height: 1px; background: rgba(201,168,76,0.06); margin-bottom: 28px; opacity: 0; transition: opacity 0.3s ease 0.2s; }
+.bl-menu.open .bl-nav-divider { opacity: 1; }
+.bl-nav-cta { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.25em; color: rgba(201,168,76,0.85); text-decoration: none; text-transform: uppercase; border: 1px solid rgba(201,168,76,0.3); padding: 12px 24px; display: inline-block; transition: all 0.2s; }
+.bl-nav-cta:hover { border-color: rgba(201,168,76,0.7); color: #c9a84c; background: rgba(201,168,76,0.04); }
+.bl-nav-home { font-size: 8px; letter-spacing: 0.18em; color: rgba(201,168,76,0.2); text-decoration: none; text-transform: uppercase; margin-top: 24px; display: block; transition: color 0.2s; }
+.bl-nav-home:hover { color: rgba(201,168,76,0.5); }
 </style>
 <script src="/i18n/i18n.js" defer></script>
 <script src="/i18n/strings.en.js" defer></script>
@@ -1039,14 +1068,58 @@ transition: background 0.3s;
 <script src="/i18n/strings.fr.js" defer></script>
 <script src="/lang-switcher.js" defer></script>
 
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<nav class="mirror-nav">
-  <a href="/" class="nav-logo">Bhav<span>é</span>'s Lab</a>
-  <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="nav-book">Book a Session</a>
+<!-- ── NAV BAR ────────────────────────────────────────────── -->
+<nav class="bl-nav">
+  <a class="bl-nav-brand" href="index.html">Bhavé's Lab</a>
+  <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 </nav>
 
+<!-- ── MENU OVERLAY ───────────────────────────────────────── -->
+<div class="bl-menu" id="bl-menu">
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#work" onclick="closeMenu()">The Work</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+      <a class="bl-nav-sub" href="home.html#inner-mining" onclick="closeMenu()">Inner Mining</a>
+      <a class="bl-nav-sub" href="home.html#pattern-immersion" onclick="closeMenu()">Pattern Immersion</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#framework" onclick="closeMenu()">Framework</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="home.html#sequence" onclick="closeMenu()">The Sequence</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#workshops" onclick="closeMenu()">Workshops</a>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#realm" onclick="closeMenu()">The Realm</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="mirror-landing.html" onclick="closeMenu()">Consciousness Mirror</a>
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-divider"></div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-cta" href="home.html#book" onclick="closeMenu()">Book a Session</a>
+    <a class="bl-nav-home" href="index.html" onclick="closeMenu()">← Back to the Field</a>
+  </div>
+
+</div>
 <div class="container">
 
   <!-- PAYMENT GATE -->
@@ -1388,6 +1461,21 @@ function restartMirror() {
 })();
 </script>
 
+<script>
+function toggleMenu() {
+  const menu   = document.getElementById('bl-menu');
+  const burger = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  burger.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('bl-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+</script>
 </body>
 </html>
 
