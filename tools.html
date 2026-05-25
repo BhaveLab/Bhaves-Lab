@@ -344,7 +344,7 @@ new p5(function(p) {
     p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
     p.noiseSeed(42);
     cx = W/2; cy = H/2;
-    let m = Math.min(W, H); innerR = m*0.27; outerR = m*0.44;
+    let m = Math.min(W, H); innerR = m*0.38; outerR = m*0.58;
     _innerR = innerR;
     for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
     for (let i = 0; i < 180; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.6,3.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(40,229) });
