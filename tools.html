@@ -344,7 +344,7 @@ new p5(function(p) {
     p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
     p.noiseSeed(42);
     cx = W/2; cy = H/2 + H*0.05;
-    let m = Math.min(W, H); innerR = m*0.33; outerR = m*0.58;
+    let m = Math.min(W, H); innerR = m*0.297; outerR = m*0.522;
     _innerR = innerR;
     for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
     for (let i = 0; i < 180; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.6,3.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(40,229) });
@@ -483,7 +483,7 @@ new p5(function(p) {
       sCtx.fillStyle = spec;
       sCtx.beginPath(); sCtx.arc(spx, spy, SR*0.30, 0, Math.PI*2); sCtx.fill();
     }
-    p.noStroke(); p.fill(200,220,255,45); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+36);
+    p.noStroke();
 
     // SOURCE pulse rings (on tap)
     for (let i = pulses.length-1; i >= 0; i--) {
@@ -496,8 +496,8 @@ new p5(function(p) {
     }
 
     // Planets — always on top
-    drawPlanets(INNER_PLANETS, innerR, 0.28, 22);
-    drawPlanets(OUTER_PLANETS, outerR, -0.16, 22);
+    drawPlanets(INNER_PLANETS, innerR, 0.28, 18);
+    drawPlanets(OUTER_PLANETS, outerR, -0.16, 18);
   };
 
   function drawPlanets(planets, radius, driftSpeed, planetR) {
