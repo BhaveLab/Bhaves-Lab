@@ -392,12 +392,44 @@ new p5(function(p) {
     p.noFill(); p.stroke(201,168,76,6); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
     p.stroke(78,205,196,4); p.ellipse(cx,cy,outerR*2,outerR*2);
 
-    // SOURCE rings
-    const p2 = p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
-    const p1 = p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
-    p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
-    p.fill(228,210,130,220); p.noStroke(); p.ellipse(cx,cy,14,14);
-    p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+innerR*0.22+14);
+    // SOURCE — white-gold globe with pulsing corona
+    {
+      const sCtx = p.drawingContext;
+      const SR   = 22;
+      const r1a  = innerR*0.22 + 42 + p.sin(t*0.7)*9;
+      const r1b  = innerR*0.22 + 25 + p.sin(t*1.2)*6;
+      const r1c  = innerR*0.22 + 10;
+      // Diffuse corona glow
+      const cGlow = sCtx.createRadialGradient(cx, cy, SR, cx, cy, r1a*1.15);
+      cGlow.addColorStop(0, 'rgba(228,210,130,0.09)');
+      cGlow.addColorStop(1, 'rgba(228,210,130,0)');
+      sCtx.fillStyle = cGlow;
+      sCtx.beginPath(); sCtx.arc(cx, cy, r1a*1.15, 0, Math.PI*2); sCtx.fill();
+      // Corona rings
+      sCtx.lineWidth = 0.5;
+      sCtx.strokeStyle = 'rgba(228,210,130,0.04)';
+      sCtx.beginPath(); sCtx.arc(cx, cy, r1a, 0, Math.PI*2); sCtx.stroke();
+      sCtx.strokeStyle = 'rgba(228,210,130,0.11)';
+      sCtx.beginPath(); sCtx.arc(cx, cy, r1b, 0, Math.PI*2); sCtx.stroke();
+      sCtx.strokeStyle = 'rgba(228,210,130,0.22)';
+      sCtx.beginPath(); sCtx.arc(cx, cy, r1c, 0, Math.PI*2); sCtx.stroke();
+      // Soft flare
+      const flare = sCtx.createRadialGradient(cx, cy, 0, cx, cy, SR*3.2);
+      flare.addColorStop(0, 'rgba(255,248,200,0.14)');
+      flare.addColorStop(1, 'rgba(255,248,200,0)');
+      sCtx.fillStyle = flare;
+      sCtx.beginPath(); sCtx.arc(cx, cy, SR*3.2, 0, Math.PI*2); sCtx.fill();
+      // Globe body — hot white-gold core, upper-left highlight
+      const shx = cx - SR*0.28, shy = cy - SR*0.32;
+      const sph = sCtx.createRadialGradient(shx, shy, 0, cx, cy, SR);
+      sph.addColorStop(0,    'rgba(255,255,245,1)');
+      sph.addColorStop(0.22, 'rgba(255,245,175,0.98)');
+      sph.addColorStop(0.58, 'rgba(228,210,130,0.95)');
+      sph.addColorStop(1,    'rgba(110,85,18,0.92)');
+      sCtx.fillStyle = sph;
+      sCtx.beginPath(); sCtx.arc(cx, cy, SR, 0, Math.PI*2); sCtx.fill();
+    }
+    p.noStroke(); p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+28);
 
     // SOURCE pulse rings (on tap)
     for (let i = pulses.length-1; i >= 0; i--) {
@@ -410,27 +442,80 @@ new p5(function(p) {
     }
 
     // Planets — always on top
-    drawPlanets(INNER_PLANETS, innerR, 0.28, 8);
-    drawPlanets(OUTER_PLANETS, outerR, -0.16, 6);
+    drawPlanets(INNER_PLANETS, innerR, 0.28, 20);
+    drawPlanets(OUTER_PLANETS, outerR, -0.16, 18);
   };
 
-  function drawPlanets(planets, radius, driftSpeed, baseSize) {
+  function drawPlanets(planets, radius, driftSpeed, planetR) {
     for (let i = 0; i < planets.length; i++) {
       const pl  = planets[i];
       const ang = pl.angle + t * driftSpeed;
       const px  = cx + radius * Math.cos(ang);
       const py  = cy + radius * Math.sin(ang);
-      pl._px = px; pl._py = py; pl._r = baseSize*2 + 8;
       const isH = hoveredPlanet === pl.id;
-      const col = pl.color;
-      p.noFill(); p.stroke(col[0],col[1],col[2],isH?70:(pl.live?25:10)); p.strokeWeight(0.5);
-      p.ellipse(px, py, (baseSize*2+(isH?18:8))*2, (baseSize*2+(isH?18:8))*2);
-      p.fill(col[0],col[1],col[2],isH?230:(pl.live?180:75)); p.noStroke();
-      p.ellipse(px, py, baseSize*4, baseSize*4);
-      const dx = px-cx, dy = py-cy, d = Math.sqrt(dx*dx+dy*dy);
-      p.fill(235, 230, 220, isH?255:(pl.live?200:70));
-      p.textFont('JetBrains Mono,monospace'); p.textSize(13); p.textAlign(p.CENTER,p.CENTER);
-      p.text(pl.name.toUpperCase(), px+(dx/d)*(baseSize*2+20), py+(dy/d)*(baseSize*2+20));
+      const r   = planetR + (isH ? 5 : 0);
+      pl._px = px; pl._py = py; pl._r = r + 12;
+      const col   = pl.color;
+      const alpha = pl.live ? 1.0 : 0.35;
+
+      // Derived light/dark variants from base color
+      const lr = Math.min(255, col[0] * 1.45 + 55) | 0;
+      const lg = Math.min(255, col[1] * 1.45 + 55) | 0;
+      const lb = Math.min(255, col[2] * 1.45 + 55) | 0;
+      const dr = (col[0] * 0.14) | 0;
+      const dg = (col[1] * 0.14) | 0;
+      const db = (col[2] * 0.14) | 0;
+
+      const ctx = p.drawingContext;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Outer glow halo
+      const glowR = r * 2.4 + (isH ? 10 : 0);
+      const glow = ctx.createRadialGradient(px, py, r*0.4, px, py, glowR);
+      glow.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},0.22)`);
+      glow.addColorStop(1, `rgba(${col[0]},${col[1]},${col[2]},0)`);
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(px, py, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3D sphere — specular highlight offset to upper-left
+      const hx = px - r * 0.33;
+      const hy = py - r * 0.36;
+      const sphere = ctx.createRadialGradient(hx, hy, 0, px, py, r);
+      sphere.addColorStop(0,    'rgba(255,255,255,0.90)');
+      sphere.addColorStop(0.18, `rgba(${lr},${lg},${lb},0.92)`);
+      sphere.addColorStop(0.58, `rgba(${col[0]},${col[1]},${col[2]},0.88)`);
+      sphere.addColorStop(1,    `rgba(${dr},${dg},${db},0.96)`);
+      ctx.fillStyle = sphere;
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Surface texture bands (clipped to sphere)
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.globalAlpha = alpha * 0.14;
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      ctx.beginPath();
+      ctx.ellipse(px + r*0.08, py + r*0.22, r*0.74, r*0.15, 0.28, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(px - r*0.05, py - r*0.16, r*0.60, r*0.10, -0.18, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Label — radiates outward from center
+      const dx = px - cx, dy = py - cy, d = Math.sqrt(dx*dx+dy*dy);
+      p.noStroke();
+      p.fill(235, 230, 220, isH ? 255 : (pl.live ? 200 : 70));
+      p.textFont('JetBrains Mono,monospace');
+      p.textSize(13);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text(pl.name.toUpperCase(), px + (dx/d)*(r+18), py + (dy/d)*(r+18));
     }
   }
 
