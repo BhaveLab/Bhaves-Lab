@@ -400,13 +400,19 @@ new p5(function(p) {
       const r1b  = innerR*0.22 + 26 + p.sin(t*1.2)*6;
       const r1c  = innerR*0.22 + 10;
 
-      // Wide soft lunar glow
-      const gGlow = sCtx.createRadialGradient(cx, cy, SR, cx, cy, SR*8);
-      gGlow.addColorStop(0,   'rgba(215,232,255,0.18)');
-      gGlow.addColorStop(0.3, 'rgba(185,210,248,0.06)');
-      gGlow.addColorStop(1,   'rgba(185,210,248,0)');
-      sCtx.fillStyle = gGlow;
-      sCtx.beginPath(); sCtx.arc(cx, cy, SR*8, 0, Math.PI*2); sCtx.fill();
+      // Atmospheric breath — slow expansion from SOURCE to full viewport and back (~10s cycle)
+      // t increments 0.006/frame at 60fps → 0.36/sec; k=1.745 gives 2π/3.6 ≈ 10s period
+      const atmBreath = (p.sin(t * 1.745) + 1) * 0.5; // 0..1
+      const viewDiag  = Math.sqrt(W*W + H*H);
+      const breathR   = SR*2.5 + (viewDiag - SR*2.5) * atmBreath;
+      const aA0 = (0.22 - atmBreath * 0.18).toFixed(3); // 0.22 tight → 0.04 full
+      const aA1 = (0.08 - atmBreath * 0.065).toFixed(3);
+      const atmoGrad = sCtx.createRadialGradient(cx, cy, SR, cx, cy, breathR);
+      atmoGrad.addColorStop(0,    `rgba(215,232,255,${aA0})`);
+      atmoGrad.addColorStop(0.35, `rgba(195,218,252,${aA1})`);
+      atmoGrad.addColorStop(1,    'rgba(185,210,248,0)');
+      sCtx.fillStyle = atmoGrad;
+      sCtx.beginPath(); sCtx.arc(cx, cy, breathR, 0, Math.PI*2); sCtx.fill();
 
       // Energy field arms — cool pale blue
       for (let arm = 0; arm < 4; arm++) {
