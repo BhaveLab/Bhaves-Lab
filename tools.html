@@ -85,7 +85,7 @@ html, body { height:100%; background:var(--void); overflow:hidden; font-family:v
 
 /* ── CANVAS ───────────────────────────────────────────────── */
 #cv-container {
-  position:fixed; top:50px; left:0; right:0; bottom:0;
+  position:fixed; top:0; left:0; right:0; bottom:0;
 }
 #cv-container canvas { display:block; }
 
@@ -220,7 +220,6 @@ function triggerSourcePulse() {
 }
 
 new p5(function(p) {
-  const NAV_H = 50;
   let W, H, cx, cy, innerR, outerR;
   let bgParticles = [], shootingStars = [], twinkleStars = [];
   let hoveredPlanet = null, t = 0;
@@ -340,11 +339,11 @@ new p5(function(p) {
   }
 
   p.setup = function() {
-    W = window.innerWidth; H = window.innerHeight - NAV_H;
+    W = window.innerWidth; H = window.innerHeight;
     let cv = p.createCanvas(W, H); cv.parent('cv-container');
     p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
     p.noiseSeed(42);
-    cx = W/2 + (W < 600 ? Math.round(W * 0.06) : 0); cy = H/2;
+    cx = W/2; cy = H/2;
     let m = Math.min(W, H); innerR = m*0.27; outerR = m*0.44;
     _innerR = innerR;
     for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
@@ -352,8 +351,8 @@ new p5(function(p) {
   };
 
   p.windowResized = function() {
-    W = window.innerWidth; H = window.innerHeight - NAV_H;
-    p.resizeCanvas(W, H); cx=W/2 + (W < 600 ? Math.round(W * 0.06) : 0); cy=H/2;
+    W = window.innerWidth; H = window.innerHeight;
+    p.resizeCanvas(W, H); cx=W/2; cy=H/2;
     let m = Math.min(W, H); innerR=m*0.27; outerR=m*0.44;
     _innerR = innerR;
     for (let pt of bgParticles) pt.resetScattered();
