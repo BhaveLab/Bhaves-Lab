@@ -209,6 +209,28 @@ const OUTER_PLANETS = [
   { id:'workshops', name:'Workshops', orbit:'OUTER · GROUP', desc:'Group sessions. The framework applied in a collective field. Dates and formats announced as they form.', cta:'View Workshops', href:'home.html#workshops', price:'Variable', color:[88,212,200], angle:Math.PI-Math.PI/4, live:true }
 ];
 
+// ── BACKGROUND FIELD — same stage palette as index.html ──────────────
+const BG_STAGES = [
+  { color:[78,205,196]  },
+  { color:[90,208,175]  },
+  { color:[115,210,148] },
+  { color:[158,207,108] },
+  { color:[193,188,85]  },
+  { color:[201,168,76]  },
+  { color:[225,208,125] },
+  { color:[88,212,200]  }
+];
+const BG_CFG = {
+  particleCount: 900,
+  flowSpeed:     2.0,
+  noiseScale:    0.0038,
+  trailLength:   22,
+  attraction:    0.08,
+  cursorRadius:  90,
+  cursorForce:   0.20
+};
+
+// SOURCE pulse globals
 let pulses = [];
 let _innerR = 0;
 function triggerSourcePulse() {
@@ -220,18 +242,116 @@ function triggerSourcePulse() {
 
 new p5(function(p) {
   const NAV_H = 50;
-  let W, H, cx, cy, innerR, outerR, bgParticles = [], shootingStars = [], twinkleStars = [], streamParticles = [], hoveredPlanet = null, t = 0;
+  let W, H, cx, cy, innerR, outerR;
+  let bgParticles = [], shootingStars = [], twinkleStars = [], streamParticles = [];
+  let bgStagePos = [];
+  let hoveredPlanet = null, t = 0;
+
+  // ── BACKGROUND PARTICLE — ported from index.html to instance mode ────
+  class BgParticle {
+    constructor(scattered) {
+      this.si = 0; this.maxAge = 0; this.age = 0; this.sz = 0;
+      this.vx = 0; this.vy = 0; this.x = 0; this.y = 0; this.trail = [];
+      if (scattered) this.resetToScattered(); else this.resetToState();
+    }
+    resetToScattered() {
+      this.si     = Math.floor(p.random(8));
+      this.maxAge = p.random(320, 820);
+      this.age    = p.random(0, this.maxAge);
+      this.sz     = p.random(0.35, 1.55);
+      this.vx = 0; this.vy = 0; this.trail = [];
+      const sp = bgStagePos[this.si];
+      this.x = sp.x + p.random(-70, 70);
+      this.y = sp.y + p.random(-70, 70);
+    }
+    resetToState() {
+      this.si     = 0;
+      this.maxAge = p.random(320, 820);
+      this.age    = 0;
+      this.sz     = p.random(0.35, 1.55);
+      this.vx = 0; this.vy = 0; this.trail = [];
+      const sp = bgStagePos[0];
+      this.x = sp.x + p.random(-22, 22);
+      this.y = sp.y + p.random(-22, 22);
+    }
+    update() {
+      const tgt  = bgStagePos[this.si];
+      const dx   = tgt.x - this.x, dy = tgt.y - this.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const capR = this.si === 6 ? 16 : 30;
+      if (dist < capR) this.si = (this.si + 1) % 8;
+
+      let attrMod = 1.0, noiseMod = 0.28;
+      if (this.si===1){attrMod=0.50;noiseMod=0.92;}
+      if (this.si===2){attrMod=0.72;noiseMod=0.42;}
+      if (this.si===6){attrMod=2.65;noiseMod=0.05;}
+      if (this.si===7){attrMod=1.55;noiseMod=0.18;}
+
+      const ns   = BG_CFG.noiseScale;
+      const nt   = p.frameCount * 0.002;
+      const nAng = p.noise(this.x*ns, this.y*ns, nt) * Math.PI * 2 * 3;
+      const attr = BG_CFG.attraction;
+      if (dist > 0) {
+        this.vx += (dx/dist)*attr*attrMod + Math.cos(nAng)*noiseMod*attr;
+        this.vy += (dy/dist)*attr*attrMod + Math.sin(nAng)*noiseMod*attr;
+      }
+
+      const cdx = this.x - p.mouseX, cdy = this.y - p.mouseY;
+      const cd  = Math.sqrt(cdx*cdx + cdy*cdy);
+      if (cd < BG_CFG.cursorRadius && cd > 0) {
+        const str = ((BG_CFG.cursorRadius - cd) / BG_CFG.cursorRadius) * BG_CFG.cursorForce;
+        this.vx += (cdx/cd)*str; this.vy += (cdy/cd)*str;
+      }
+
+      const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+      if (spd > BG_CFG.flowSpeed) { this.vx=(this.vx/spd)*BG_CFG.flowSpeed; this.vy=(this.vy/spd)*BG_CFG.flowSpeed; }
+      this.vx *= 0.91; this.vy *= 0.91;
+      this.x += this.vx; this.y += this.vy;
+
+      this.trail.push({x:this.x, y:this.y, si:this.si});
+      if (this.trail.length > BG_CFG.trailLength) this.trail.shift();
+      this.age++;
+      if (this.age > this.maxAge || this.x < -60 || this.x > W+60 || this.y < -60 || this.y > H+60) this.resetToState();
+    }
+    draw() {
+      const lifeT = 1 - this.age / this.maxAge;
+      for (let i=1; i<this.trail.length; i++) {
+        const t2  = i / this.trail.length;
+        const col = BG_STAGES[this.trail[i].si].color;
+        p.stroke(col[0], col[1], col[2], t2 * 110 * lifeT);
+        p.strokeWeight(this.sz * t2 * 1.05);
+        p.line(this.trail[i-1].x, this.trail[i-1].y, this.trail[i].x, this.trail[i].y);
+      }
+      const col = BG_STAGES[this.si].color;
+      p.fill(col[0], col[1], col[2], 180 * lifeT);
+      p.noStroke();
+      p.ellipse(this.x, this.y, this.sz * 2.3, this.sz * 2.3);
+    }
+  }
+
+  function initBgStages() {
+    const bgR = Math.min(W, H) * 0.35;
+    bgStagePos = [];
+    for (let i=0; i<8; i++) {
+      bgStagePos.push({
+        x: cx + bgR * Math.cos(-Math.PI/2 + i * Math.PI*2/8),
+        y: cy + bgR * Math.sin(-Math.PI/2 + i * Math.PI*2/8)
+      });
+    }
+  }
 
   p.setup = function() {
     W = window.innerWidth; H = window.innerHeight - NAV_H;
     let cv = p.createCanvas(W, H); cv.parent('cv-container');
     p.colorMode(p.RGB,255,255,255,255); p.smooth();
+    p.randomSeed(42); p.noiseSeed(42);
     cx = W/2; cy = H/2;
     let m = Math.min(W,H); innerR = m*0.27; outerR = m*0.44;
     _innerR = innerR;
-    for (let i=0;i<120;i++) bgParticles.push({ x:p.random(W), y:p.random(H), vx:p.random(-0.15,0.15), vy:p.random(-0.15,0.15), sz:p.random(0.3,1.2), alpha:p.random(8,35), col:p.random()>0.5?[201,168,76]:[78,205,196] });
-    for (let i=0;i<120;i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(10,55) });
-    for (let i=0;i<120;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
+    initBgStages();
+    for (let i=0; i<BG_CFG.particleCount; i++) bgParticles.push(new BgParticle(true));
+    for (let i=0; i<60; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(10,55) });
+    for (let i=0; i<120; i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
   };
 
   p.windowResized = function() {
@@ -239,25 +359,54 @@ new p5(function(p) {
     p.resizeCanvas(W,H); cx=W/2; cy=H/2;
     let m=Math.min(W,H); innerR=m*0.27; outerR=m*0.44;
     _innerR = innerR;
+    initBgStages();
+    for (let pt of bgParticles) pt.resetToScattered();
     streamParticles = [];
-    for (let i=0;i<120;i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
+    for (let i=0; i<120; i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
   };
 
   p.draw = function() {
-    p.background(8,8,8,30); t+=0.006;
-    for (let bp of bgParticles) { bp.x+=bp.vx; bp.y+=bp.vy; if(bp.x<0)bp.x=W; if(bp.x>W)bp.x=0; if(bp.y<0)bp.y=H; if(bp.y>H)bp.y=0; p.noStroke(); p.fill(bp.col[0],bp.col[1],bp.col[2],bp.alpha); p.ellipse(bp.x,bp.y,bp.sz,bp.sz); }
+    // Void fade — matches index.html exactly
+    p.fill(8,8,8,16); p.noStroke(); p.rect(0,0,W,H);
+    t += 0.006;
+
+    // Path lines between bg stage nodes (barely visible — structural truth)
+    const seq = [0,1,2,3,4,5,6,7,0];
+    p.noFill();
+    for (let i=0; i<seq.length-1; i++) {
+      const col = BG_STAGES[seq[i]].color;
+      p.stroke(col[0], col[1], col[2], 7); p.strokeWeight(0.3);
+      p.line(bgStagePos[seq[i]].x, bgStagePos[seq[i]].y, bgStagePos[seq[i+1]].x, bgStagePos[seq[i+1]].y);
+    }
+
+    // Flow particles
+    for (let pt of bgParticles) { pt.update(); pt.draw(); }
+
+    // Twinkle stars
     for (let s of twinkleStars) { let a=(p.sin(t*s.spd+s.phase)*0.5+0.5)*s.base; p.noStroke(); p.fill(201,168,76,a); p.ellipse(s.x,s.y,s.sz,s.sz); }
-    if(p.random()<0.014) { let ang=p.random(p.TWO_PI), spd=p.random(8,20); shootingStars.push({x:cx+p.random(-W*0.48,W*0.48),y:cy+p.random(-H*0.48,H*0.48),vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:0,maxLife:Math.floor(p.random(22,52)),len:p.random(45,130)}); }
+
+    // Shooting stars
+    if(p.random()<0.012) { let ang=p.random(p.TWO_PI), spd=p.random(8,20); shootingStars.push({x:cx+p.random(-W*0.48,W*0.48),y:cy+p.random(-H*0.48,H*0.48),vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:0,maxLife:Math.floor(p.random(22,52)),len:p.random(45,130)}); }
     for(let i=shootingStars.length-1;i>=0;i--) { let s=shootingStars[i]; let al=(1-s.life/s.maxLife)*150; p.stroke(228,210,130,al); p.strokeWeight(0.7); let tailLen=s.len*(s.life/s.maxLife); p.line(s.x,s.y,s.x-s.vx*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5),s.y-s.vy*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5)); s.x+=s.vx; s.y+=s.vy; s.life++; if(s.life>=s.maxLife)shootingStars.splice(i,1); }
+
+    // Energy stream particles (circling beyond outer orbit)
     for (let s of streamParticles) { s.a+=s.da; p.noStroke(); p.fill(201,168,76,s.al); p.ellipse(cx+s.r*Math.cos(s.a),cy+s.r*Math.sin(s.a),s.sz,s.sz); }
+
+    // Orbit rings
     p.noFill(); p.stroke(201,168,76,6); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
     p.stroke(78,205,196,4); p.ellipse(cx,cy,outerR*2,outerR*2);
+
+    // SOURCE rings
     let p2=p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
     let p1=p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
     p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
     p.fill(228,210,130,200); p.noStroke(); p.ellipse(cx,cy,6,6);
     p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+innerR*0.22+14);
+
+    // SOURCE pulse rings
     for (let i=pulses.length-1;i>=0;i--) { let pu=pulses[i]; let prog=(pu.r-pu.startR)/(pu.maxR-pu.startR); p.noFill(); p.stroke(228,210,130,(1-prog)*70); p.strokeWeight(1); p.ellipse(cx,cy,pu.r*2,pu.r*2); pu.r+=pu.maxR*0.022; if(pu.r>=pu.maxR)pulses.splice(i,1); }
+
+    // Planets (always on top)
     drawPlanets(INNER_PLANETS,innerR,0.28,8); drawPlanets(OUTER_PLANETS,outerR,-0.16,6);
   };
 
