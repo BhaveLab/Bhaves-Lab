@@ -392,44 +392,80 @@ new p5(function(p) {
     p.noFill(); p.stroke(201,168,76,6); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
     p.stroke(78,205,196,4); p.ellipse(cx,cy,outerR*2,outerR*2);
 
-    // SOURCE — white-gold globe with pulsing corona
+    // SOURCE — galactic core with spiral arms and white-gold globe
     {
       const sCtx = p.drawingContext;
-      const SR   = 22;
-      const r1a  = innerR*0.22 + 42 + p.sin(t*0.7)*9;
-      const r1b  = innerR*0.22 + 25 + p.sin(t*1.2)*6;
+      const SR   = 24;
+      const r1a  = innerR*0.22 + 44 + p.sin(t*0.7)*10;
+      const r1b  = innerR*0.22 + 26 + p.sin(t*1.2)*6;
       const r1c  = innerR*0.22 + 10;
-      // Diffuse corona glow
+
+      // Wide galactic background glow
+      const gGlow = sCtx.createRadialGradient(cx, cy, SR, cx, cy, SR*8);
+      gGlow.addColorStop(0,   'rgba(228,210,130,0.18)');
+      gGlow.addColorStop(0.3, 'rgba(228,210,130,0.06)');
+      gGlow.addColorStop(0.7, 'rgba(180,160,80,0.02)');
+      gGlow.addColorStop(1,   'rgba(180,160,80,0)');
+      sCtx.fillStyle = gGlow;
+      sCtx.beginPath(); sCtx.arc(cx, cy, SR*8, 0, Math.PI*2); sCtx.fill();
+
+      // Spiral arms — 4 arms rotating slowly outward
+      for (let arm = 0; arm < 4; arm++) {
+        const baseAng = (arm / 4) * Math.PI*2 + t*0.06;
+        for (let u = 0.08; u < 0.90; u += 0.035) {
+          const sAng = baseAng + u * Math.PI * 2.2;
+          const sRad = u * SR * 5.5;
+          const sx   = cx + Math.cos(sAng) * sRad;
+          const sy   = cy + Math.sin(sAng) * sRad;
+          sCtx.fillStyle = `rgba(228,210,130,${(1-u)*0.18})`;
+          sCtx.beginPath();
+          sCtx.arc(sx, sy, (1-u)*2.2+0.3, 0, Math.PI*2);
+          sCtx.fill();
+        }
+      }
+
+      // Corona diffuse
       const cGlow = sCtx.createRadialGradient(cx, cy, SR, cx, cy, r1a*1.15);
-      cGlow.addColorStop(0, 'rgba(228,210,130,0.09)');
+      cGlow.addColorStop(0, 'rgba(228,210,130,0.12)');
       cGlow.addColorStop(1, 'rgba(228,210,130,0)');
       sCtx.fillStyle = cGlow;
       sCtx.beginPath(); sCtx.arc(cx, cy, r1a*1.15, 0, Math.PI*2); sCtx.fill();
+
       // Corona rings
       sCtx.lineWidth = 0.5;
-      sCtx.strokeStyle = 'rgba(228,210,130,0.04)';
+      sCtx.strokeStyle = 'rgba(228,210,130,0.05)';
       sCtx.beginPath(); sCtx.arc(cx, cy, r1a, 0, Math.PI*2); sCtx.stroke();
-      sCtx.strokeStyle = 'rgba(228,210,130,0.11)';
+      sCtx.strokeStyle = 'rgba(228,210,130,0.12)';
       sCtx.beginPath(); sCtx.arc(cx, cy, r1b, 0, Math.PI*2); sCtx.stroke();
-      sCtx.strokeStyle = 'rgba(228,210,130,0.22)';
+      sCtx.strokeStyle = 'rgba(228,210,130,0.26)';
       sCtx.beginPath(); sCtx.arc(cx, cy, r1c, 0, Math.PI*2); sCtx.stroke();
-      // Soft flare
-      const flare = sCtx.createRadialGradient(cx, cy, 0, cx, cy, SR*3.2);
-      flare.addColorStop(0, 'rgba(255,248,200,0.14)');
+
+      // Soft stellar flare
+      const flare = sCtx.createRadialGradient(cx, cy, 0, cx, cy, SR*3.5);
+      flare.addColorStop(0, 'rgba(255,248,200,0.18)');
       flare.addColorStop(1, 'rgba(255,248,200,0)');
       sCtx.fillStyle = flare;
-      sCtx.beginPath(); sCtx.arc(cx, cy, SR*3.2, 0, Math.PI*2); sCtx.fill();
-      // Globe body — hot white-gold core, upper-left highlight
+      sCtx.beginPath(); sCtx.arc(cx, cy, SR*3.5, 0, Math.PI*2); sCtx.fill();
+
+      // Globe — intense white-gold core with deep shadow
       const shx = cx - SR*0.28, shy = cy - SR*0.32;
       const sph = sCtx.createRadialGradient(shx, shy, 0, cx, cy, SR);
-      sph.addColorStop(0,    'rgba(255,255,245,1)');
-      sph.addColorStop(0.22, 'rgba(255,245,175,0.98)');
-      sph.addColorStop(0.58, 'rgba(228,210,130,0.95)');
+      sph.addColorStop(0,    'rgba(255,255,250,1)');
+      sph.addColorStop(0.15, 'rgba(255,252,220,1)');
+      sph.addColorStop(0.38, 'rgba(255,240,160,0.98)');
+      sph.addColorStop(0.65, 'rgba(228,210,130,0.95)');
       sph.addColorStop(1,    'rgba(110,85,18,0.92)');
       sCtx.fillStyle = sph;
       sCtx.beginPath(); sCtx.arc(cx, cy, SR, 0, Math.PI*2); sCtx.fill();
+
+      // Hot core pinpoint
+      const core = sCtx.createRadialGradient(cx-SR*0.12, cy-SR*0.12, 0, cx, cy, SR*0.38);
+      core.addColorStop(0, 'rgba(255,255,255,0.92)');
+      core.addColorStop(1, 'rgba(255,255,255,0)');
+      sCtx.fillStyle = core;
+      sCtx.beginPath(); sCtx.arc(cx, cy, SR*0.38, 0, Math.PI*2); sCtx.fill();
     }
-    p.noStroke(); p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+28);
+    p.noStroke(); p.fill(228,210,130,45); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+30);
 
     // SOURCE pulse rings (on tap)
     for (let i = pulses.length-1; i >= 0; i--) {
@@ -453,69 +489,76 @@ new p5(function(p) {
       const px  = cx + radius * Math.cos(ang);
       const py  = cy + radius * Math.sin(ang);
       const isH = hoveredPlanet === pl.id;
-      const r   = planetR + (isH ? 5 : 0);
-      pl._px = px; pl._py = py; pl._r = r + 12;
-      const col   = pl.color;
-      const alpha = pl.live ? 1.0 : 0.35;
 
-      // Derived light/dark variants from base color
+      // Per-planet breathing — unique rhythm derived from angle (no data changes needed)
+      const breathSpd = 0.28 + Math.abs(Math.sin(pl.angle * 2.7)) * 0.28;
+      const breathT   = p.sin(t * breathSpd + pl.angle) * 0.5 + 0.5; // 0..1
+
+      const r     = planetR + (isH ? 5 : 0) + breathT * 2.5;
+      pl._px = px; pl._py = py; pl._r = planetR + 16;
+      const col   = pl.color;
+      const base  = pl.live ? 1.0 : 0.35;
+      const alpha = base * (0.72 + breathT * 0.28);
+
+      // Derived light/dark variants
       const lr = Math.min(255, col[0] * 1.45 + 55) | 0;
       const lg = Math.min(255, col[1] * 1.45 + 55) | 0;
       const lb = Math.min(255, col[2] * 1.45 + 55) | 0;
-      const dr = (col[0] * 0.14) | 0;
-      const dg = (col[1] * 0.14) | 0;
-      const db = (col[2] * 0.14) | 0;
+      const dr = (col[0] * 0.12) | 0;
+      const dg = (col[1] * 0.12) | 0;
+      const db = (col[2] * 0.12) | 0;
 
       const ctx = p.drawingContext;
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      // Outer glow halo
-      const glowR = r * 2.4 + (isH ? 10 : 0);
-      const glow = ctx.createRadialGradient(px, py, r*0.4, px, py, glowR);
-      glow.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},0.22)`);
-      glow.addColorStop(1, `rgba(${col[0]},${col[1]},${col[2]},0)`);
+      // Wide breathing halo
+      const glowR = r * (2.8 + breathT * 0.8) + (isH ? 14 : 0);
+      const glow  = ctx.createRadialGradient(px, py, r*0.5, px, py, glowR);
+      glow.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},0.28)`);
+      glow.addColorStop(0.45, `rgba(${col[0]},${col[1]},${col[2]},0.10)`);
+      glow.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
       ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(px, py, glowR, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, glowR, 0, Math.PI*2); ctx.fill();
 
-      // 3D sphere — specular highlight offset to upper-left
-      const hx = px - r * 0.33;
-      const hy = py - r * 0.36;
+      // Atmospheric rim scatter — thin bright ring at sphere edge
+      const rim = ctx.createRadialGradient(px, py, r*0.78, px, py, r*1.22);
+      rim.addColorStop(0,   `rgba(${lr},${lg},${lb},0)`);
+      rim.addColorStop(0.6, `rgba(${lr},${lg},${lb},0.14)`);
+      rim.addColorStop(1,   `rgba(${lr},${lg},${lb},0)`);
+      ctx.fillStyle = rim;
+      ctx.beginPath(); ctx.arc(px, py, r*1.22, 0, Math.PI*2); ctx.fill();
+
+      // 3D sphere — specular highlight upper-left, deep shadow lower-right
+      const hx = px - r*0.33, hy = py - r*0.36;
       const sphere = ctx.createRadialGradient(hx, hy, 0, px, py, r);
-      sphere.addColorStop(0,    'rgba(255,255,255,0.90)');
-      sphere.addColorStop(0.18, `rgba(${lr},${lg},${lb},0.92)`);
-      sphere.addColorStop(0.58, `rgba(${col[0]},${col[1]},${col[2]},0.88)`);
-      sphere.addColorStop(1,    `rgba(${dr},${dg},${db},0.96)`);
+      sphere.addColorStop(0,    'rgba(255,255,255,0.95)');
+      sphere.addColorStop(0.12, `rgba(${Math.min(255,lr+30)},${Math.min(255,lg+30)},${Math.min(255,lb+30)},0.92)`);
+      sphere.addColorStop(0.30, `rgba(${lr},${lg},${lb},0.90)`);
+      sphere.addColorStop(0.62, `rgba(${col[0]},${col[1]},${col[2]},0.85)`);
+      sphere.addColorStop(1,    `rgba(${dr},${dg},${db},0.97)`);
       ctx.fillStyle = sphere;
-      ctx.beginPath();
-      ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
 
-      // Surface texture bands (clipped to sphere)
-      ctx.beginPath();
-      ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.globalAlpha = alpha * 0.14;
+      // Surface texture + limb darkening (clipped to sphere)
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.clip();
+      ctx.globalAlpha = alpha * 0.13;
       ctx.fillStyle = 'rgba(0,0,0,1)';
       ctx.beginPath();
-      ctx.ellipse(px + r*0.08, py + r*0.22, r*0.74, r*0.15, 0.28, 0, Math.PI*2);
+      ctx.ellipse(px+r*0.08, py+r*0.22, r*0.74, r*0.15, 0.28, 0, Math.PI*2);
       ctx.fill();
       ctx.beginPath();
-      ctx.ellipse(px - r*0.05, py - r*0.16, r*0.60, r*0.10, -0.18, 0, Math.PI*2);
+      ctx.ellipse(px-r*0.05, py-r*0.16, r*0.60, r*0.10, -0.18, 0, Math.PI*2);
       ctx.fill();
+      // Limb darkening — dark radial overlay toward shadow edge
+      ctx.globalAlpha = alpha * 0.38;
+      const limb = ctx.createRadialGradient(px, py, r*0.45, px, py, r);
+      limb.addColorStop(0, 'rgba(0,0,0,0)');
+      limb.addColorStop(1, 'rgba(0,0,0,0.70)');
+      ctx.fillStyle = limb;
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
 
       ctx.restore();
-
-      // Label — radiates outward from center
-      const dx = px - cx, dy = py - cy, d = Math.sqrt(dx*dx+dy*dy);
-      p.noStroke();
-      p.fill(235, 230, 220, isH ? 255 : (pl.live ? 200 : 70));
-      p.textFont('JetBrains Mono,monospace');
-      p.textSize(13);
-      p.textAlign(p.CENTER, p.CENTER);
-      p.text(pl.name.toUpperCase(), px + (dx/d)*(r+18), py + (dy/d)*(r+18));
     }
   }
 
