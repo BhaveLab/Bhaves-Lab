@@ -296,7 +296,7 @@ BhaveI18n.register('fr', {
 
   mirror: {
     introH1: 'Le <em>Miroir de</em><br>Conscience',
-    introSubtitle: 'Six questions. Pas de réponses données.<br>Seulement ce qui est déjà là — reflété en retour.',
+    introSubtitle: 'Eight questions. Pas de réponses données.<br>Seulement ce qui est déjà là — reflété en retour.',
     introBody: 'Ce n\'est pas un test. Il n\'y a rien à réussir ou à échouer.\n\nRépondez à ce qui vous semble vrai maintenant. Le Miroir vous montrera ce qu\'il voit — pas quoi en faire. Cette partie vous appartient.',
     beginBtn: 'Entrer dans le Miroir',
     loadingText: 'Le Miroir lit ce que vous avez apporté...',

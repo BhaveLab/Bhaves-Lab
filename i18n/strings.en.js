@@ -310,7 +310,7 @@ BhaveI18n.register('en', {
   // ── CONSCIOUSNESS MIRROR (consciousness-mirror.html) ──────────────────────
   mirror: {
     introH1: 'The <em>Consciousness</em><br>Mirror',
-    introSubtitle: 'Six questions. No answers given.<br>Only what is already there — reflected back.',
+    introSubtitle: 'Eight questions. No answers given.<br>Only what is already there — reflected back.',
     introBody: 'This isn\'t a test. There is nothing to pass or fail.\n\nAnswer what feels true right now. The Mirror will show you what it sees — not what to do with it. That part belongs to you.',
     beginBtn: 'Enter the Mirror',
     loadingText: 'The Mirror is reading what you brought...',

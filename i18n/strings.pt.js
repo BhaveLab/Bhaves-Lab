@@ -296,7 +296,7 @@ BhaveI18n.register('pt', {
 
   mirror: {
     introH1: 'O <em>Espelho da</em><br>Consciência',
-    introSubtitle: 'Seis perguntas. Nenhuma resposta dada.<br>Apenas o que já está lá — refletido de volta.',
+    introSubtitle: 'Oito perguntas. Nenhuma resposta dada.<br>Apenas o que já está lá — refletido de volta.',
     introBody: 'Isso não é um teste. Não há nada para passar ou reprovar.\n\nResponda o que parece verdadeiro agora. O Espelho mostrará o que vê — não o que fazer com isso. Essa parte pertence a você.',
     beginBtn: 'Entrar no Espelho',
     loadingText: 'O Espelho está lendo o que você trouxe...',
