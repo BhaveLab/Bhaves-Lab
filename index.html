@@ -394,6 +394,27 @@ function drawNodes() {
       ellipse(pos.x, pos.y, (glowR + 22) * 2, (glowR + 22) * 2);
       stroke(200, 220, 255, glowA * 0.12);
       ellipse(pos.x, pos.y, (glowR + 44 + pulse) * 2, (glowR + 44 + pulse) * 2);
+      // Blue-teal corona pulse — slow breathing ring outside the white ones
+      const tealPulse = sin(frameCount * 0.022) * 0.5 + 0.5;
+      stroke(78, 205, 196, glowA * (0.07 + tealPulse * 0.11)); strokeWeight(0.5);
+      ellipse(pos.x, pos.y, (glowR + 34) * 2, (glowR + 34) * 2);
+      // Wisps — 7 tiny blue-teal radial blobs drifting outward at different phases
+      ctx.save();
+      for (let w = 0; w < 7; w++) {
+        const wPhase = sin(frameCount * 0.018 + w * 1.05) * 0.5 + 0.5;
+        const wAng   = (w / 7) * TWO_PI + frameCount * 0.007;
+        const wDist  = SR * 1.6 + wPhase * SR * 2.0;
+        const wR     = SR * 0.35 + wPhase * SR * 0.28;
+        const wA     = (wPhase * 0.065).toFixed(3);
+        const wx     = pos.x + cos(wAng) * wDist;
+        const wy     = pos.y + sin(wAng) * wDist;
+        const wg = ctx.createRadialGradient(wx, wy, 0, wx, wy, wR);
+        wg.addColorStop(0, `rgba(140,220,215,${wA})`);
+        wg.addColorStop(1, 'rgba(78,205,196,0)');
+        ctx.fillStyle = wg;
+        ctx.beginPath(); ctx.arc(wx, wy, wR, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
       // Glass sphere body
       ctx.save();
       ctx.fillStyle = 'rgba(220,235,255,0.20)';
