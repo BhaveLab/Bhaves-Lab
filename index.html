@@ -386,20 +386,47 @@ function drawNodes() {
     ellipse(pos.x, pos.y, glowR * 2, glowR * 2);
 
     if (isSrc) {
-      // SOURCE breathes
-      stroke(col[0], col[1], col[2], glowA * 0.3);
-      ellipse(pos.x, pos.y, (glowR + 20) * 2, (glowR + 20) * 2);
+      // SOURCE — lunar glass sphere, cool white-silver
+      const SR  = 15;
+      const ctx = drawingContext;
+      // Breathing corona rings
       const pulse = sin(frameCount * 0.035) * 6;
-      stroke(col[0], col[1], col[2], glowA * 0.12);
-      ellipse(pos.x, pos.y, (glowR + 40 + pulse) * 2, (glowR + 40 + pulse) * 2);
+      noFill();
+      stroke(220, 235, 255, glowA * 0.30); strokeWeight(0.5);
+      ellipse(pos.x, pos.y, (glowR + 22) * 2, (glowR + 22) * 2);
+      stroke(200, 220, 255, glowA * 0.12);
+      ellipse(pos.x, pos.y, (glowR + 44 + pulse) * 2, (glowR + 44 + pulse) * 2);
+      // Glass sphere body
+      ctx.save();
+      ctx.fillStyle = 'rgba(220,235,255,0.20)';
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR, 0, Math.PI*2); ctx.fill();
+      const ig = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, SR);
+      ig.addColorStop(0,    'rgba(255,255,255,0.95)');
+      ig.addColorStop(0.20, 'rgba(240,248,255,0.75)');
+      ig.addColorStop(0.55, 'rgba(210,228,252,0.35)');
+      ig.addColorStop(1,    'rgba(185,210,245,0)');
+      ctx.fillStyle = ig;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR, 0, Math.PI*2); ctx.fill();
+      // Glass rim — upper-left arc
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, SR * 0.88, Math.PI, Math.PI * 1.5);
+      ctx.lineWidth = Math.max(1, SR * 0.07);
+      ctx.strokeStyle = 'rgba(255,255,255,0.82)';
+      ctx.stroke();
+      // Specular dot
+      const spx = pos.x - SR*0.38, spy = pos.y - SR*0.38;
+      const sp = ctx.createRadialGradient(spx, spy, 0, spx, spy, SR*0.26);
+      sp.addColorStop(0, 'rgba(255,255,255,0.95)');
+      sp.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sp; ctx.beginPath(); ctx.arc(spx, spy, SR*0.26, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      noStroke();
+    } else {
+      const coreA = constrain(30 + density * 150, 25, 200);
+      fill(col[0], col[1], col[2], coreA);
+      noStroke();
+      ellipse(pos.x, pos.y, 5, 5);
     }
-
-    // Core — barely there at rest
-    const coreR = isSrc ? 4 : 2.5;
-    const coreA = constrain(30 + density * 150, 25, 200);
-    fill(col[0], col[1], col[2], coreA);
-    noStroke();
-    ellipse(pos.x, pos.y, coreR * 2, coreR * 2);
 
     // Stage labels — emerge only with particle density
     // At rest: ~5% opacity. Under particle cluster: ~35% max.
@@ -423,7 +450,7 @@ function drawNodes() {
       ly = pos.y + 26;
     }
 
-    text(s.name, lx, ly);
+    if (!isSrc) text(s.name, lx, ly);
   }
 }
 
