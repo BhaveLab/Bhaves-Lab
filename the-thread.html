@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Thread — Bhavé's Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  min-height: 100%;
+  background: #080808;
+  color: #c9a84c;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(201, 168, 76, 0.35);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  z-index: 10;
+}
+.back:hover { color: rgba(201, 168, 76, 0.75); }
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 112px 32px 80px;
+}
+
+.label {
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  color: rgba(201, 168, 76, 0.45);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.divider {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(201,168,76,0), rgba(201,168,76,0.25), rgba(201,168,76,0));
+  margin: 0 auto 28px;
+}
+
+.headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(28px, 6vw, 38px);
+  letter-spacing: 0.03em;
+  color: rgba(201, 168, 76, 0.9);
+  line-height: 1.3;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.subhead {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(13px, 2.8vw, 15px);
+  line-height: 1.75;
+  color: rgba(201, 168, 76, 0.38);
+  letter-spacing: 0.03em;
+  margin-bottom: 52px;
+  text-align: center;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Form ─────────────────────────────────────────────────── */
+.form-block {
+  border: 1px solid rgba(201, 168, 76, 0.1);
+  padding: 32px;
+  margin-bottom: 52px;
+}
+
+.field {
+  margin-bottom: 32px;
+}
+
+.field-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.field-var {
+  font-size: 7px;
+  letter-spacing: 0.22em;
+  color: rgba(201, 168, 76, 0.22);
+  text-transform: uppercase;
+}
+
+.field-label {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  color: rgba(201, 168, 76, 0.45);
+  text-transform: uppercase;
+}
+
+textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+  color: rgba(201, 168, 76, 0.85);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 16px);
+  line-height: 1.7;
+  padding: 8px 0;
+  resize: none;
+  outline: none;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  border-bottom-color: rgba(201, 168, 76, 0.45);
+}
+
+textarea::placeholder {
+  color: rgba(201, 168, 76, 0.12);
+  font-style: italic;
+}
+
+.form-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.submit-btn {
+  background: none;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  color: rgba(201, 168, 76, 0.85);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-btn:hover {
+  border-color: rgba(201, 168, 76, 0.75);
+  color: #c9a84c;
+  background: rgba(201, 168, 76, 0.04);
+}
+
+.save-status {
+  font-size: 7px;
+  letter-spacing: 0.22em;
+  color: rgba(201, 168, 76, 0.35);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.save-status.show { opacity: 1; }
+
+/* ── Entries ──────────────────────────────────────────────── */
+.entries-header {
+  font-size: 7px;
+  letter-spacing: 0.3em;
+  color: rgba(201, 168, 76, 0.2);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.entries-count {
+  color: rgba(201, 168, 76, 0.15);
+}
+
+.entry {
+  border-left: 1px solid rgba(201, 168, 76, 0.1);
+  padding: 0 0 0 20px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.entry::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 6px;
+  width: 5px;
+  height: 1px;
+  background: rgba(201, 168, 76, 0.2);
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.entry-ts {
+  font-size: 7px;
+  letter-spacing: 0.2em;
+  color: rgba(201, 168, 76, 0.18);
+  text-transform: uppercase;
+}
+
+.entry-del {
+  background: none;
+  border: none;
+  color: rgba(201, 168, 76, 0.1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  padding: 0 2px;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.entry-del:hover { color: rgba(201, 168, 76, 0.45); }
+
+.entry-row { margin-bottom: 14px; }
+.entry-row:last-child { margin-bottom: 0; }
+
+.entry-key {
+  font-size: 7px;
+  letter-spacing: 0.2em;
+  color: rgba(201, 168, 76, 0.25);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.entry-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(14px, 3vw, 16px);
+  line-height: 1.6;
+  color: rgba(201, 168, 76, 0.65);
+  letter-spacing: 0.02em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.entry-conn .entry-key { color: rgba(201, 168, 76, 0.35); }
+.entry-conn .entry-val { color: rgba(201, 168, 76, 0.8); font-style: italic; }
+
+.no-entries {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  color: rgba(201, 168, 76, 0.12);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* ── BL NAV ─────────────────────────────────────────────── */
+.bl-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.08); }
+.bl-nav-brand { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 13px; letter-spacing: 0.3em; color: rgba(201,168,76,0.7); text-transform: uppercase; text-decoration: none; }
+.bl-hamburger { background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-direction: column; gap: 5px; z-index: 1001; }
+.bl-hamburger span { display: block; width: 22px; height: 1px; background: rgba(201,168,76,0.6); transition: all 0.3s ease; transform-origin: center; }
+.bl-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); background: rgba(201,168,76,0.9); }
+.bl-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.bl-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: rgba(201,168,76,0.9); }
+.bl-menu { position: fixed; inset: 0; z-index: 999; background: rgba(8,8,8,0.97); display: flex; flex-direction: column; justify-content: center; padding: 80px 32px 48px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.bl-menu.open { opacity: 1; pointer-events: all; }
+.bl-nav-section { margin-bottom: 28px; opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.bl-menu.open .bl-nav-section:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
+.bl-menu.open .bl-nav-section:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.bl-menu.open .bl-nav-section:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
+.bl-menu.open .bl-nav-section:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.bl-menu.open .bl-nav-section:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
+.bl-menu.open .bl-nav-section:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.bl-nav-main { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 26px; letter-spacing: 0.06em; color: rgba(201,168,76,0.85); text-decoration: none; display: block; margin-bottom: 10px; transition: color 0.2s; }
+.bl-nav-main:hover { color: #c9a84c; }
+.bl-nav-subs { display: flex; flex-direction: column; gap: 6px; padding-left: 16px; border-left: 1px solid rgba(201,168,76,0.12); }
+.bl-nav-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: rgba(201,168,76,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+.bl-nav-sub:hover { color: rgba(201,168,76,0.7); }
+.bl-nav-divider { width: 100%; height: 1px; background: rgba(201,168,76,0.06); margin-bottom: 28px; opacity: 0; transition: opacity 0.3s ease 0.2s; }
+.bl-menu.open .bl-nav-divider { opacity: 1; }
+.bl-nav-cta { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.25em; color: rgba(201,168,76,0.85); text-decoration: none; text-transform: uppercase; border: 1px solid rgba(201,168,76,0.3); padding: 12px 24px; display: inline-block; transition: all 0.2s; }
+.bl-nav-cta:hover { border-color: rgba(201,168,76,0.7); color: #c9a84c; background: rgba(201,168,76,0.04); }
+.bl-nav-home { font-size: 8px; letter-spacing: 0.18em; color: rgba(201,168,76,0.2); text-decoration: none; text-transform: uppercase; margin-top: 24px; display: block; transition: color 0.2s; }
+.bl-nav-home:hover { color: rgba(201,168,76,0.5); }
+</style>
+</head>
+<body>
+
+<!-- ── NAV BAR ────────────────────────────────────────────── -->
+<nav class="bl-nav">
+  <a class="bl-nav-brand" href="index.html">Bhavé's Lab</a>
+  <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- ── MENU OVERLAY ───────────────────────────────────────── -->
+<div class="bl-menu" id="bl-menu">
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#work" onclick="closeMenu()">The Work</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+      <a class="bl-nav-sub" href="inner-mining-landing.html" onclick="closeMenu()">Inner Mining</a>
+      <a class="bl-nav-sub" href="pattern-immersion-landing.html" onclick="closeMenu()">Pattern Immersion</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#framework" onclick="closeMenu()">Framework</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="home.html#sequence" onclick="closeMenu()">The Sequence</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="workshops-landing.html" onclick="closeMenu()">Workshops</a>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="tools.html" onclick="closeMenu()">The Realm</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="mirror-landing.html" onclick="closeMenu()">Consciousness Mirror</a>
+      <a class="bl-nav-sub" href="the-thread.html" onclick="closeMenu()">The Thread</a>
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-divider"></div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-cta" href="https://calendly.com/bhaveslab" onclick="closeMenu()">Book a Session</a>
+    <a class="bl-nav-home" href="index.html" onclick="closeMenu()">← Back to the Field</a>
+  </div>
+
+</div>
+
+<a class="back" href="tools.html">← The Realm</a>
+
+<div class="page">
+  <div class="label">Inner · Instrument</div>
+  <div class="divider"></div>
+  <div class="headline">What moves through you.</div>
+  <div class="subhead">
+    Three variables. One entry.<br>
+    The Thread accumulates over time — tracing what runs through changing conditions.
+  </div>
+
+  <div class="form-block">
+    <div class="field">
+      <div class="field-meta">
+        <span class="field-var">A</span>
+        <span class="field-label">What is happening</span>
+      </div>
+      <textarea id="varA" rows="2" placeholder="The observable situation."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-meta">
+        <span class="field-var">B</span>
+        <span class="field-label">What you are experiencing</span>
+      </div>
+      <textarea id="varB" rows="2" placeholder="The internal state."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-meta">
+        <span class="field-var">C</span>
+        <span class="field-label">What you are making it mean</span>
+      </div>
+      <textarea id="varC" rows="2" placeholder="The interpretation."></textarea>
+    </div>
+
+    <div class="form-footer">
+      <button class="submit-btn" onclick="saveEntry()">Save Entry</button>
+      <span class="save-status" id="save-status">Saved</span>
+    </div>
+  </div>
+
+  <div id="entries-section"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'the-thread-entries';
+
+function toggleMenu() {
+  const menu   = document.getElementById('bl-menu');
+  const burger = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  burger.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('bl-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+// Auto-resize textareas
+document.querySelectorAll('textarea').forEach(ta => {
+  ta.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+});
+
+function getEntries() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+
+function saveEntries(entries) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const h = d.getHours().toString().padStart(2,'0');
+  const m = d.getMinutes().toString().padStart(2,'0');
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${h}:${m}`;
+}
+
+function saveEntry() {
+  const a = document.getElementById('varA').value.trim();
+  const b = document.getElementById('varB').value.trim();
+  const c = document.getElementById('varC').value.trim();
+  if (!a && !b && !c) return;
+
+  const entries = getEntries();
+  entries.unshift({ id: Date.now(), ts: Date.now(), a, b, c });
+  saveEntries(entries);
+
+  document.getElementById('varA').value = '';
+  document.getElementById('varB').value = '';
+  document.getElementById('varC').value = '';
+  document.querySelectorAll('textarea').forEach(ta => { ta.style.height = ''; });
+
+  const status = document.getElementById('save-status');
+  status.classList.add('show');
+  setTimeout(() => status.classList.remove('show'), 1800);
+
+  renderEntries();
+}
+
+function deleteEntry(id) {
+  const entries = getEntries().filter(e => e.id !== id);
+  saveEntries(entries);
+  renderEntries();
+}
+
+function renderEntries() {
+  const entries = getEntries();
+  const section = document.getElementById('entries-section');
+
+  if (entries.length === 0) {
+    section.innerHTML = '<div class="no-entries">No entries yet</div>';
+    return;
+  }
+
+  const headerCount = `<span class="entries-count">${entries.length}</span>`;
+  let html = `<div class="entries-header"><span>Thread</span>${headerCount}</div>`;
+
+  for (const e of entries) {
+    html += `
+    <div class="entry" id="entry-${e.id}">
+      <div class="entry-head">
+        <span class="entry-ts">${formatDate(e.ts)}</span>
+        <button class="entry-del" onclick="deleteEntry(${e.id})" title="Remove">×</button>
+      </div>
+      ${e.a ? `<div class="entry-row">
+        <div class="entry-key">A · What is happening</div>
+        <div class="entry-val">${escHtml(e.a)}</div>
+      </div>` : ''}
+      ${e.b ? `<div class="entry-row">
+        <div class="entry-key">B · What you are experiencing</div>
+        <div class="entry-val">${escHtml(e.b)}</div>
+      </div>` : ''}
+      ${e.c ? `<div class="entry-row entry-conn">
+        <div class="entry-key">C · What you are making it mean</div>
+        <div class="entry-val">${escHtml(e.c)}</div>
+      </div>` : ''}
+    </div>`;
+  }
+
+  section.innerHTML = html;
+}
+
+function escHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+renderEntries();
+</script>
+</body>
+</html>
