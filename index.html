@@ -394,22 +394,29 @@ function drawNodes() {
       ellipse(pos.x, pos.y, (glowR + 22) * 2, (glowR + 22) * 2);
       stroke(200, 220, 255, glowA * 0.12);
       ellipse(pos.x, pos.y, (glowR + 44 + pulse) * 2, (glowR + 44 + pulse) * 2);
-      // Blue-teal corona pulse — slow breathing ring outside the white ones
-      const tealPulse = sin(frameCount * 0.022) * 0.5 + 0.5;
-      stroke(78, 205, 196, glowA * (0.07 + tealPulse * 0.11)); strokeWeight(0.5);
-      ellipse(pos.x, pos.y, (glowR + 34) * 2, (glowR + 34) * 2);
-      // Wisps — 7 tiny blue-teal radial blobs drifting outward at different phases
+      // Blue-teal radial glow — 3-second cycle, peaks at rgba(78,205,196,0.4)
+      // frameCount * 0.03491 = 2π / (60fps * 3s) → one full cycle per 3 seconds
+      const tealT = sin(frameCount * 0.03491) * 0.5 + 0.5; // 0..1
       ctx.save();
-      for (let w = 0; w < 7; w++) {
-        const wPhase = sin(frameCount * 0.018 + w * 1.05) * 0.5 + 0.5;
-        const wAng   = (w / 7) * TWO_PI + frameCount * 0.007;
-        const wDist  = SR * 1.6 + wPhase * SR * 2.0;
-        const wR     = SR * 0.35 + wPhase * SR * 0.28;
-        const wA     = (wPhase * 0.065).toFixed(3);
+      const tg = ctx.createRadialGradient(pos.x, pos.y, SR*0.8, pos.x, pos.y, SR*3.8);
+      tg.addColorStop(0,   `rgba(78,205,196,${(tealT * 0.40).toFixed(3)})`);
+      tg.addColorStop(0.5, `rgba(78,205,196,${(tealT * 0.15).toFixed(3)})`);
+      tg.addColorStop(1,   'rgba(78,205,196,0)');
+      ctx.fillStyle = tg;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR*3.8, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 4 wisps — #4ECDC4 drifting outward, each staggered 25% in cycle
+      ctx.save();
+      for (let w = 0; w < 4; w++) {
+        const wPhase = (frameCount * 0.008 + w * 0.25) % 1; // 0→1 continuously
+        const wAng   = (w / 4) * TWO_PI + frameCount * 0.005;
+        const wDist  = SR * (1.3 + wPhase * 3.2);
+        const wR     = SR * 0.45 * (1 - wPhase * 0.5);
+        const wA     = (0.50 * (1 - wPhase)).toFixed(3); // bright near orb, fades out
         const wx     = pos.x + cos(wAng) * wDist;
         const wy     = pos.y + sin(wAng) * wDist;
         const wg = ctx.createRadialGradient(wx, wy, 0, wx, wy, wR);
-        wg.addColorStop(0, `rgba(140,220,215,${wA})`);
+        wg.addColorStop(0, `rgba(78,205,196,${wA})`);
         wg.addColorStop(1, 'rgba(78,205,196,0)');
         ctx.fillStyle = wg;
         ctx.beginPath(); ctx.arc(wx, wy, wR, 0, Math.PI*2); ctx.fill();
