@@ -321,7 +321,7 @@ new p5(function(p) {
         const r = (78  + (225 - 78)  * cT) | 0;
         const g = (205 + (208 - 205) * cT) | 0;
         const b = (196 + (125 - 196) * cT) | 0;
-        p.stroke(r, g, b, t2 * 115 * lifeAlpha);
+        p.stroke(r, g, b, t2 * 98 * lifeAlpha);
         p.strokeWeight(this.sz * t2 * 1.1);
         p.line(this.trail[i-1].x, this.trail[i-1].y, this.trail[i].x, this.trail[i].y);
       }
@@ -332,7 +332,7 @@ new p5(function(p) {
       const r    = (78  + (225 - 78)  * cT) | 0;
       const g    = (205 + (208 - 205) * cT) | 0;
       const b    = (196 + (125 - 196) * cT) | 0;
-      p.fill(r, g, b, 185 * lifeAlpha);
+      p.fill(r, g, b, 157 * lifeAlpha);
       p.noStroke();
       p.ellipse(this.x, this.y, this.sz * 2.4, this.sz * 2.4);
     }
@@ -343,8 +343,8 @@ new p5(function(p) {
     let cv = p.createCanvas(W, H); cv.parent('cv-container');
     p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
     p.noiseSeed(42);
-    cx = W/2; cy = H/2;
-    let m = Math.min(W, H); innerR = m*0.38; outerR = m*0.58;
+    cx = W/2; cy = H/2 + H*0.05;
+    let m = Math.min(W, H); innerR = m*0.33; outerR = m*0.58;
     _innerR = innerR;
     for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
     for (let i = 0; i < 180; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.6,3.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(40,229) });
@@ -352,8 +352,8 @@ new p5(function(p) {
 
   p.windowResized = function() {
     W = window.innerWidth; H = window.innerHeight;
-    p.resizeCanvas(W, H); cx=W/2; cy=H/2;
-    let m = Math.min(W, H); innerR=m*0.27; outerR=m*0.44;
+    p.resizeCanvas(W, H); cx=W/2; cy=H/2+H*0.05;
+    let m = Math.min(W, H); innerR=m*0.33; outerR=m*0.58;
     _innerR = innerR;
     for (let pt of bgParticles) pt.resetScattered();
   };
