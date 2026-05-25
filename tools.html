@@ -269,9 +269,9 @@ new p5(function(p) {
       const lifeT = this.age / this.maxAge;
 
       // Perlin noise — creates organic curling, not straight lines
-      const nAng = p.noise(this.x * 0.0038, this.y * 0.0038, p.frameCount * 0.002) * Math.PI * 6;
-      this.vx += Math.cos(nAng) * 0.026;
-      this.vy += Math.sin(nAng) * 0.026;
+      const nAng = p.noise(this.x * 0.0038, this.y * 0.0038, p.frameCount * 0.002) * Math.PI * 2.5;
+      this.vx += Math.cos(nAng) * 0.014;
+      this.vy += Math.sin(nAng) * 0.014;
 
       // Phase 1 (0–40% of life): outward burst from SOURCE
       if (lifeT < 0.40 && dist > 0) {
@@ -344,7 +344,7 @@ new p5(function(p) {
     let cv = p.createCanvas(W, H); cv.parent('cv-container');
     p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
     p.noiseSeed(42);
-    cx = W/2; cy = H/2;
+    cx = W/2 + (W < 600 ? Math.round(W * 0.06) : 0); cy = H/2;
     let m = Math.min(W, H); innerR = m*0.27; outerR = m*0.44;
     _innerR = innerR;
     for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
@@ -353,7 +353,7 @@ new p5(function(p) {
 
   p.windowResized = function() {
     W = window.innerWidth; H = window.innerHeight - NAV_H;
-    p.resizeCanvas(W, H); cx=W/2; cy=H/2;
+    p.resizeCanvas(W, H); cx=W/2 + (W < 600 ? Math.round(W * 0.06) : 0); cy=H/2;
     let m = Math.min(W, H); innerR=m*0.27; outerR=m*0.44;
     _innerR = innerR;
     for (let pt of bgParticles) pt.resetScattered();
