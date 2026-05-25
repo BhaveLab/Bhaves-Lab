@@ -397,7 +397,7 @@ new p5(function(p) {
     const p2 = p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
     const p1 = p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
     p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
-    p.fill(228,210,130,200); p.noStroke(); p.ellipse(cx,cy,6,6);
+    p.fill(228,210,130,220); p.noStroke(); p.ellipse(cx,cy,14,14);
     p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+innerR*0.22+14);
 
     // SOURCE pulse rings (on tap)
@@ -421,17 +421,17 @@ new p5(function(p) {
       const ang = pl.angle + t * driftSpeed;
       const px  = cx + radius * Math.cos(ang);
       const py  = cy + radius * Math.sin(ang);
-      pl._px = px; pl._py = py; pl._r = baseSize + 6;
+      pl._px = px; pl._py = py; pl._r = baseSize*2 + 8;
       const isH = hoveredPlanet === pl.id;
       const col = pl.color;
-      p.noFill(); p.stroke(col[0],col[1],col[2],isH?55:(pl.live?18:8)); p.strokeWeight(0.5);
-      p.ellipse(px, py, (baseSize+(isH?14:6))*2, (baseSize+(isH?14:6))*2);
-      p.fill(col[0],col[1],col[2],isH?220:(pl.live?150:60)); p.noStroke();
-      p.ellipse(px, py, baseSize*2, baseSize*2);
+      p.noFill(); p.stroke(col[0],col[1],col[2],isH?70:(pl.live?25:10)); p.strokeWeight(0.5);
+      p.ellipse(px, py, (baseSize*2+(isH?18:8))*2, (baseSize*2+(isH?18:8))*2);
+      p.fill(col[0],col[1],col[2],isH?230:(pl.live?180:75)); p.noStroke();
+      p.ellipse(px, py, baseSize*4, baseSize*4);
       const dx = px-cx, dy = py-cy, d = Math.sqrt(dx*dx+dy*dy);
-      p.fill(col[0],col[1],col[2],isH?130:(pl.live?55:22));
-      p.textFont('JetBrains Mono,monospace'); p.textSize(radius===innerR?7.5:6.5); p.textAlign(p.CENTER,p.CENTER);
-      p.text(pl.name.toUpperCase(), px+(dx/d)*(baseSize+14), py+(dy/d)*(baseSize+14));
+      p.fill(235, 230, 220, isH?255:(pl.live?200:70));
+      p.textFont('JetBrains Mono,monospace'); p.textSize(13); p.textAlign(p.CENTER,p.CENTER);
+      p.text(pl.name.toUpperCase(), px+(dx/d)*(baseSize*2+20), py+(dy/d)*(baseSize*2+20));
     }
   }
 
