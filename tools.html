@@ -209,27 +209,6 @@ const OUTER_PLANETS = [
   { id:'workshops', name:'Workshops', orbit:'OUTER · GROUP', desc:'Group sessions. The framework applied in a collective field. Dates and formats announced as they form.', cta:'View Workshops', href:'home.html#workshops', price:'Variable', color:[88,212,200], angle:Math.PI-Math.PI/4, live:true }
 ];
 
-// ── BACKGROUND FIELD — same stage palette as index.html ──────────────
-const BG_STAGES = [
-  { color:[78,205,196]  },
-  { color:[90,208,175]  },
-  { color:[115,210,148] },
-  { color:[158,207,108] },
-  { color:[193,188,85]  },
-  { color:[201,168,76]  },
-  { color:[225,208,125] },
-  { color:[88,212,200]  }
-];
-const BG_CFG = {
-  particleCount: 900,
-  flowSpeed:     2.0,
-  noiseScale:    0.0038,
-  trailLength:   22,
-  attraction:    0.08,
-  cursorRadius:  90,
-  cursorForce:   0.20
-};
-
 // SOURCE pulse globals
 let pulses = [];
 let _innerR = 0;
@@ -243,228 +222,278 @@ function triggerSourcePulse() {
 new p5(function(p) {
   const NAV_H = 50;
   let W, H, cx, cy, innerR, outerR;
-  let bgParticles = [], shootingStars = [], twinkleStars = [], streamParticles = [];
-  let bgStagePos = [];
+  let bgParticles = [], shootingStars = [], twinkleStars = [];
   let hoveredPlanet = null, t = 0;
 
-  // ── BACKGROUND PARTICLE — ported from index.html to instance mode ────
+  // ── SOURCE-EMISSION PARTICLE ─────────────────────────────────────────
+  // Births at center, radiates outward with Perlin-noise curling,
+  // arcs back inward during final third of life. Color: teal (center) → gold (edge).
   class BgParticle {
     constructor(scattered) {
-      this.si = 0; this.maxAge = 0; this.age = 0; this.sz = 0;
-      this.vx = 0; this.vy = 0; this.x = 0; this.y = 0; this.trail = [];
-      if (scattered) this.resetToScattered(); else this.resetToState();
+      this.sz    = p.random(0.3, 1.6);
+      this.trail = [];
+      if (scattered) this.resetScattered(); else this.resetCenter();
     }
-    resetToScattered() {
-      this.si     = Math.floor(p.random(8));
-      this.maxAge = p.random(320, 820);
-      this.age    = p.random(0, this.maxAge);
-      this.sz     = p.random(0.35, 1.55);
-      this.vx = 0; this.vy = 0; this.trail = [];
-      const sp = bgStagePos[this.si];
-      this.x = sp.x + p.random(-70, 70);
-      this.y = sp.y + p.random(-70, 70);
+
+    resetCenter() {
+      const ang    = p.random(p.TWO_PI);
+      const burst  = p.random(0.5, 2.0);
+      this.x       = cx + p.random(-10, 10);
+      this.y       = cy + p.random(-10, 10);
+      this.vx      = Math.cos(ang) * burst;
+      this.vy      = Math.sin(ang) * burst;
+      this.maxAge  = p.random(260, 700);
+      this.age     = 0;
+      this.trail   = [];
     }
-    resetToState() {
-      this.si     = 0;
-      this.maxAge = p.random(320, 820);
-      this.age    = 0;
-      this.sz     = p.random(0.35, 1.55);
-      this.vx = 0; this.vy = 0; this.trail = [];
-      const sp = bgStagePos[0];
-      this.x = sp.x + p.random(-22, 22);
-      this.y = sp.y + p.random(-22, 22);
+
+    resetScattered() {
+      // Seed the field across the canvas on first load so it looks alive immediately
+      const ang    = p.random(p.TWO_PI);
+      const r      = p.random(0, outerR * 1.2);
+      this.x       = cx + Math.cos(ang) * r;
+      this.y       = cy + Math.sin(ang) * r;
+      const va     = p.random(p.TWO_PI);
+      this.vx      = Math.cos(va) * p.random(0.2, 1.4);
+      this.vy      = Math.sin(va) * p.random(0.2, 1.4);
+      this.maxAge  = p.random(260, 700);
+      this.age     = p.random(0, this.maxAge);
+      this.trail   = [];
     }
+
     update() {
-      const tgt  = bgStagePos[this.si];
-      const dx   = tgt.x - this.x, dy = tgt.y - this.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const capR = this.si === 6 ? 16 : 30;
-      if (dist < capR) this.si = (this.si + 1) % 8;
+      const dx    = cx - this.x;
+      const dy    = cy - this.y;
+      const dist  = Math.sqrt(dx*dx + dy*dy);
+      const maxR  = outerR * 1.3;
+      const lifeT = this.age / this.maxAge;
 
-      let attrMod = 1.0, noiseMod = 0.28;
-      if (this.si===1){attrMod=0.50;noiseMod=0.92;}
-      if (this.si===2){attrMod=0.72;noiseMod=0.42;}
-      if (this.si===6){attrMod=2.65;noiseMod=0.05;}
-      if (this.si===7){attrMod=1.55;noiseMod=0.18;}
+      // Perlin noise — creates organic curling, not straight lines
+      const nAng = p.noise(this.x * 0.0038, this.y * 0.0038, p.frameCount * 0.002) * Math.PI * 6;
+      this.vx += Math.cos(nAng) * 0.026;
+      this.vy += Math.sin(nAng) * 0.026;
 
-      const ns   = BG_CFG.noiseScale;
-      const nt   = p.frameCount * 0.002;
-      const nAng = p.noise(this.x*ns, this.y*ns, nt) * Math.PI * 2 * 3;
-      const attr = BG_CFG.attraction;
-      if (dist > 0) {
-        this.vx += (dx/dist)*attr*attrMod + Math.cos(nAng)*noiseMod*attr;
-        this.vy += (dy/dist)*attr*attrMod + Math.sin(nAng)*noiseMod*attr;
+      // Phase 1 (0–40% of life): outward burst from SOURCE
+      if (lifeT < 0.40 && dist > 0) {
+        const outStr = 0.092 * (1.0 - lifeT / 0.40);
+        this.vx -= (dx / dist) * outStr;
+        this.vy -= (dy / dist) * outStr;
       }
 
-      const cdx = this.x - p.mouseX, cdy = this.y - p.mouseY;
-      const cd  = Math.sqrt(cdx*cdx + cdy*cdy);
-      if (cd < BG_CFG.cursorRadius && cd > 0) {
-        const str = ((BG_CFG.cursorRadius - cd) / BG_CFG.cursorRadius) * BG_CFG.cursorForce;
-        this.vx += (cdx/cd)*str; this.vy += (cdy/cd)*str;
+      // Phase 3 (62–100% of life): arc back toward SOURCE
+      if (lifeT > 0.62 && dist > 0) {
+        const retStr = 0.11 * ((lifeT - 0.62) / 0.38);
+        this.vx += (dx / dist) * retStr;
+        this.vy += (dy / dist) * retStr;
+      }
+
+      // Constant gentle gravity toward center (scales with distance)
+      if (dist > 0) {
+        const g = 0.010 * Math.min(dist / maxR, 1.0);
+        this.vx += (dx / dist) * g;
+        this.vy += (dy / dist) * g;
       }
 
       const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-      if (spd > BG_CFG.flowSpeed) { this.vx=(this.vx/spd)*BG_CFG.flowSpeed; this.vy=(this.vy/spd)*BG_CFG.flowSpeed; }
-      this.vx *= 0.91; this.vy *= 0.91;
-      this.x += this.vx; this.y += this.vy;
+      if (spd > 2.2) { this.vx = (this.vx/spd)*2.2; this.vy = (this.vy/spd)*2.2; }
+      this.vx *= 0.92; this.vy *= 0.92;
+      this.x  += this.vx;
+      this.y  += this.vy;
 
-      this.trail.push({x:this.x, y:this.y, si:this.si});
-      if (this.trail.length > BG_CFG.trailLength) this.trail.shift();
+      this.trail.push({ x:this.x, y:this.y, d:dist });
+      if (this.trail.length > 24) this.trail.shift();
       this.age++;
-      if (this.age > this.maxAge || this.x < -60 || this.x > W+60 || this.y < -60 || this.y > H+60) this.resetToState();
+
+      // Respawn at center when returned or expired
+      const returnedHome = dist < 14 && lifeT > 0.50;
+      if (this.age > this.maxAge || returnedHome || dist > maxR * 1.1) this.resetCenter();
     }
+
     draw() {
-      const lifeT = 1 - this.age / this.maxAge;
-      for (let i=1; i<this.trail.length; i++) {
-        const t2  = i / this.trail.length;
-        const col = BG_STAGES[this.trail[i].si].color;
-        p.stroke(col[0], col[1], col[2], t2 * 110 * lifeT);
-        p.strokeWeight(this.sz * t2 * 1.05);
+      const lifeAlpha = 1 - this.age / this.maxAge;
+      const maxR      = outerR * 1.3;
+      const colorRange = maxR * 0.58;
+
+      // Trail — color shifts teal→gold with distance from center
+      for (let i = 1; i < this.trail.length; i++) {
+        const t2     = i / this.trail.length;
+        const cT     = Math.min(this.trail[i].d / colorRange, 1.0);
+        // teal [78,205,196] → gold [225,208,125]
+        const r = (78  + (225 - 78)  * cT) | 0;
+        const g = (205 + (208 - 205) * cT) | 0;
+        const b = (196 + (125 - 196) * cT) | 0;
+        p.stroke(r, g, b, t2 * 115 * lifeAlpha);
+        p.strokeWeight(this.sz * t2 * 1.1);
         p.line(this.trail[i-1].x, this.trail[i-1].y, this.trail[i].x, this.trail[i].y);
       }
-      const col = BG_STAGES[this.si].color;
-      p.fill(col[0], col[1], col[2], 180 * lifeT);
-      p.noStroke();
-      p.ellipse(this.x, this.y, this.sz * 2.3, this.sz * 2.3);
-    }
-  }
 
-  function initBgStages() {
-    const bgR = Math.min(W, H) * 0.35;
-    bgStagePos = [];
-    for (let i=0; i<8; i++) {
-      bgStagePos.push({
-        x: cx + bgR * Math.cos(-Math.PI/2 + i * Math.PI*2/8),
-        y: cy + bgR * Math.sin(-Math.PI/2 + i * Math.PI*2/8)
-      });
+      // Head dot
+      const dist = Math.sqrt(Math.pow(this.x - cx, 2) + Math.pow(this.y - cy, 2));
+      const cT   = Math.min(dist / colorRange, 1.0);
+      const r    = (78  + (225 - 78)  * cT) | 0;
+      const g    = (205 + (208 - 205) * cT) | 0;
+      const b    = (196 + (125 - 196) * cT) | 0;
+      p.fill(r, g, b, 185 * lifeAlpha);
+      p.noStroke();
+      p.ellipse(this.x, this.y, this.sz * 2.4, this.sz * 2.4);
     }
   }
 
   p.setup = function() {
     W = window.innerWidth; H = window.innerHeight - NAV_H;
     let cv = p.createCanvas(W, H); cv.parent('cv-container');
-    p.colorMode(p.RGB,255,255,255,255); p.smooth();
-    p.randomSeed(42); p.noiseSeed(42);
+    p.colorMode(p.RGB, 255, 255, 255, 255); p.smooth();
+    p.noiseSeed(42);
     cx = W/2; cy = H/2;
-    let m = Math.min(W,H); innerR = m*0.27; outerR = m*0.44;
+    let m = Math.min(W, H); innerR = m*0.27; outerR = m*0.44;
     _innerR = innerR;
-    initBgStages();
-    for (let i=0; i<BG_CFG.particleCount; i++) bgParticles.push(new BgParticle(true));
-    for (let i=0; i<60; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(10,55) });
-    for (let i=0; i<120; i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
+    for (let i = 0; i < 950; i++) bgParticles.push(new BgParticle(true));
+    for (let i = 0; i < 70; i++) twinkleStars.push({ x:p.random(W), y:p.random(H), sz:p.random(0.4,2.2), phase:p.random(p.TWO_PI), spd:p.random(0.5,2.8), base:p.random(8,45) });
   };
 
   p.windowResized = function() {
     W = window.innerWidth; H = window.innerHeight - NAV_H;
-    p.resizeCanvas(W,H); cx=W/2; cy=H/2;
-    let m=Math.min(W,H); innerR=m*0.27; outerR=m*0.44;
+    p.resizeCanvas(W, H); cx=W/2; cy=H/2;
+    let m = Math.min(W, H); innerR=m*0.27; outerR=m*0.44;
     _innerR = innerR;
-    initBgStages();
-    for (let pt of bgParticles) pt.resetToScattered();
-    streamParticles = [];
-    for (let i=0; i<120; i++) { let a=p.random(p.TWO_PI), r=outerR*p.random(1.08,1.5); streamParticles.push({ a, r, da:p.random()>0.5?p.random(0.002,0.007):-p.random(0.002,0.007), sz:p.random(0.5,2.8), al:p.random(18,65) }); }
+    for (let pt of bgParticles) pt.resetScattered();
   };
 
   p.draw = function() {
-    // Void fade — matches index.html exactly
-    p.fill(8,8,8,16); p.noStroke(); p.rect(0,0,W,H);
+    // Void fade — long trails, same depth as index.html
+    p.fill(8, 8, 8, 16); p.noStroke(); p.rect(0, 0, W, H);
     t += 0.006;
 
-    // Path lines between bg stage nodes (barely visible — structural truth)
-    const seq = [0,1,2,3,4,5,6,7,0];
-    p.noFill();
-    for (let i=0; i<seq.length-1; i++) {
-      const col = BG_STAGES[seq[i]].color;
-      p.stroke(col[0], col[1], col[2], 7); p.strokeWeight(0.3);
-      p.line(bgStagePos[seq[i]].x, bgStagePos[seq[i]].y, bgStagePos[seq[i+1]].x, bgStagePos[seq[i+1]].y);
-    }
-
-    // Flow particles
+    // Flow particles — emanate from SOURCE, arc back in
     for (let pt of bgParticles) { pt.update(); pt.draw(); }
 
-    // Twinkle stars
-    for (let s of twinkleStars) { let a=(p.sin(t*s.spd+s.phase)*0.5+0.5)*s.base; p.noStroke(); p.fill(201,168,76,a); p.ellipse(s.x,s.y,s.sz,s.sz); }
+    // Twinkle stars (depth layer)
+    for (let s of twinkleStars) {
+      const a = (p.sin(t * s.spd + s.phase) * 0.5 + 0.5) * s.base;
+      p.noStroke(); p.fill(201, 168, 76, a); p.ellipse(s.x, s.y, s.sz, s.sz);
+    }
 
     // Shooting stars
-    if(p.random()<0.012) { let ang=p.random(p.TWO_PI), spd=p.random(8,20); shootingStars.push({x:cx+p.random(-W*0.48,W*0.48),y:cy+p.random(-H*0.48,H*0.48),vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,life:0,maxLife:Math.floor(p.random(22,52)),len:p.random(45,130)}); }
-    for(let i=shootingStars.length-1;i>=0;i--) { let s=shootingStars[i]; let al=(1-s.life/s.maxLife)*150; p.stroke(228,210,130,al); p.strokeWeight(0.7); let tailLen=s.len*(s.life/s.maxLife); p.line(s.x,s.y,s.x-s.vx*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5),s.y-s.vy*(tailLen/Math.max(s.vx*s.vx+s.vy*s.vy,1)*0.5)); s.x+=s.vx; s.y+=s.vy; s.life++; if(s.life>=s.maxLife)shootingStars.splice(i,1); }
+    if (p.random() < 0.010) {
+      const ang = p.random(p.TWO_PI), spd = p.random(8, 20);
+      shootingStars.push({ x:cx+p.random(-W*0.48,W*0.48), y:cy+p.random(-H*0.48,H*0.48), vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, life:0, maxLife:Math.floor(p.random(22,52)), len:p.random(45,130) });
+    }
+    for (let i = shootingStars.length-1; i >= 0; i--) {
+      const s  = shootingStars[i];
+      const al = (1 - s.life/s.maxLife) * 145;
+      const tl = s.len * (s.life/s.maxLife);
+      const dv = Math.max(s.vx*s.vx + s.vy*s.vy, 1);
+      p.stroke(228, 210, 130, al); p.strokeWeight(0.7);
+      p.line(s.x, s.y, s.x - s.vx*(tl/dv)*0.5, s.y - s.vy*(tl/dv)*0.5);
+      s.x += s.vx; s.y += s.vy; s.life++;
+      if (s.life >= s.maxLife) shootingStars.splice(i, 1);
+    }
 
-    // Energy stream particles (circling beyond outer orbit)
-    for (let s of streamParticles) { s.a+=s.da; p.noStroke(); p.fill(201,168,76,s.al); p.ellipse(cx+s.r*Math.cos(s.a),cy+s.r*Math.sin(s.a),s.sz,s.sz); }
-
-    // Orbit rings
+    // Orbit rings (dimmed — background field shows through)
     p.noFill(); p.stroke(201,168,76,6); p.strokeWeight(0.5); p.ellipse(cx,cy,innerR*2,innerR*2);
     p.stroke(78,205,196,4); p.ellipse(cx,cy,outerR*2,outerR*2);
 
     // SOURCE rings
-    let p2=p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
-    let p1=p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
+    const p2 = p.sin(t*0.7)*8; p.stroke(228,210,130,5); p.strokeWeight(0.5); p.ellipse(cx,cy,(innerR*0.22+40+p2)*2,(innerR*0.22+40+p2)*2);
+    const p1 = p.sin(t*1.2)*5; p.stroke(228,210,130,12); p.ellipse(cx,cy,(innerR*0.22+20+p1)*2,(innerR*0.22+20+p1)*2);
     p.stroke(228,210,130,22); p.ellipse(cx,cy,innerR*0.22*2,innerR*0.22*2);
     p.fill(228,210,130,200); p.noStroke(); p.ellipse(cx,cy,6,6);
     p.fill(228,210,130,55); p.textFont('JetBrains Mono,monospace'); p.textSize(7); p.textAlign(p.CENTER,p.CENTER); p.text('SOURCE',cx,cy+innerR*0.22+14);
 
-    // SOURCE pulse rings
-    for (let i=pulses.length-1;i>=0;i--) { let pu=pulses[i]; let prog=(pu.r-pu.startR)/(pu.maxR-pu.startR); p.noFill(); p.stroke(228,210,130,(1-prog)*70); p.strokeWeight(1); p.ellipse(cx,cy,pu.r*2,pu.r*2); pu.r+=pu.maxR*0.022; if(pu.r>=pu.maxR)pulses.splice(i,1); }
+    // SOURCE pulse rings (on tap)
+    for (let i = pulses.length-1; i >= 0; i--) {
+      const pu   = pulses[i];
+      const prog = (pu.r - pu.startR) / (pu.maxR - pu.startR);
+      p.noFill(); p.stroke(228,210,130,(1-prog)*70); p.strokeWeight(1);
+      p.ellipse(cx, cy, pu.r*2, pu.r*2);
+      pu.r += pu.maxR * 0.022;
+      if (pu.r >= pu.maxR) pulses.splice(i, 1);
+    }
 
-    // Planets (always on top)
-    drawPlanets(INNER_PLANETS,innerR,0.28,8); drawPlanets(OUTER_PLANETS,outerR,-0.16,6);
+    // Planets — always on top
+    drawPlanets(INNER_PLANETS, innerR, 0.28, 8);
+    drawPlanets(OUTER_PLANETS, outerR, -0.16, 6);
   };
 
-  function drawPlanets(planets,radius,driftSpeed,baseSize) {
-    for (let i=0;i<planets.length;i++) {
-      let pl=planets[i], angle=pl.angle+t*driftSpeed;
-      let px=cx+radius*Math.cos(angle), py=cy+radius*Math.sin(angle);
-      pl._px=px; pl._py=py; pl._r=baseSize+6;
-      let isH=(hoveredPlanet===pl.id), col=pl.color;
-      p.noFill(); p.stroke(col[0],col[1],col[2],isH?55:(pl.live?18:8)); p.strokeWeight(0.5); p.ellipse(px,py,(baseSize+(isH?14:6))*2,(baseSize+(isH?14:6))*2);
-      p.fill(col[0],col[1],col[2],isH?220:(pl.live?150:60)); p.noStroke(); p.ellipse(px,py,baseSize*2,baseSize*2);
-      let dx=px-cx,dy=py-cy,d=Math.sqrt(dx*dx+dy*dy);
-      p.fill(col[0],col[1],col[2],isH?130:(pl.live?55:22)); p.textFont('JetBrains Mono,monospace'); p.textSize(radius===innerR?7.5:6.5); p.textAlign(p.CENTER,p.CENTER);
+  function drawPlanets(planets, radius, driftSpeed, baseSize) {
+    for (let i = 0; i < planets.length; i++) {
+      const pl  = planets[i];
+      const ang = pl.angle + t * driftSpeed;
+      const px  = cx + radius * Math.cos(ang);
+      const py  = cy + radius * Math.sin(ang);
+      pl._px = px; pl._py = py; pl._r = baseSize + 6;
+      const isH = hoveredPlanet === pl.id;
+      const col = pl.color;
+      p.noFill(); p.stroke(col[0],col[1],col[2],isH?55:(pl.live?18:8)); p.strokeWeight(0.5);
+      p.ellipse(px, py, (baseSize+(isH?14:6))*2, (baseSize+(isH?14:6))*2);
+      p.fill(col[0],col[1],col[2],isH?220:(pl.live?150:60)); p.noStroke();
+      p.ellipse(px, py, baseSize*2, baseSize*2);
+      const dx = px-cx, dy = py-cy, d = Math.sqrt(dx*dx+dy*dy);
+      p.fill(col[0],col[1],col[2],isH?130:(pl.live?55:22));
+      p.textFont('JetBrains Mono,monospace'); p.textSize(radius===innerR?7.5:6.5); p.textAlign(p.CENTER,p.CENTER);
       p.text(pl.name.toUpperCase(), px+(dx/d)*(baseSize+14), py+(dy/d)*(baseSize+14));
     }
   }
 
   p.mouseMoved = function() {
-    hoveredPlanet=null;
-    if(Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2))<innerR*0.22+44){document.body.style.cursor='pointer';return;}
-    for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2))<pl._r+16){hoveredPlanet=pl.id;document.body.style.cursor='pointer';return;} }
-    document.body.style.cursor='default';
+    hoveredPlanet = null;
+    if (Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2)) < innerR*0.22+44) { document.body.style.cursor='pointer'; return; }
+    for (const pl of [...INNER_PLANETS,...OUTER_PLANETS]) {
+      if (!pl._px) continue;
+      if (Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2)) < pl._r+16) { hoveredPlanet=pl.id; document.body.style.cursor='pointer'; return; }
+    }
+    document.body.style.cursor = 'default';
   };
 
   p.mousePressed = function() {
-    if(Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2))<innerR*0.22+44){triggerSourcePulse();openSourcePanel();return false;}
-    for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2))<pl._r+18){openPanel(pl);return false;} }
+    if (Math.sqrt(Math.pow(p.mouseX-cx,2)+Math.pow(p.mouseY-cy,2)) < innerR*0.22+44) { triggerSourcePulse(); openSourcePanel(); return false; }
+    for (const pl of [...INNER_PLANETS,...OUTER_PLANETS]) {
+      if (!pl._px) continue;
+      if (Math.sqrt(Math.pow(p.mouseX-pl._px,2)+Math.pow(p.mouseY-pl._py,2)) < pl._r+18) { openPanel(pl); return false; }
+    }
   };
 
   p.touchStarted = function() {
-    if(document.getElementById('planet-panel').classList.contains('open'))return;
-    let tx=p.touches.length>0?p.touches[0].x:p.mouseX, ty=p.touches.length>0?p.touches[0].y:p.mouseY;
-    if(Math.sqrt(Math.pow(tx-cx,2)+Math.pow(ty-cy,2))<innerR*0.22+44){triggerSourcePulse();openSourcePanel();return false;}
-    for (let pl of [...INNER_PLANETS,...OUTER_PLANETS]) { if(!pl._px)continue; if(Math.sqrt(Math.pow(tx-pl._px,2)+Math.pow(ty-pl._py,2))<pl._r+22){openPanel(pl);return false;} }
+    if (document.getElementById('planet-panel').classList.contains('open')) return;
+    const tx = p.touches.length > 0 ? p.touches[0].x : p.mouseX;
+    const ty = p.touches.length > 0 ? p.touches[0].y : p.mouseY;
+    if (Math.sqrt(Math.pow(tx-cx,2)+Math.pow(ty-cy,2)) < innerR*0.22+44) { triggerSourcePulse(); openSourcePanel(); return false; }
+    for (const pl of [...INNER_PLANETS,...OUTER_PLANETS]) {
+      if (!pl._px) continue;
+      if (Math.sqrt(Math.pow(tx-pl._px,2)+Math.pow(ty-pl._py,2)) < pl._r+22) { openPanel(pl); return false; }
+    }
   };
 
 }, document.getElementById('cv-container'));
 
 function openSourcePanel() {
-  document.getElementById('panel-orbit').textContent = '';
-  document.getElementById('panel-name').textContent = 'SOURCE';
-  document.getElementById('panel-desc').textContent = 'I Am';
-  document.getElementById('panel-actions').innerHTML = '';
+  document.getElementById('panel-orbit').textContent   = '';
+  document.getElementById('panel-name').textContent    = 'SOURCE';
+  document.getElementById('panel-desc').textContent    = 'I Am';
+  document.getElementById('panel-actions').innerHTML   = '';
   document.getElementById('planet-panel').classList.add('open');
 }
 function openPanel(pl) {
   document.getElementById('panel-orbit').textContent = pl.orbit;
-  document.getElementById('panel-name').textContent = pl.name;
-  document.getElementById('panel-desc').textContent = pl.coming || pl.desc;
+  document.getElementById('panel-name').textContent  = pl.name;
+  document.getElementById('panel-desc').textContent  = pl.coming || pl.desc;
   document.getElementById('panel-actions').innerHTML = pl.coming
     ? `<span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.18em;color:rgba(201,168,76,0.25);text-transform:uppercase;">${pl.coming}</span>`
     : `<a class="panel-cta" href="${pl.href}">${pl.cta}</a><span class="panel-price">${pl.price}</span>`;
   document.getElementById('planet-panel').classList.add('open');
 }
 function closePanel() { document.getElementById('planet-panel').classList.remove('open'); }
-document.addEventListener('keydown', e => { if(e.key==='Escape'){closePanel();closeMenu();} });
-function toggleMenu() { document.getElementById('bl-menu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); document.body.style.overflow=document.getElementById('bl-menu').classList.contains('open')?'hidden':''; }
-function closeMenu() { document.getElementById('bl-menu').classList.remove('open'); document.getElementById('hamburger').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closePanel(); closeMenu(); } });
+function toggleMenu() {
+  document.getElementById('bl-menu').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+  document.body.style.overflow = document.getElementById('bl-menu').classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('bl-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>
