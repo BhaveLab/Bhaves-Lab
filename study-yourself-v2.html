@@ -320,11 +320,14 @@
 <!-- ── NAV BAR ────────────────────────────────────────────── -->
 <nav class="bl-nav">
   <a class="bl-nav-brand" href="index.html">Bhavé's Lab</a>
-  <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button id="ms-auth-btn" class="ms-auth-btn">Log Out</button>
+    <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
 </nav>
 
 <!-- ── MENU OVERLAY ───────────────────────────────────────── -->
