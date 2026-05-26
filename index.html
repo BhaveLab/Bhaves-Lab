@@ -321,7 +321,6 @@ const PLANETS = [
   { label: 'DECISION',   color: [158, 207, 108], desc: 'What gets chosen based on perceived reality — not actual reality. The gap between the two is where most patterns live.' },
   { label: 'EXPERIENCE', color: [193, 188,  85], desc: 'The output of the decision in context. What gets generated when the decision meets the field.' },
   { label: 'REALITY',    color: [201, 168,  76], desc: 'The feedback from Experience that becomes the next State. The loop closes here.' },
-  { label: 'SOURCE',     color: [225, 208, 125], desc: 'The observer beneath all of it. The one that notices. Always present, never absent.', large: true },
   { label: 'CURIOSITY',  color: [88,  212, 200], desc: 'The signal that something in the sequence wants attention. Not anxiety. The system pointing at itself.' },
 ];
 
@@ -391,8 +390,8 @@ function setup() {
   noiseSeed(CFG.seed);
   computeStagePos();
 
-  for (let i = 0; i < 8; i++) {
-    planetBaseAngles.push(-HALF_PI + (i * TWO_PI / 8));
+  for (let i = 0; i < 7; i++) {
+    planetBaseAngles.push(-HALF_PI + (i * TWO_PI / 7));
   }
 
   for (let i = 0; i < CFG.particleCount; i++) {
@@ -558,7 +557,7 @@ function drawPlanets() {
   const orbitR = min(width, height) * 0.36;
   const ctx = drawingContext;
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     const angle   = planetBaseAngles[i] + orbitAngle;
     const px      = cx + orbitR * Math.cos(angle);
     const py      = cy + orbitR * Math.sin(angle);
@@ -628,7 +627,7 @@ function handlePlanetTap(mx, my) {
     }
   }
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     const p = PLANETS[i];
     if (p._px === undefined) continue;
     const d = Math.hypot(mx - p._px, my - p._py);
