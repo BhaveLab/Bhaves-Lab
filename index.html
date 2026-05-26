@@ -94,6 +94,27 @@ html, body {
   border-color: rgba(201, 168, 76, 0.28);
 }
 
+/* ENTER THE REALM — standalone above all canvas layers */
+#enter-realm-fixed {
+  position: fixed;
+  bottom: 48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+#enter-realm-fixed.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#enter-realm-fixed .enter-link {
+  pointer-events: auto;
+}
+
 /* Minimal seed indicator — invisible, for internal reference only */
 .seed-ref {
   position: fixed;
@@ -265,9 +286,10 @@ html, body {
 <div class="overlay" id="overlay">
   <div class="brand">Bhavé's Lab</div>
   <div class="divider"></div>
-  <div class="enter-links">
-    <a class="enter-link" href="tools.html">Enter the Realm</a>
-  </div>
+</div>
+
+<div id="enter-realm-fixed">
+  <a class="enter-link" href="tools.html">Enter the Realm</a>
 </div>
 
 <div id="stage-reveal" class="stage-reveal">
@@ -381,6 +403,7 @@ function setup() {
   // Fade in overlay after field has a moment to breathe
   setTimeout(() => {
     document.getElementById('overlay').classList.add('visible');
+    document.getElementById('enter-realm-fixed').classList.add('visible');
   }, 2200);
 
   document.getElementById('seed-ref').textContent = `SEED_${CFG.seed}`;
@@ -618,7 +641,7 @@ function mousePressed(event) {
 }
 
 function touchStarted(event) {
-  if (event && event.target && !event.target.matches('canvas')) return false;
+  if (event && event.target && !event.target.matches('canvas')) return;
   if (touches.length > 0) handlePlanetTap(touches[0].x, touches[0].y);
   return false;
 }
