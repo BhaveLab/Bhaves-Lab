@@ -8,12 +8,15 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
+html {
   height: 100%;
+}
+body {
+  min-height: 100%;
   background: #080808;
   color: #c9a84c;
   font-family: 'JetBrains Mono', monospace;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .back {
@@ -31,13 +34,13 @@ html, body {
 .back:hover { color: rgba(201, 168, 76, 0.75); }
 
 .container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 40px 32px;
-  max-width: 560px;
+  justify-content: flex-start;
+  padding: 100px 32px 80px;
+  max-width: 580px;
   margin: 0 auto;
   text-align: center;
 }
@@ -114,6 +117,83 @@ html, body {
   transition: color 0.2s;
 }
 .realm-link:hover { color: rgba(201, 168, 76, 0.55); }
+
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(26px, 5.5vw, 36px);
+  letter-spacing: 0.03em;
+  color: rgba(201, 168, 76, 0.9);
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: rgba(201, 168, 76, 0.35);
+  text-transform: uppercase;
+  margin-bottom: 52px;
+}
+
+.section-sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(201,168,76,0), rgba(201,168,76,0.18), rgba(201,168,76,0));
+  margin: 48px 0;
+}
+
+.session-section {
+  width: 100%;
+  max-width: 480px;
+}
+
+.session-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.session-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: rgba(201, 168, 76, 0.65);
+  text-transform: uppercase;
+}
+
+.session-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: rgba(201, 168, 76, 0.3);
+  text-transform: uppercase;
+}
+
+.session-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(15px, 3.5vw, 19px);
+  color: rgba(201, 168, 76, 0.7);
+  letter-spacing: 0.03em;
+  margin-bottom: 18px;
+}
+
+.footer-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(12px, 2.5vw, 14px);
+  line-height: 1.8;
+  color: rgba(201, 168, 76, 0.3);
+  letter-spacing: 0.03em;
+  max-width: 440px;
+  margin-bottom: 44px;
+}
 
 /* ── BL NAV ─────────────────────────────────────────────── */
 .bl-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.08); }
@@ -201,15 +281,43 @@ html, body {
 <div class="container">
   <div class="label">Outer · Experience</div>
   <div class="divider"></div>
-  <div class="headline">The sovereign container.</div>
-  <div class="body">
-    The full session in a sovereign container. Tulum.<br>
-    Your space or a secured environment.
-    Nothing scheduled around it —
-    the work runs as long as the work requires.
+  <div class="page-title">Gospel Immersion Sessions</div>
+  <div class="subtitle">Two pathways. One session.</div>
+
+  <!-- Section 1 -->
+  <div class="session-section">
+    <div class="session-header">
+      <div class="session-name">The Full Gospel</div>
+      <div class="session-price">$750</div>
+    </div>
+    <div class="session-tagline">Fully contained.</div>
+    <div class="body">
+      You bring yourself. If your space is ready for the work — quiet, private, uninterrupted — we use it. If it isn't, accommodation is arranged. Either way, nothing is left to figure out on the day. The session begins and runs however long the work requires — three hours or eight. Nothing is scheduled around it. The framework, the biofeedback baseline, the application, the hypnosis, the post-read. All of it. When it's complete, it's complete.<br><br>
+      This is the session with nothing left out.
+    </div>
+    <a class="cta" href="https://calendly.com/bhaveslab">Book the Full Gospel</a>
   </div>
-  <a class="cta" href="https://calendly.com/bhaveslab">Book a Session</a>
-  <div class="price">$750 — $500</div>
+
+  <div class="section-sep"></div>
+
+  <!-- Section 2 -->
+  <div class="session-section">
+    <div class="session-header">
+      <div class="session-name">The Field Session</div>
+      <div class="session-price">$500</div>
+    </div>
+    <div class="body">
+      You have a space. Book the day. The full Gospel Session runs in your environment — baseline read, application, hypnosis, post-read. Clean entry, clean exit. Your accommodation, your logistics. The work is the only thing that crosses over.
+    </div>
+    <a class="cta" href="https://calendly.com/bhaveslab">Book the Field Session</a>
+  </div>
+
+  <div class="section-sep"></div>
+
+  <div class="footer-note">
+    This is not a retreat. No meals are arranged, no itinerary managed beyond the session itself. You are here on a sovereign mission — the logistics of your field are yours to run. The session is the transmission.
+  </div>
+
   <a class="cta" href="tools.html">Enter the Realm</a>
 </div>
 
