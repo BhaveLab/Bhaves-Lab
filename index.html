@@ -331,7 +331,6 @@ let stagePos         = [];
 let stageCounts      = new Array(8).fill(0);
 let planetBaseAngles = [];
 let orbitAngle       = 0;
-let ringTextAngle    = 0;
 let activePlanet     = -1;
 let pulseTimer       = 0;
 
@@ -413,10 +412,8 @@ function draw() {
     stageCounts[pt.si]++;
   }
 
-  orbitAngle    += 0.00030;
-  ringTextAngle += 0.00018;
+  orbitAngle += 0.00030;
   if (activePlanet >= 0) pulseTimer++;
-  drawFrameworkRing();
   drawPlanets();
 }
 
@@ -442,6 +439,7 @@ function drawPaths() {
 function drawNodes() {
   for (let i = 0; i < 8; i++) {
     const s       = STAGES[i];
+    if (s.name === 'CURIOSITY') continue;
     const pos     = stagePos[i];
     const count   = stageCounts[i];
     const density = count / max(CFG.particleCount / 8, 1);
@@ -527,52 +525,7 @@ function drawNodes() {
       ellipse(pos.x, pos.y, 5, 5);
     }
 
-    // Stage labels — emerge only with particle density
-    // At rest: ~5% opacity. Under particle cluster: ~35% max.
-    // Users may never consciously read them. The system doesn't announce itself.
-    const labelA = constrain(5 + density * 55, 4, 60);
-    fill(col[0], col[1], col[2], labelA);
-    textFont('JetBrains Mono, monospace');
-    textSize(isSrc ? 7.5 : 6.5);
-    textAlign(CENTER, CENTER);
-
-    let lx = pos.x, ly = pos.y;
-    if (!isSrc) {
-      const cx = width / 2;
-      const cy = height / 2;
-      const dx = pos.x - cx;
-      const dy = pos.y - cy;
-      const d  = sqrt(dx * dx + dy * dy);
-      lx = pos.x + (dx / d) * 21;
-      ly = pos.y + (dy / d) * 21;
-    } else {
-      ly = pos.y + 26;
-    }
-
-    if (!isSrc) text(s.name, lx, ly);
   }
-}
-
-// ── FRAMEWORK RING ────────────────────────────────────────────────────
-function drawFrameworkRing() {
-  const cx = width / 2, cy = height / 2;
-  const r  = min(width, height) * 0.36 * 1.21;
-  const words = ['STATE','·','PERCEPTION','·','FORMATION','·','DECISION','·','EXPERIENCE','·','REALITY','·'];
-  const ctx = drawingContext;
-  ctx.save();
-  ctx.font = '400 5.5px "JetBrains Mono", monospace';
-  ctx.fillStyle = 'rgba(201,168,76,0.14)';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let i = 0; i < words.length; i++) {
-    const angle = ringTextAngle + (i * TWO_PI / words.length);
-    ctx.save();
-    ctx.translate(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-    ctx.rotate(angle + Math.PI / 2);
-    ctx.fillText(words[i], 0, 0);
-    ctx.restore();
-  }
-  ctx.restore();
 }
 
 // ── PLANETS ───────────────────────────────────────────────────────────
@@ -659,11 +612,13 @@ function handlePlanetTap(mx, my) {
   }
 }
 
-function mousePressed() {
+function mousePressed(event) {
+  if (event && event.target && !event.target.matches('canvas')) return;
   handlePlanetTap(mouseX, mouseY);
 }
 
-function touchStarted() {
+function touchStarted(event) {
+  if (event && event.target && !event.target.matches('canvas')) return false;
   if (touches.length > 0) handlePlanetTap(touches[0].x, touches[0].y);
   return false;
 }
