@@ -791,21 +791,14 @@ You hold without softening. The instrument does not adjust to make the user comf
 Do not begin your response with "I" or with the user's words back to them. Begin from observation.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://www.bhaveslab.com/api/reflect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [
-          { role: 'user', content: input }
-        ]
-      })
+      body: JSON.stringify({ input, systemPrompt })
     });
 
     const data = await response.json();
-    return data.content?.[0]?.text || '[ Signal unclear. Return when something is active. ]';
+    return data.text || '[ Signal unclear. Return when something is active. ]';
   } catch (err) {
     return '[ Signal lost. The instrument is waiting. ]';
   }
