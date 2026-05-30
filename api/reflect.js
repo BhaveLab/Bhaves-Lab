@@ -1,19 +1,7 @@
-const ALLOWED_ORIGINS = [
-  'https://bhaveslab.com',
-  'https://gospel.bhaveslab.com',
-];
-
-function setCORSHeaders(req, res) {
-  const origin = req.headers.origin;
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-}
-
-export default async function handler(req, res) {
-  setCORSHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
