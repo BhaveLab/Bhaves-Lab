@@ -841,6 +841,13 @@ body::after {
       <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--teal);" id="stateComparison"></div>
     </div>
 
+    <div style="margin-top: 24px; animation: fadeUp 0.7s ease 0.4s forwards; opacity: 0;">
+      <div class="parable-label" style="margin-bottom: 12px;">Reality Update</div>
+      <div class="sub-prompt" style="margin-bottom: 16px; animation: none; opacity: 1;">Given what you can now see in the sequence — what would a different State produce?</div>
+      <textarea class="trace-input" id="realityUpdateInput" placeholder="Optional..." rows="2" style="animation: none; opacity: 1;"></textarea>
+      <div style="font-size: 10px; color: var(--text-3); margin-top: 10px; letter-spacing: 0.1em;">This is not a resolution. It is the next observation.</div>
+    </div>
+
     <div class="email-row">
       <input class="email-input" type="email" placeholder="email this trace to yourself" id="emailField">
       <button class="email-btn" onclick="sendTrace()">Send trace →</button>
@@ -993,7 +1000,7 @@ body::after {
       { tag: 'State', sub: 'Origin', color: 'var(--state-color)', val: document.getElementById('stateOriginInput')?.value || '' },
       { tag: 'Perception', sub: 'The Filter', color: 'var(--perception-color)', val: document.getElementById('perceptionInput')?.value || '' },
       { tag: 'Formation', sub: 'Hidden Layer', color: 'var(--formation-color)', val: document.getElementById('formationInput')?.value || '' },
-      { tag: 'Decision', sub: 'The Execution', color: 'var(--decision-color)', val: document.getElementById('decisionInput')?.value || '' },
+      { tag: 'Decision', sub: 'The Execution', color: 'var(--decision-color)', val: document.getElementById('decisionInput')?.value || '', stateNote: document.getElementById('stateWord')?.value || '' },
       { tag: 'Experience', sub: 'The Output', color: 'var(--experience-color)', val: document.getElementById('experienceInput')?.value || '' },
       { tag: 'Reality', sub: 'The Wall', color: 'var(--reality-color)', val: document.getElementById('realityInput')?.value || '' },
     ];
@@ -1005,7 +1012,10 @@ body::after {
           <div class="trace-row-tag" style="color: ${r.color}">${r.tag}</div>
           <div class="trace-row-sub">${r.sub}</div>
         </div>
-        <div class="trace-row-value">${r.val || '<span style="opacity:0.3;font-size:12px;">—</span>'}</div>
+        <div class="trace-row-value">
+          ${r.val || '<span style="opacity:0.3;font-size:12px;">—</span>'}
+          ${r.stateNote ? `<div style="font-size:10px;color:var(--text-3);margin-top:6px;letter-spacing:0.08em;">State running at this moment: &ldquo;${r.stateNote}&rdquo;</div>` : ''}
+        </div>
       </div>
     `).join('');
 
@@ -1033,6 +1043,7 @@ body::after {
       'STATE — The Origin: '              + (document.getElementById('stateOriginInput')?.value || '—'),
       'THE GAP — First Read: '            + (document.getElementById('gapInput1')?.value        || '—'),
       'THE GAP — What Else Was Present: ' + (document.getElementById('gapInput2')?.value        || '—'),
+      'REALITY UPDATE: '                  + (document.getElementById('realityUpdateInput')?.value || ''),
     ];
 
     if (btn) btn.textContent = 'Sending…';
