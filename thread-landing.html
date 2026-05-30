@@ -4,245 +4,295 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Thread — Bhavé's Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<meta name="description" content="Track what's running. See the connection you keep assigning. The Thread logs your pattern over time.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-  background: #080808;
-  color: #c9a84c;
-  font-family: 'JetBrains Mono', monospace;
-  overflow: hidden;
+:root {
+  --void: #060809;
+  --deep: #090c10;
+  --surface: #0e1318;
+  --border: #181f28;
+  --border-lit: #243040;
+  --silver: #8aa0b4;
+  --silver-mid: #3a5060;
+  --silver-dim: rgba(138,160,180,0.06);
+  --silver-glow: rgba(138,160,180,0.12);
+  --teal: #4ecdc4;
+  --teal-mid: #2a6e6a;
+  --text: #c8d4de;
+  --text-2: #607888;
+  --text-3: #2a3a48;
 }
 
-.back {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  color: rgba(201, 168, 76, 0.35);
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-  z-index: 10;
-}
-.back:hover { color: rgba(201, 168, 76, 0.75); }
+html { scroll-behavior: smooth; }
 
-.container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 32px;
-  max-width: 560px;
-  margin: 0 auto;
-  text-align: center;
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.label {
-  font-size: 8px;
-  letter-spacing: 0.35em;
-  color: rgba(201, 168, 76, 0.45);
-  text-transform: uppercase;
-  margin-bottom: 28px;
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
 }
 
-.divider {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, rgba(201,168,76,0), rgba(201,168,76,0.25), rgba(201,168,76,0));
-  margin: 0 auto 28px;
+.orb {
+  position: fixed; width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(78,205,196,0.03) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none; animation: orbPulse 12s ease-in-out infinite;
+}
+@keyframes orbPulse { 0%, 100% { opacity: 0.4; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); } }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; border-bottom: 1px solid var(--border);
+  background: rgba(6,8,9,0.92); backdrop-filter: blur(12px); z-index: 100;
+}
+.nav-logo { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-3); text-decoration: none; transition: color 0.3s; }
+.nav-logo:hover { color: var(--text-2); }
+.nav-tool { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); opacity: 0.7; }
+
+.back-btn {
+  position: fixed; top: 60px; left: 24px;
+  font-size: 11px; letter-spacing: 0.15em; color: rgba(78,205,196,0.35);
+  text-decoration: none; text-transform: uppercase; z-index: 100;
+  transition: color 0.3s; font-family: 'IBM Plex Mono', monospace;
+}
+.back-btn:hover { color: rgba(78,205,196,0.75); }
+
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 120px 40px 80px; text-align: center; position: relative;
 }
 
-.headline {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 300;
-  font-style: italic;
-  font-size: clamp(28px, 6vw, 38px);
-  letter-spacing: 0.03em;
-  color: rgba(201, 168, 76, 0.9);
-  line-height: 1.3;
-  margin-bottom: 28px;
-}
+.hero-eyebrow { font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--teal); opacity: 0.7; margin-bottom: 28px; animation: fadeUp 0.8s ease forwards; opacity: 0; }
+.hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 10vw, 96px); font-weight: 300; letter-spacing: -0.02em; line-height: 1; color: var(--text); margin-bottom: 32px; animation: fadeUp 0.8s ease 0.1s forwards; opacity: 0; }
+.hero-title em { font-style: italic; color: var(--teal); }
+.hero-sub { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 3vw, 24px); font-weight: 300; font-style: italic; color: var(--text-2); max-width: 500px; line-height: 1.6; margin-bottom: 56px; animation: fadeUp 0.8s ease 0.2s forwards; opacity: 0; }
 
-.body {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 300;
-  font-size: clamp(14px, 3vw, 17px);
-  line-height: 1.8;
-  color: rgba(201, 168, 76, 0.5);
-  letter-spacing: 0.03em;
-  margin-bottom: 40px;
-  max-width: 420px;
-}
+.hero-cta { display: inline-flex; align-items: center; gap: 16px; background: transparent; border: 1px solid var(--border-lit); padding: 18px 36px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text); text-decoration: none; transition: all 0.4s ease; animation: fadeUp 0.8s ease 0.3s forwards; opacity: 0; position: relative; overflow: hidden; }
+.hero-cta::before { content: ''; position: absolute; inset: 0; background: var(--silver-dim); transform: translateX(-100%); transition: transform 0.4s ease; }
+.hero-cta:hover::before { transform: translateX(0); }
+.hero-cta:hover { border-color: var(--teal-mid); color: var(--teal); }
+.hero-cta-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; }
 
-.body-sep {
-  display: block;
-  height: 14px;
-}
+.hero-price { font-size: 10px; color: var(--text-3); margin-top: 16px; letter-spacing: 0.15em; animation: fadeUp 0.8s ease 0.4s forwards; opacity: 0; }
 
-.cta {
-  display: block;
-  border: 1px solid rgba(201, 168, 76, 0.4);
-  color: rgba(201, 168, 76, 0.85);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  text-decoration: none;
-  padding: 14px 36px;
-  transition: all 0.2s;
-  margin-bottom: 16px;
-}
-.cta:hover {
-  border-color: rgba(201, 168, 76, 0.75);
-  color: #c9a84c;
-  background: rgba(201, 168, 76, 0.04);
-}
+.hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); animation: fadeUp 0.8s ease 0.8s forwards; opacity: 0; cursor: pointer; }
+.scroll-line { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--text-3), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+@keyframes scrollPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-.price {
-  font-size: 8px;
-  letter-spacing: 0.2em;
-  color: rgba(201, 168, 76, 0.3);
-  margin-bottom: 32px;
-}
+.section { padding: 100px 40px; max-width: 780px; margin: 0 auto; }
+.section-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-3); margin-bottom: 48px; display: flex; align-items: center; gap: 16px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.cta-secondary {
-  display: block;
-  border: 1px solid rgba(201, 168, 76, 0.4);
-  color: rgba(201, 168, 76, 0.85);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  text-decoration: none;
-  padding: 14px 36px;
-  transition: all 0.2s;
-}
-.cta-secondary:hover {
-  border-color: rgba(201, 168, 76, 0.75);
-  color: #c9a84c;
-  background: rgba(201, 168, 76, 0.04);
-}
+.what-statement { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 300; line-height: 1.5; color: var(--text); margin-bottom: 24px; }
+.what-statement em { font-style: italic; color: var(--teal); }
+.what-body { font-size: 12px; color: var(--text-2); line-height: 1.9; max-width: 560px; margin-bottom: 56px; }
 
-/* ── BL NAV ─────────────────────────────────────────────── */
-.bl-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.08); }
-.bl-nav-brand { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 13px; letter-spacing: 0.3em; color: rgba(201,168,76,0.7); text-transform: uppercase; text-decoration: none; }
-.bl-hamburger { background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-direction: column; gap: 5px; z-index: 1001; }
-.bl-hamburger span { display: block; width: 22px; height: 1px; background: rgba(201,168,76,0.6); transition: all 0.3s ease; transform-origin: center; }
-.bl-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); background: rgba(201,168,76,0.9); }
-.bl-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.bl-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: rgba(201,168,76,0.9); }
-.bl-menu { position: fixed; inset: 0; z-index: 999; background: rgba(8,8,8,0.97); display: flex; flex-direction: column; justify-content: center; padding: 80px 32px 48px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-.bl-menu.open { opacity: 1; pointer-events: all; }
-.bl-nav-section { margin-bottom: 28px; opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
-.bl-menu.open .bl-nav-section:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
-.bl-menu.open .bl-nav-section:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
-.bl-menu.open .bl-nav-section:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
-.bl-menu.open .bl-nav-section:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
-.bl-menu.open .bl-nav-section:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
-.bl-menu.open .bl-nav-section:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
-.bl-nav-main { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 26px; letter-spacing: 0.06em; color: rgba(201,168,76,0.85); text-decoration: none; display: block; margin-bottom: 10px; transition: color 0.2s; }
-.bl-nav-main:hover { color: #c9a84c; }
-.bl-nav-subs { display: flex; flex-direction: column; gap: 6px; padding-left: 16px; border-left: 1px solid rgba(201,168,76,0.12); }
-.bl-nav-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: rgba(201,168,76,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
-.bl-nav-sub:hover { color: rgba(201,168,76,0.7); }
-.bl-nav-divider { width: 100%; height: 1px; background: rgba(201,168,76,0.06); margin-bottom: 28px; opacity: 0; transition: opacity 0.3s ease 0.2s; }
-.bl-menu.open .bl-nav-divider { opacity: 1; }
-.bl-nav-cta { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.25em; color: rgba(201,168,76,0.85); text-decoration: none; text-transform: uppercase; border: 1px solid rgba(201,168,76,0.3); padding: 12px 24px; display: inline-block; transition: all 0.2s; }
-.bl-nav-cta:hover { border-color: rgba(201,168,76,0.7); color: #c9a84c; background: rgba(201,168,76,0.04); }
-.bl-nav-home { font-size: 8px; letter-spacing: 0.18em; color: rgba(201,168,76,0.2); text-decoration: none; text-transform: uppercase; margin-top: 24px; display: block; transition: color 0.2s; }
-.bl-nav-home:hover { color: rgba(201,168,76,0.5); }
+.variable-demo { margin: 48px 0; border: 1px solid var(--border); overflow: hidden; }
+.variable-demo-header { padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); display: flex; justify-content: space-between; }
+
+.variable-row { display: grid; grid-template-columns: 80px 1fr; border-bottom: 1px solid var(--border); opacity: 0; transform: translateX(-8px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.variable-row:last-child { border-bottom: none; }
+.variable-row.visible { opacity: 1; transform: translateX(0); }
+
+.variable-label { padding: 16px 16px; background: var(--surface); border-right: 1px solid var(--border); font-size: 9px; letter-spacing: 0.18em; font-weight: 600; text-transform: uppercase; display: flex; align-items: center; }
+.variable-label.a { color: var(--teal); }
+.variable-label.b { color: #c8a96e; }
+.variable-label.conn { color: var(--silver); }
+
+.variable-value { padding: 16px 20px; background: var(--deep); font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic; color: var(--text-2); line-height: 1.6; }
+.variable-note { padding: 8px 20px; background: var(--void); font-size: 10px; color: var(--text-3); border-top: 1px solid var(--border); }
+
+.time-block { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 56px 0; }
+.time-steps { display: flex; flex-direction: column; gap: 24px; margin-top: 40px; }
+
+.time-step { display: grid; grid-template-columns: 32px 1fr; gap: 20px; align-items: flex-start; opacity: 0; transform: translateX(-8px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.time-step.visible { opacity: 1; transform: translateX(0); }
+
+.time-step-num { font-size: 9px; letter-spacing: 0.1em; color: var(--teal); padding-top: 3px; font-weight: 500; }
+.time-step-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--text); margin-bottom: 5px; }
+.time-step-body { font-size: 11px; color: var(--text-2); line-height: 1.8; }
+
+.insight-block { margin: 40px 0; padding: 28px 32px; background: var(--silver-dim); border: 1px solid rgba(138,160,180,0.08); border-left: 2px solid var(--silver-mid); }
+.insight-quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 3vw, 24px); font-style: italic; color: var(--text-2); line-height: 1.65; }
+.insight-quote em { color: var(--teal); font-style: normal; }
+
+.bottom-cta { padding: 100px 40px 120px; display: flex; flex-direction: column; align-items: center; text-align: center; border-top: 1px solid var(--border); }
+.bottom-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 6vw, 56px); font-weight: 300; line-height: 1.2; color: var(--text); margin-bottom: 20px; }
+.bottom-title em { font-style: italic; color: var(--teal); }
+.bottom-sub { font-size: 12px; color: var(--text-2); margin-bottom: 48px; line-height: 1.8; max-width: 420px; }
+
+.bottom-btn { display: inline-flex; align-items: center; gap: 16px; background: rgba(78,205,196,0.06); border: 1px solid var(--teal-mid); padding: 20px 48px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden; }
+.bottom-btn::before { content: ''; position: absolute; inset: 0; background: rgba(78,205,196,0.08); transform: translateY(100%); transition: transform 0.3s ease; }
+.bottom-btn:hover::before { transform: translateY(0); }
+.bottom-btn:hover { border-color: var(--teal); }
+
+.bottom-price { margin-top: 16px; font-size: 11px; color: var(--text-3); letter-spacing: 0.15em; }
+.bottom-note { margin-top: 24px; font-size: 10px; color: var(--text-3); line-height: 1.8; max-width: 380px; }
+
+footer { padding: 24px 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-3); }
+footer a { color: var(--text-3); text-decoration: none; transition: color 0.3s; }
+footer a:hover { color: var(--text-2); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 100px 24px 80px; }
+  .section { padding: 72px 24px; }
+  .bottom-cta { padding: 72px 24px 100px; }
+  .variable-row { grid-template-columns: 60px 1fr; }
+  footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+}
 </style>
 </head>
 <body>
-<!-- ── NAV BAR ────────────────────────────────────────────── -->
-<nav class="bl-nav">
-  <a class="bl-nav-brand" href="index.html">Bhavé's Lab</a>
-  <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+
+<div class="orb"></div>
+
+<nav>
+  <a href="https://bhaveslab.com" class="nav-logo">Bhavé's Lab</a>
+  <div class="nav-tool">The Thread</div>
 </nav>
 
-<!-- ── MENU OVERLAY ───────────────────────────────────────── -->
-<div class="bl-menu" id="bl-menu">
+<a href="https://bhaveslab.com/tools.html" class="back-btn">← The Realm</a>
 
-  <div class="bl-nav-section">
-    <a class="bl-nav-main" href="home.html#work" onclick="closeMenu()">The Work</a>
-    <div class="bl-nav-subs">
-      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
-      <a class="bl-nav-sub" href="inner-mining-landing.html" onclick="closeMenu()">Inner Mining</a>
-      <a class="bl-nav-sub" href="pattern-immersion-landing.html" onclick="closeMenu()">Pattern Immersion</a>
+<section class="hero">
+  <div class="hero-eyebrow">Bhavé's Lab · The Realm</div>
+  <h1 class="hero-title">The <em>Thread</em></h1>
+  <p class="hero-sub">Something happens. You react. You've been here before. The Thread tracks when — and shows you the connection you keep assigning.</p>
+  <a href="https://bhaveslab.com/the-thread.html" class="hero-cta">
+    <span class="hero-cta-inner">Open the Thread <span>→</span></span>
+  </a>
+  <div class="hero-price">Free · entries never expire</div>
+  <div class="hero-scroll" onclick="document.getElementById('what').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-line"></div>
+    <span>what this is</span>
+  </div>
+</section>
+
+<section class="section" id="what">
+  <div class="section-label">What this is</div>
+
+  <div class="what-statement">
+    Every pattern has a thread.<br>
+    This tool helps you<br><em>find yours.</em>
+  </div>
+  <div class="what-body">
+    A situation happens. Something inside you responds. You call the connection between them obvious — but it isn't. It was assigned. And you've been assigning the same connection, in different rooms, with different people, for a long time.<br><br>
+    The Thread is a log. Every time something activates in your system, you enter three things: what happened externally (Variable A), what you experienced internally (Variable B), and the connection you assigned between them. Over time, the pattern becomes visible in your own entries — not because the tool interpreted it, but because you wrote it down.
+  </div>
+
+  <div class="section-label">The Variable Viewer</div>
+
+  <div class="variable-demo">
+    <div class="variable-demo-header">
+      <span>Example entry</span>
+      <span>logged today</span>
+    </div>
+    <div class="variable-row" id="vr1">
+      <div class="variable-label a">A</div>
+      <div class="variable-value">Meeting got cancelled with no explanation</div>
+    </div>
+    <div class="variable-row" id="vr2">
+      <div class="variable-label b">B</div>
+      <div class="variable-value">Felt invisible — like what I bring doesn't register</div>
+    </div>
+    <div class="variable-row" id="vr3">
+      <div class="variable-label conn">→</div>
+      <div class="variable-value">When things get cancelled, it means I don't matter</div>
+    </div>
+    <div class="variable-note">// The connection between A and B was assigned — not given. That assignment is the data.</div>
+  </div>
+
+  <div class="insight-block">
+    <div class="insight-quote">The situation didn't create the experience. The <em>connection you assigned</em> between the situation and the experience created it. That connection is a formation — and it has been running longer than this room.</div>
+  </div>
+
+  <div class="time-block">
+    <div class="section-label">Why it works over time</div>
+    <div class="time-steps" id="timeSteps">
+      <div class="time-step">
+        <div class="time-step-num">01</div>
+        <div>
+          <div class="time-step-title">First entry — you log what happened</div>
+          <div class="time-step-body">One situation. One internal state. One assigned connection. Thirty seconds. The entry is logged with a timestamp.</div>
+        </div>
+      </div>
+      <div class="time-step">
+        <div class="time-step-num">02</div>
+        <div>
+          <div class="time-step-title">Over days — entries accumulate</div>
+          <div class="time-step-body">Different situations. Different rooms. But if the same connection keeps appearing in the → column — that is the pattern. Not one event. The recurring assignment.</div>
+        </div>
+      </div>
+      <div class="time-step">
+        <div class="time-step-num">03</div>
+        <div>
+          <div class="time-step-title">The thread becomes visible</div>
+          <div class="time-step-body">You don't need someone to tell you what your pattern is. Your own entries show you. The Thread doesn't interpret — it reflects your log back to you in sequence.</div>
+        </div>
+      </div>
+      <div class="time-step">
+        <div class="time-step-num">04</div>
+        <div>
+          <div class="time-step-title">Pattern recognition changes the gap</div>
+          <div class="time-step-body">When you can see the assignment before you make it — the gap between A and B opens. That gap is where a different connection becomes possible.</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="bl-nav-section">
-    <a class="bl-nav-main" href="home.html#framework" onclick="closeMenu()">Framework</a>
-    <div class="bl-nav-subs">
-      <a class="bl-nav-sub" href="home.html#sequence" onclick="closeMenu()">The Sequence</a>
-    </div>
-  </div>
+</section>
 
-  <div class="bl-nav-section">
-    <a class="bl-nav-main" href="workshops-landing.html" onclick="closeMenu()">Workshops</a>
-  </div>
+<section class="bottom-cta">
+  <h2 class="bottom-title">The pattern is already<br><em>in the log.</em></h2>
+  <p class="bottom-sub">You just haven't been keeping one. The Thread takes thirty seconds per entry. The pattern shows itself over time.</p>
+  <a href="https://bhaveslab.com/the-thread.html" class="bottom-btn">
+    Open the Thread <span>→</span>
+  </a>
+  <div class="bottom-price">Free · all entries saved</div>
+  <div class="bottom-note">Your entries persist across sessions. Patterns surface after consistent use — not from one entry, from many.</div>
+</section>
 
-  <div class="bl-nav-section">
-    <a class="bl-nav-main" href="tools.html" onclick="closeMenu()">The Realm</a>
-    <div class="bl-nav-subs">
-      <a class="bl-nav-sub" href="mirror-landing.html" onclick="closeMenu()">Consciousness Mirror</a>
-      <a class="bl-nav-sub" href="thread-landing.html" onclick="closeMenu()">The Thread</a>
-      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
-      <a class="bl-nav-sub" href="https://gospel.bhaveslab.com" onclick="closeMenu()">Source Archive</a>
-    </div>
-  </div>
-
-  <div class="bl-nav-divider"></div>
-
-  <div class="bl-nav-section">
-    <a class="bl-nav-cta" href="https://calendly.com/bhaveslab" onclick="closeMenu()">Book a Session</a>
-    <a class="bl-nav-home" href="index.html" onclick="closeMenu()">← Back to the Field</a>
-  </div>
-
-</div>
-
-<a class="back" href="tools.html">← The Realm</a>
-
-<div class="container">
-  <div class="label">The Thread</div>
-  <div class="divider"></div>
-  <div class="headline">What runs through everything.</div>
-  <div class="body">
-    Not the events. Not the circumstances. The meaning you assign to them.<span class="body-sep"></span>
-    The Thread traces one thing — the connection between what happens and what you make it mean.
-    Enter it here. Over time your own entries reveal the structure.
-    Not because the system tells you what it is. Because you can see it yourself.<span class="body-sep"></span>
-    What you bring: what is happening, what you are experiencing, what you are making it mean.
-  </div>
-  <a class="cta" href="the-thread.html">Enter the Thread</a>
-  <div class="price">$5 / month</div>
-  <a class="cta-secondary" href="tools.html">Enter the Realm</a>
-</div>
+<footer>
+  <a href="https://bhaveslab.com/tools.html">← Back to The Realm</a>
+  <span>Bhavé's Lab · The Thread</span>
+  <a href="https://bhaveslab.com">bhaveslab.com</a>
+</footer>
 
 <script>
-function toggleMenu() {
-  const menu   = document.getElementById('bl-menu');
-  const burger = document.getElementById('hamburger');
-  menu.classList.toggle('open');
-  burger.classList.toggle('open');
-  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
-}
-function closeMenu() {
-  document.getElementById('bl-menu').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), entry.target.dataset.delay || 0);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  ['vr1','vr2','vr3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.dataset.delay = i * 150;
+    observer.observe(el);
+  });
+
+  document.querySelectorAll('.time-step').forEach((el, i) => {
+    el.dataset.delay = i * 100;
+    observer.observe(el);
+  });
 </script>
 </body>
 </html>

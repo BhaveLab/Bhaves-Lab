@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Observer — Bhavé's Lab</title>
+<meta name="description" content="You name a condition. The Observer asks the questions your system has been avoiding.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void: #060809;
+  --deep: #090c10;
+  --surface: #0e1318;
+  --border: #181f28;
+  --border-lit: #243040;
+  --gold: #c8a96e;
+  --gold-mid: #7a6430;
+  --gold-dim: rgba(200,169,110,0.07);
+  --gold-glow: rgba(200,169,110,0.12);
+  --text: #c8d4de;
+  --text-2: #607888;
+  --text-3: #2a3a48;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.orb {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,169,110,0.04) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: orbPulse 12s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(6,8,9,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.nav-logo { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-3); text-decoration: none; transition: color 0.3s; }
+.nav-logo:hover { color: var(--text-2); }
+.nav-tool { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); opacity: 0.7; }
+
+.back-btn {
+  position: fixed;
+  top: 60px;
+  left: 24px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(200,169,110,0.35);
+  text-decoration: none;
+  text-transform: uppercase;
+  z-index: 100;
+  transition: color 0.3s;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.back-btn:hover { color: rgba(200,169,110,0.75); }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px 80px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--gold); opacity: 0.7; margin-bottom: 28px;
+  animation: fadeUp 0.8s ease forwards; opacity: 0;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 10vw, 96px);
+  font-weight: 300; letter-spacing: -0.02em; line-height: 1;
+  color: var(--text); margin-bottom: 32px;
+  animation: fadeUp 0.8s ease 0.1s forwards; opacity: 0;
+}
+
+.hero-title em { font-style: italic; color: var(--gold); }
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 3vw, 24px); font-weight: 300; font-style: italic;
+  color: var(--text-2); max-width: 500px; line-height: 1.6; margin-bottom: 56px;
+  animation: fadeUp 0.8s ease 0.2s forwards; opacity: 0;
+}
+
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 16px;
+  background: transparent; border: 1px solid var(--border-lit);
+  padding: 18px 36px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text); text-decoration: none; transition: all 0.4s ease;
+  animation: fadeUp 0.8s ease 0.3s forwards; opacity: 0;
+  position: relative; overflow: hidden;
+}
+
+.hero-cta::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold-dim); transform: translateX(-100%); transition: transform 0.4s ease;
+}
+.hero-cta:hover::before { transform: translateX(0); }
+.hero-cta:hover { border-color: var(--gold-mid); color: var(--gold); }
+.hero-cta-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; }
+
+.hero-price {
+  font-size: 10px; color: var(--text-3); margin-top: 16px;
+  letter-spacing: 0.15em; animation: fadeUp 0.8s ease 0.4s forwards; opacity: 0;
+}
+
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
+  animation: fadeUp 0.8s ease 0.8s forwards; opacity: 0; cursor: pointer;
+}
+.scroll-line { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--text-3), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+@keyframes scrollPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+.section { padding: 100px 40px; max-width: 780px; margin: 0 auto; }
+
+.section-label {
+  font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 48px;
+  display: flex; align-items: center; gap: 16px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.what-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(24px, 4vw, 36px); font-weight: 300; line-height: 1.5;
+  color: var(--text); margin-bottom: 24px;
+}
+.what-statement em { font-style: italic; color: var(--gold); }
+
+.what-body {
+  font-size: 12px; color: var(--text-2); line-height: 1.9;
+  max-width: 560px; margin-bottom: 56px;
+}
+
+.inside-steps { display: flex; flex-direction: column; gap: 2px; margin: 48px 0; }
+
+.inside-step {
+  display: grid; grid-template-columns: 40px 1fr;
+  border: 1px solid var(--border); overflow: hidden;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s;
+}
+.inside-step.visible { opacity: 1; transform: translateY(0); }
+.inside-step:hover { border-color: var(--border-lit); }
+
+.inside-step-num {
+  padding: 18px 0 18px 14px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  font-size: 9px; letter-spacing: 0.1em; color: var(--gold); font-weight: 500;
+  display: flex; align-items: flex-start; padding-top: 20px;
+}
+
+.inside-step-body { padding: 18px 20px; background: var(--deep); }
+
+.inside-step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 400; color: var(--text); margin-bottom: 6px;
+}
+
+.inside-step-desc {
+  font-size: 11px; color: var(--text-2); line-height: 1.8;
+}
+
+.leave-block {
+  margin: 56px 0;
+  padding: 32px 36px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(200,169,110,0.1);
+  border-left: 2px solid var(--gold-mid);
+}
+
+.leave-label { font-size: 9px; letter-spacing: 0.25em; color: var(--gold-mid); text-transform: uppercase; margin-bottom: 16px; font-weight: 600; }
+
+.leave-items { display: flex; flex-direction: column; gap: 12px; }
+
+.leave-item {
+  display: flex; gap: 16px; align-items: flex-start;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px; font-style: italic; color: var(--text-2); line-height: 1.6;
+}
+
+.leave-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 9px; }
+
+.not-for {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 56px 0;
+}
+
+.not-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+
+.not-col-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 14px; }
+.not-col-label.is { color: var(--gold); }
+.not-col-label.not { color: var(--text-3); }
+
+.not-items { display: flex; flex-direction: column; gap: 8px; }
+.not-item { font-size: 11px; color: var(--text-2); line-height: 1.6; padding-left: 12px; border-left: 1px solid var(--border); }
+.not-item.is { border-color: var(--gold-mid); color: var(--text); }
+
+.bottom-cta {
+  padding: 100px 40px 120px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.bottom-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 6vw, 56px); font-weight: 300; line-height: 1.2;
+  color: var(--text); margin-bottom: 20px;
+}
+.bottom-title em { font-style: italic; color: var(--gold); }
+
+.bottom-sub { font-size: 12px; color: var(--text-2); margin-bottom: 48px; line-height: 1.8; max-width: 420px; }
+
+.bottom-btn {
+  display: inline-flex; align-items: center; gap: 16px;
+  background: var(--gold-dim); border: 1px solid var(--gold-mid);
+  padding: 20px 48px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); text-decoration: none; transition: all 0.3s ease;
+  position: relative; overflow: hidden;
+}
+.bottom-btn::before { content: ''; position: absolute; inset: 0; background: rgba(200,169,110,0.08); transform: translateY(100%); transition: transform 0.3s ease; }
+.bottom-btn:hover::before { transform: translateY(0); }
+.bottom-btn:hover { border-color: var(--gold); box-shadow: 0 0 24px rgba(200,169,110,0.08); }
+
+.bottom-price { margin-top: 16px; font-size: 11px; color: var(--text-3); letter-spacing: 0.15em; }
+.bottom-note { margin-top: 24px; font-size: 10px; color: var(--text-3); line-height: 1.8; max-width: 360px; }
+
+footer {
+  padding: 24px 40px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; color: var(--text-3);
+}
+footer a { color: var(--text-3); text-decoration: none; transition: color 0.3s; }
+footer a:hover { color: var(--text-2); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 100px 24px 80px; }
+  .section { padding: 72px 24px; }
+  .bottom-cta { padding: 72px 24px 100px; }
+  .not-grid { grid-template-columns: 1fr; }
+  footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb"></div>
+
+<nav>
+  <a href="https://bhaveslab.com" class="nav-logo">Bhavé's Lab</a>
+  <div class="nav-tool">The Observer</div>
+</nav>
+
+<a href="https://bhaveslab.com/tools.html" class="back-btn">← The Realm</a>
+
+<section class="hero" style="position:relative;">
+  <div class="hero-eyebrow">Bhavé's Lab · The Realm</div>
+  <h1 class="hero-title">The <em>Observer</em></h1>
+  <p class="hero-sub">You name a condition. The Observer asks the questions your system has been avoiding.</p>
+  <a href="https://bhaveslab.com/the-observer.html" class="hero-cta">
+    <span class="hero-cta-inner">Enter the Observer <span>→</span></span>
+  </a>
+  <div class="hero-price">$5 · single session · no interpretation, only reflection</div>
+  <div class="hero-scroll" onclick="document.getElementById('what').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-line"></div>
+    <span>what this is</span>
+  </div>
+</section>
+
+<section class="section" id="what">
+  <div class="section-label">What this is</div>
+
+  <div class="what-statement">
+    Most tools give you answers.<br>
+    The Observer gives you<br><em>better questions.</em>
+  </div>
+  <div class="what-body">
+    Something is active in your system right now — a condition you keep returning to, a pattern running underneath the surface, a state that won't resolve no matter what you do about it.<br><br>
+    The Observer doesn't diagnose it. It doesn't offer solutions. It asks precise questions — one layer deeper each time — until what was running underneath becomes visible to you. Not because the Observer told you. Because you saw it.
+  </div>
+
+  <div class="section-label">What happens inside</div>
+
+  <div class="inside-steps" id="insideSteps">
+    <div class="inside-step">
+      <div class="inside-step-num">01</div>
+      <div class="inside-step-body">
+        <div class="inside-step-title">You name the condition</div>
+        <div class="inside-step-desc">Not the story around it. The actual condition — what's active in your system right now. One sentence. That's the entry point.</div>
+      </div>
+    </div>
+    <div class="inside-step">
+      <div class="inside-step-num">02</div>
+      <div class="inside-step-body">
+        <div class="inside-step-title">The Observer asks deeper</div>
+        <div class="inside-step-desc">Each response generates the next question — one layer further into the structure of what you named. The questions don't follow a script. They follow your answers.</div>
+      </div>
+    </div>
+    <div class="inside-step">
+      <div class="inside-step-num">03</div>
+      <div class="inside-step-body">
+        <div class="inside-step-title">The pattern surfaces</div>
+        <div class="inside-step-desc">At a certain depth the structural pattern underneath the condition becomes visible. Not as analysis — as recognition. You see what was running before you had language for it.</div>
+      </div>
+    </div>
+    <div class="inside-step">
+      <div class="inside-step-num">04</div>
+      <div class="inside-step-body">
+        <div class="inside-step-title">The reflection closes</div>
+        <div class="inside-step-desc">The Observer surfaces what it found — one precise sentence naming the structural read. Not advice. Not a next step. The mechanism, made visible.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="leave-block">
+    <div class="leave-label">What you leave with</div>
+    <div class="leave-items">
+      <div class="leave-item"><div class="leave-dot"></div>A precise reflection of what was structurally running underneath the condition you named</div>
+      <div class="leave-item"><div class="leave-dot"></div>Visibility into the pattern — not as a problem to fix, as a mechanism to observe</div>
+      <div class="leave-item"><div class="leave-dot"></div>The condition seen clearly — which is the only starting point for anything that follows</div>
+    </div>
+  </div>
+
+  <div class="not-for">
+    <div class="section-label">What The Observer is and isn't</div>
+    <div class="not-grid">
+      <div>
+        <div class="not-col-label is">What it is</div>
+        <div class="not-items">
+          <div class="not-item is">A structured reflection instrument</div>
+          <div class="not-item is">A mirror — shows you what's running</div>
+          <div class="not-item is">A depth-driven question sequence</div>
+          <div class="not-item is">An observation tool, not a solution</div>
+        </div>
+      </div>
+      <div>
+        <div class="not-col-label not">What it isn't</div>
+        <div class="not-items">
+          <div class="not-item">A coaching session</div>
+          <div class="not-item">A diagnosis or assessment</div>
+          <div class="not-item">A guided meditation</div>
+          <div class="not-item">An advice engine</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section class="bottom-cta">
+  <h2 class="bottom-title">Something is<br><em>already running.</em></h2>
+  <p class="bottom-sub">The Observer doesn't tell you what it is. It asks until you can see it yourself.</p>
+  <a href="https://bhaveslab.com/the-observer.html" class="bottom-btn">
+    Enter the Observer <span>→</span>
+  </a>
+  <div class="bottom-price">$5 · single session</div>
+  <div class="bottom-note">The session runs as deep as you take it. Most people find the pattern in 4–6 questions. Some go further.</div>
+</section>
+
+<footer>
+  <a href="https://bhaveslab.com/tools.html">← Back to The Realm</a>
+  <span>Bhavé's Lab · The Observer</span>
+  <a href="https://bhaveslab.com">bhaveslab.com</a>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), entry.target.dataset.delay || 0);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.inside-step').forEach((el, i) => {
+    el.dataset.delay = i * 100;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

@@ -18,6 +18,8 @@
     { "source": "/events", "destination": "/events.html" },
     { "source": "/tools", "destination": "/tools.html" },
     { "source": "/the-trace", "destination": "/the-trace.html" },
-    { "source": "/the-trace-landing", "destination": "/the-trace-landing.html" }
+    { "source": "/the-trace-landing", "destination": "/the-trace-landing.html" },
+    { "source": "/the-observer-landing", "destination": "/the-observer-landing.html" },
+    { "source": "/thread-landing", "destination": "/thread-landing.html" }
   ]
 }
