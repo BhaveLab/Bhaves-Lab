@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Trace — Bhavé's Lab</title>
+<script>
+(function() {
+  if (new URLSearchParams(window.location.search).get('paid') !== 'true') {
+    window.location.replace('the-trace-landing.html');
+  }
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void: #060809;
+  --deep: #0a0e12;
+  --surface: #101418;
+  --panel: #141a20;
+  --border: #1a2230;
+  --border-lit: #243040;
+  --teal: #3dd6c8;
+  --teal-mid: #1a8078;
+  --teal-dim: rgba(61,214,200,0.08);
+  --teal-glow: rgba(61,214,200,0.15);
+  --gold: #c8a96e;
+  --gold-dim: rgba(200,169,110,0.08);
+  --text: #ccd8e0;
+  --text-2: #6a8090;
+  --text-3: #304050;
+  --state-color: #3dd6c8;
+  --perception-color: #7ec8a0;
+  --formation-color: #c8a96e;
+  --decision-color: #d4826a;
+  --experience-color: #b89ad0;
+  --reality-color: #7098c0;
+  --source-color: #d0b8a8;
+  --curiosity-color: #3dd6c8;
+}
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  overflow: hidden;
+}
+
+/* Grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Ambient pulse */
+.ambient {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61,214,200,0.03) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* Sequence strip — persistent top */
+.seq-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 100;
+  padding: 0 24px;
+}
+
+.seq-node {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--text-3);
+  transition: color 0.6s ease, opacity 0.6s ease;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.seq-node.active { color: var(--teal); }
+.seq-node.complete { color: var(--text-2); opacity: 0.6; }
+
+.seq-arr {
+  color: var(--text-3);
+  font-size: 9px;
+  transition: color 0.6s ease;
+}
+
+/* Lab mark — top right */
+.lab-mark {
+  position: fixed;
+  top: 0;
+  right: 24px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  z-index: 101;
+}
+
+/* Main stage */
+.stage {
+  position: fixed;
+  inset: 40px 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  pointer-events: none;
+}
+
+.stage.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.stage-inner {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Stage label */
+.stage-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.stage-label-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+.stage-label span { color: var(--text-2); }
+
+/* Prompt text */
+.prompt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 12px;
+  animation: fadeUp 0.7s ease 0.1s forwards;
+  opacity: 0;
+}
+
+.prompt em {
+  font-style: italic;
+  color: var(--teal);
+}
+
+/* Sub-prompt */
+.sub-prompt {
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  animation: fadeUp 0.7s ease 0.2s forwards;
+  opacity: 0;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Input */
+.trace-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lit);
+  padding: 12px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  resize: none;
+  min-height: 44px;
+  max-height: 160px;
+  overflow-y: auto;
+  animation: fadeUp 0.7s ease 0.3s forwards;
+  opacity: 0;
+  transition: border-color 0.3s ease;
+  caret-color: var(--teal);
+  line-height: 1.6;
+}
+
+.trace-input:focus { border-color: var(--teal-mid); }
+.trace-input::placeholder { color: var(--text-3); font-style: italic; }
+
+/* Word input (single word) */
+.word-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lit);
+  padding: 12px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--teal);
+  outline: none;
+  animation: fadeUp 0.7s ease 0.3s forwards;
+  opacity: 0;
+  transition: border-color 0.3s ease;
+  caret-color: var(--teal);
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.word-input:focus { border-color: var(--teal-mid); }
+.word-input::placeholder { color: var(--text-3); font-family: 'IBM Plex Mono', monospace; font-size: 14px; letter-spacing: 0.1em; }
+
+/* Reflection display */
+.reflection {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--teal);
+  text-align: center;
+  letter-spacing: 0.05em;
+  animation: breathe 3s ease-in-out infinite;
+  padding: 24px 0;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Continue button */
+.continue-btn {
+  margin-top: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid var(--border-lit);
+  padding: 12px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: fadeUp 0.7s ease 0.4s forwards;
+  opacity: 0;
+  align-self: flex-start;
+}
+
+.continue-btn:hover {
+  border-color: var(--teal-mid);
+  color: var(--teal);
+  background: var(--teal-dim);
+}
+
+.continue-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.continue-btn .arr { font-size: 12px; }
+
+/* Pause hold */
+.pause-hold {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+  animation: fadeUp 0.7s ease 0.3s forwards;
+  opacity: 0;
+}
+
+.pause-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--border-lit);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pause-ring-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--teal);
+  clip-path: circle(0% at 50% 50%);
+  transition: none;
+}
+
+.pause-ring-fill.filling {
+  animation: fillRing 15s linear forwards;
+}
+
+@keyframes fillRing {
+  0% { clip-path: inset(50% 0 50% 0); border-color: var(--teal); }
+  100% { clip-path: inset(0% 0 0% 0); border-color: var(--teal); }
+}
+
+.pause-count {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.2em;
+}
+
+/* Divider */
+.divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+  animation: fadeUp 0.7s ease 0.25s forwards;
+  opacity: 0;
+}
+
+/* Parable card */
+.parable-card {
+  padding: 20px 24px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(61,214,200,0.08);
+  border-left: 2px solid var(--teal-mid);
+  margin-bottom: 24px;
+  animation: fadeUp 0.7s ease 0.2s forwards;
+  opacity: 0;
+}
+
+.parable-label {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--teal-mid);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.parable-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-2);
+  line-height: 1.85;
+}
+
+/* Final trace map */
+.trace-map {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: fadeUp 0.7s ease 0.2s forwards;
+  opacity: 0;
+}
+
+.trace-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.trace-row-label {
+  padding: 14px 16px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.trace-row-tag {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.trace-row-sub {
+  font-size: 9px;
+  color: var(--text-3);
+}
+
+.trace-row-value {
+  padding: 14px 18px;
+  background: var(--deep);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+/* Email prompt */
+.email-row {
+  display: flex;
+  gap: 0;
+  margin-top: 24px;
+  animation: fadeUp 0.7s ease 0.4s forwards;
+  opacity: 0;
+}
+
+.email-input {
+  flex: 1;
+  background: var(--deep);
+  border: 1px solid var(--border-lit);
+  border-right: none;
+  padding: 12px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  caret-color: var(--teal);
+}
+
+.email-input::placeholder { color: var(--text-3); }
+
+.email-btn {
+  background: var(--teal-dim);
+  border: 1px solid var(--border-lit);
+  border-left: 1px solid var(--teal-mid);
+  padding: 12px 20px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.email-btn:hover { background: rgba(61,214,200,0.15); }
+
+/* Session CTA */
+.session-cta {
+  margin-top: 32px;
+  padding: 20px 24px;
+  border: 1px solid var(--border-lit);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  animation: fadeUp 0.7s ease 0.5s forwards;
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.session-cta:hover { border-color: var(--teal-mid); background: var(--teal-dim); }
+
+.session-cta-text { font-size: 11px; color: var(--text-2); line-height: 1.6; }
+.session-cta-text strong { display: block; color: var(--text); font-weight: 400; margin-bottom: 3px; font-size: 12px; }
+.session-cta-arr { color: var(--teal); font-size: 16px; flex-shrink: 0; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress line */
+.progress-line {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--teal);
+  transition: width 0.8s ease;
+  z-index: 100;
+  box-shadow: 0 0 8px var(--teal);
+}
+
+/* Scrollable stage content */
+.stage-scroll {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* State colors per layer */
+.c-state { color: var(--state-color); }
+.c-perception { color: var(--perception-color); }
+.c-formation { color: var(--formation-color); }
+.c-decision { color: var(--decision-color); }
+.c-experience { color: var(--experience-color); }
+.c-reality { color: var(--reality-color); }
+.c-source { color: var(--source-color); }
+.c-curiosity { color: var(--curiosity-color); }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .seq-node { font-size: 7px; padding: 0 4px; letter-spacing: 0.1em; }
+  .lab-mark { display: none; }
+  .prompt { font-size: 22px; }
+  .trace-row { grid-template-columns: 80px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- Sequence strip -->
+<div class="seq-strip" id="seqStrip">
+  <span class="seq-node" id="sn-state">State</span>
+  <span class="seq-arr">→</span>
+  <span class="seq-node" id="sn-perception">Perception</span>
+  <span class="seq-arr">→</span>
+  <span class="seq-node" id="sn-formation">Formation</span>
+  <span class="seq-arr">→</span>
+  <span class="seq-node" id="sn-decision">Decision</span>
+  <span class="seq-arr">→</span>
+  <span class="seq-node" id="sn-experience">Experience</span>
+  <span class="seq-arr">→</span>
+  <span class="seq-node" id="sn-reality">Reality</span>
+</div>
+
+<div class="lab-mark">Bhavé's Lab · The Trace</div>
+
+<div class="progress-line" id="progressLine" style="width: 0%"></div>
+
+<!-- ============================================================
+     STAGE 0 — STATE CALIBRATION
+     ============================================================ -->
+<div class="stage active" id="stage-0">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot"></div>
+      <span class="c-state">State</span>
+      <span>— The Operating Condition</span>
+    </div>
+    <div class="prompt">Before anything loads —<br>notice what your body is running <em>right now.</em></div>
+    <div class="sub-prompt">Not a feeling. Not a story about your day.<br>A frequency. A physical register.<br>Where is it sitting in your system?</div>
+    <input class="word-input" id="stateWord" type="text" placeholder="one word" maxlength="30" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="continue-btn" id="btn-0" disabled onclick="advanceFromState()">
+      Log it <span class="arr">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 0B — STATE REFLECTION
+     ============================================================ -->
+<div class="stage" id="stage-0b">
+  <div class="stage-inner" style="align-items: center; text-align: center;">
+    <div class="stage-label" style="justify-content: center;">
+      <div class="stage-label-dot"></div>
+      <span class="c-state">State logged</span>
+    </div>
+    <div class="reflection" id="stateReflection"></div>
+    <div class="sub-prompt" style="text-align: center; margin-top: 12px;">You will recognize this again<br>before this trace is finished.</div>
+    <div style="display: flex; justify-content: center; margin-top: 32px;">
+      <button class="continue-btn" onclick="advance('stage-1')" style="animation-delay: 1.5s;">
+        Continue <span class="arr">→</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 1 — NAME THE WALL (REALITY)
+     ============================================================ -->
+<div class="stage" id="stage-1">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--reality-color);"></div>
+      <span class="c-reality">Reality</span>
+      <span>— The Hardened Wall</span>
+    </div>
+    <div class="prompt">What is the <em>specific wall</em><br>you keep returning to?</div>
+    <div class="sub-prompt">Not the emotion around it. The structure of it.<br>Name the friction you are calling your Reality right now.</div>
+    <textarea class="trace-input" id="realityInput" placeholder="Describe it precisely..." rows="3"></textarea>
+
+    <div class="divider"></div>
+
+    <div class="parable-card">
+      <div class="parable-label">The Builder</div>
+      <div class="parable-text">A builder's first endeavor fails. He rebuilds a second, then a third. Each time it stalls in the same shape. He thinks he is building forward — but he is rebuilding the exact same Reality three times with different materials, running the exact same sequence. The architecture never changed. Only the address did.</div>
+    </div>
+
+    <button class="continue-btn" id="btn-1" disabled onclick="advance('stage-2')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 2 — EXPERIENCE
+     ============================================================ -->
+<div class="stage" id="stage-2">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--experience-color);"></div>
+      <span class="c-experience">Experience</span>
+      <span>— The Generated Output</span>
+    </div>
+    <div class="prompt">Are you responding to<br>what <em>actually happened</em> —<br>or your system's rendering of it?</div>
+    <div class="sub-prompt">Experience is not what occurred. It is the output your system generated from what it was told occurred.<br><br>What does your system tell you is happening — versus what can you confirm actually took place?</div>
+    <textarea class="trace-input" id="experienceInput" placeholder="What is the system's version? What are the mechanical facts?" rows="3"></textarea>
+
+    <div class="divider"></div>
+
+    <div class="parable-card">
+      <div class="parable-label">The Eleven-Minute Fire</div>
+      <div class="parable-text">A man survives a fire that lasted exactly eleven minutes. He spends the next thirty years making hundreds of small decisions to manage his distance from heat — in relationships, in work, in loud rooms. He is living inside the doorway of a generated experience, long after the event has ended.</div>
+    </div>
+
+    <button class="continue-btn" id="btn-2" disabled onclick="advance('stage-3')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 3 — DECISION
+     ============================================================ -->
+<div class="stage" id="stage-3">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--decision-color);"></div>
+      <span class="c-decision">Decision</span>
+      <span>— The Execution</span>
+    </div>
+    <div class="prompt">Where did your <em>feet move</em><br>before your mouth found language for it?</div>
+    <div class="sub-prompt">Decision is not a free choice. It is the behavioral execution of meaning your system already assembled.<br><br>At what exact moment did your body close down — before you believed you were deciding?</div>
+    <textarea class="trace-input" id="decisionInput" placeholder="Where was the decision already made..." rows="3"></textarea>
+
+    <button class="continue-btn" id="btn-3" disabled onclick="advance('stage-4')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 4 — FORMATION
+     ============================================================ -->
+<div class="stage" id="stage-4">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--formation-color);"></div>
+      <span class="c-formation">Formation</span>
+      <span>— The Hidden Layer</span>
+    </div>
+    <div class="prompt">What did your internal programmer<br>assign to this<br>to make your reaction feel <em>inevitable?</em></div>
+    <div class="sub-prompt">Formation is where meaning is secretly assigned. Your reaction felt obvious. It wasn't.<br><br>What past event is this new situation being compared to — even if the comparison makes no logical sense?</div>
+    <textarea class="trace-input" id="formationInput" placeholder="What historical meaning was assigned..." rows="3"></textarea>
+
+    <div class="divider"></div>
+
+    <div class="parable-card">
+      <div class="parable-label">The Unsigned Contract</div>
+      <div class="parable-text">A woman sits with a perfectly fair, lucrative contract. She reads it three times. She understands it. She does not sign. She is not reading the contract in front of her — she is reading the archive of a bad deal made years ago. The Formation was running the cost of an old room.</div>
+    </div>
+
+    <button class="continue-btn" id="btn-4" disabled onclick="advance('stage-5')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 5 — PERCEPTION
+     ============================================================ -->
+<div class="stage" id="stage-5">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--perception-color);"></div>
+      <span class="c-perception">Perception</span>
+      <span>— The Filter</span>
+    </div>
+    <div class="prompt">What did your lens<br><em>filter out</em> to keep<br>your old story intact?</div>
+    <div class="sub-prompt">Perception is a survival lens — it scans for what confirms your baseline State and deletes what doesn't.<br><br>What specific data, resources, or possibilities in that situation did your lens not register — so it could prove your old story was accurate?</div>
+    <textarea class="trace-input" id="perceptionInput" placeholder="What was present that your lens didn't include..." rows="3"></textarea>
+
+    <div class="divider"></div>
+
+    <div class="parable-card">
+      <div class="parable-label">Arthur and the Marble Table</div>
+      <div class="parable-text">Arthur owned a marble table with a crack in it. He spent years anticipating guests noticing the damage. One evening, a woman runs her hand over the break and calls the table beautiful. Arthur is unsettled. His lens did not permit this reading. The crack was not in the marble. The crack was in his archive.</div>
+    </div>
+
+    <button class="continue-btn" id="btn-5" disabled onclick="advance('stage-6')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE 6 — STATE ORIGIN
+     ============================================================ -->
+<div class="stage" id="stage-6">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--state-color);"></div>
+      <span class="c-state">State</span>
+      <span>— The Origin</span>
+    </div>
+    <div class="prompt">Before you even entered that room —<br>what was your body<br><em>already running?</em></div>
+    <div class="sub-prompt">The body files the report before the mind writes the headline.<br><br>Where did the jaw set, or the chest contract, before any of this began? What baseline frequency was your system pre-loaded with?</div>
+    <textarea class="trace-input" id="stateOriginInput" placeholder="Where in your body. What it felt like before anything happened..." rows="3"></textarea>
+
+    <div class="divider"></div>
+
+    <div class="parable-card">
+      <div class="parable-label">Marcus at the Table</div>
+      <div class="parable-text">Marcus arrives at a family dinner already defending. No one has spoken. The bread has not been passed. But he has been drafting the counterargument in his chest since the highway. The argument was over before it began — State had already set the table.</div>
+    </div>
+
+    <button class="continue-btn" id="btn-6" disabled onclick="advance('stage-gap')">
+      Continue <span class="arr">→</span>
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE GAP — THE GAP PRACTICE
+     ============================================================ -->
+<div class="stage" id="stage-gap">
+  <div class="stage-scroll">
+  <div class="stage-inner">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--gold);"></div>
+      <span style="color: var(--gold);">The Gap</span>
+      <span>— The Intervention Point</span>
+    </div>
+    <div class="prompt">Between the signal arriving<br>and your automated response —<br>there is a <em>seam.</em></div>
+    <div class="sub-prompt">The old formation will feel like urgency. Like inevitability. Like the only available read.<br><br>You are in the gap right now. Before you name what shifts — hold it. Do not move toward the conclusion yet.</div>
+
+    <div class="pause-hold" id="pauseHold">
+      <div class="pause-ring">
+        <div class="pause-ring-fill" id="pauseRingFill"></div>
+      </div>
+      <div class="pause-count" id="pauseCount">holding · 15</div>
+    </div>
+
+    <div id="gapInputSection" style="display: none; flex-direction: column; gap: 0;">
+      <div class="sub-prompt" style="margin-top: 24px; animation: fadeUp 0.6s ease forwards;">What ran in you just now? What did your system immediately move toward?</div>
+      <textarea class="trace-input" id="gapInput1" placeholder="What formed..." rows="2" style="animation: fadeUp 0.6s ease 0.1s forwards; opacity: 0;"></textarea>
+
+      <div class="sub-prompt" style="margin-top: 20px; animation: fadeUp 0.6s ease 0.2s forwards; opacity: 0;">What else was present that the first read didn't include?</div>
+      <textarea class="trace-input" id="gapInput2" placeholder="What the first read missed..." rows="2" style="animation: fadeUp 0.6s ease 0.3s forwards; opacity: 0;"></textarea>
+
+      <button class="continue-btn" id="btn-gap" disabled onclick="advance('stage-final')" style="margin-top: 24px; animation: fadeUp 0.6s ease 0.4s forwards; opacity: 0;">
+        See the trace <span class="arr">→</span>
+      </button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STAGE FINAL — THE TRACE MAP + CLOSE
+     ============================================================ -->
+<div class="stage" id="stage-final">
+  <div class="stage-scroll">
+  <div class="stage-inner" style="max-width: 720px;">
+    <div class="stage-label">
+      <div class="stage-label-dot" style="background: var(--teal);"></div>
+      <span class="c-curiosity">Trace Complete</span>
+    </div>
+
+    <div class="prompt" style="margin-bottom: 8px;">Your system, mapped.</div>
+    <div class="sub-prompt" style="margin-bottom: 24px;">Your words. Your sequence. The architecture that built the wall — visible now.</div>
+
+    <div class="trace-map" id="traceMap"></div>
+
+    <div style="margin-top: 32px; padding: 20px 24px; border: 1px solid var(--border); background: var(--teal-dim); animation: fadeUp 0.7s ease 0.3s forwards; opacity: 0;">
+      <div class="parable-label" style="margin-bottom: 12px;">The close</div>
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: var(--text-2); line-height: 1.85;">
+        Your system is not cursed. It is not broken. It is performing precisely as it was set.<br><br>
+        The sequence ran. You had a Reality. You will have it again — until the sequence is interrupted at the source.<br><br>
+        <span style="color: var(--text);">Seeing the code does not uninstall it. Choosing differently, inside the gap, repeatedly — that is what rewrites the default.</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; padding: 16px 20px; border: 1px solid var(--border); animation: fadeUp 0.7s ease 0.35s forwards; opacity: 0;">
+      <div style="font-size: 10px; color: var(--text-2); margin-bottom: 8px; letter-spacing: 0.1em; text-transform: uppercase;">Your State — then and now</div>
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--teal);" id="stateComparison"></div>
+    </div>
+
+    <div class="email-row">
+      <input class="email-input" type="email" placeholder="email this trace to yourself" id="emailField">
+      <button class="email-btn" onclick="sendTrace()">Send trace →</button>
+    </div>
+
+    <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="session-cta">
+      <div class="session-cta-text">
+        <strong>Go deeper with a session</strong>
+        You've mapped the sequence. A session traces it further — live, precise, and without the wall in the way.
+      </div>
+      <div class="session-cta-arr">→</div>
+    </a>
+
+    <div style="margin-top: 32px; text-align: center; animation: fadeUp 0.7s ease 0.6s forwards; opacity: 0;">
+      <button onclick="restart()" style="background: transparent; border: none; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='var(--text-2)'" onmouseout="this.style.color='var(--text-3)'">
+        Run another trace ↺
+      </button>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+<script>
+  const stages = ['stage-0','stage-0b','stage-1','stage-2','stage-3','stage-4','stage-5','stage-6','stage-gap','stage-final'];
+  let currentStage = 'stage-0';
+  let stateWord = '';
+
+  const stageNodeMap = {
+    'stage-0': 'state', 'stage-0b': 'state',
+    'stage-1': 'reality',
+    'stage-2': 'experience',
+    'stage-3': 'decision',
+    'stage-4': 'formation',
+    'stage-5': 'perception',
+    'stage-6': 'state',
+    'stage-gap': null,
+    'stage-final': null
+  };
+
+  const completeOrder = ['state','perception','formation','decision','experience','reality'];
+
+  function updateSeqStrip(stageName) {
+    const active = stageNodeMap[stageName];
+    const completeNodes = {
+      'stage-0': [], 'stage-0b': [],
+      'stage-1': ['state'],
+      'stage-2': ['state','reality'],
+      'stage-3': ['state','reality','experience'],
+      'stage-4': ['state','reality','experience','decision'],
+      'stage-5': ['state','reality','experience','decision','formation'],
+      'stage-6': ['state','reality','experience','decision','formation','perception'],
+      'stage-gap': completeOrder,
+      'stage-final': completeOrder
+    };
+    const done = completeNodes[stageName] || [];
+    completeOrder.forEach(n => {
+      const el = document.getElementById('sn-' + n);
+      if (!el) return;
+      el.className = 'seq-node';
+      if (n === active) el.classList.add('active');
+      else if (done.includes(n)) el.classList.add('complete');
+    });
+  }
+
+  function advance(nextId) {
+    const cur = document.getElementById(currentStage);
+    const next = document.getElementById(nextId);
+    if (!cur || !next) return;
+    cur.classList.remove('active');
+    setTimeout(() => {
+      next.classList.add('active');
+      currentStage = nextId;
+      updateSeqStrip(nextId);
+      updateProgress();
+      if (nextId === 'stage-gap') initGap();
+      if (nextId === 'stage-final') buildTraceMap();
+      if (nextId === 'stage-0b') showReflection();
+    }, 50);
+  }
+
+  function updateProgress() {
+    const idx = stages.indexOf(currentStage);
+    const pct = Math.round((idx / (stages.length - 1)) * 100);
+    document.getElementById('progressLine').style.width = pct + '%';
+  }
+
+  // STATE
+  const stateInput = document.getElementById('stateWord');
+  const btn0 = document.getElementById('btn-0');
+  stateInput.addEventListener('input', () => {
+    btn0.disabled = stateInput.value.trim().length === 0;
+  });
+  stateInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); if (!btn0.disabled) advanceFromState(); }
+  });
+
+  function advanceFromState() {
+    stateWord = stateInput.value.trim();
+    advance('stage-0b');
+  }
+
+  function showReflection() {
+    document.getElementById('stateReflection').textContent = stateWord;
+  }
+
+  // Enable buttons when textarea has content
+  ['realityInput','experienceInput','decisionInput','formationInput','perceptionInput','stateOriginInput'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    const btn = document.getElementById('btn-' + (i + 1));
+    if (!el || !btn) return;
+    el.addEventListener('input', () => { btn.disabled = el.value.trim().length < 3; });
+  });
+
+  // GAP PRACTICE
+  let gapTimer;
+  function initGap() {
+    let count = 15;
+    const countEl = document.getElementById('pauseCount');
+    const fillEl = document.getElementById('pauseRingFill');
+    const inputSection = document.getElementById('gapInputSection');
+
+    setTimeout(() => { fillEl.classList.add('filling'); }, 300);
+
+    gapTimer = setInterval(() => {
+      count--;
+      if (count <= 0) {
+        clearInterval(gapTimer);
+        countEl.textContent = 'gap held';
+        setTimeout(() => {
+          document.getElementById('pauseHold').style.display = 'none';
+          inputSection.style.display = 'flex';
+        }, 600);
+      } else {
+        countEl.textContent = 'holding · ' + count;
+      }
+    }, 1000);
+
+    const g1 = document.getElementById('gapInput1');
+    const g2 = document.getElementById('gapInput2');
+    const btnGap = document.getElementById('btn-gap');
+    function checkGap() { btnGap.disabled = g1.value.trim().length < 2 || g2.value.trim().length < 2; }
+    g1.addEventListener('input', checkGap);
+    g2.addEventListener('input', checkGap);
+  }
+
+  // BUILD TRACE MAP
+  function buildTraceMap() {
+    const rows = [
+      { tag: 'State', sub: 'Origin', color: 'var(--state-color)', val: document.getElementById('stateOriginInput')?.value || '' },
+      { tag: 'Perception', sub: 'The Filter', color: 'var(--perception-color)', val: document.getElementById('perceptionInput')?.value || '' },
+      { tag: 'Formation', sub: 'Hidden Layer', color: 'var(--formation-color)', val: document.getElementById('formationInput')?.value || '' },
+      { tag: 'Decision', sub: 'The Execution', color: 'var(--decision-color)', val: document.getElementById('decisionInput')?.value || '' },
+      { tag: 'Experience', sub: 'The Output', color: 'var(--experience-color)', val: document.getElementById('experienceInput')?.value || '' },
+      { tag: 'Reality', sub: 'The Wall', color: 'var(--reality-color)', val: document.getElementById('realityInput')?.value || '' },
+    ];
+
+    const map = document.getElementById('traceMap');
+    map.innerHTML = rows.map(r => `
+      <div class="trace-row">
+        <div class="trace-row-label">
+          <div class="trace-row-tag" style="color: ${r.color}">${r.tag}</div>
+          <div class="trace-row-sub">${r.sub}</div>
+        </div>
+        <div class="trace-row-value">${r.val || '<span style="opacity:0.3;font-size:12px;">—</span>'}</div>
+      </div>
+    `).join('');
+
+    const now = document.getElementById('stateWord')?.value || '';
+    document.getElementById('stateComparison').textContent = now ? `"${now}" — then. Notice it now.` : '';
+  }
+
+  function sendTrace() {
+    const email = document.getElementById('emailField').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailField').style.borderColor = 'var(--decision-color)';
+      return;
+    }
+    document.getElementById('emailField').value = '';
+    document.getElementById('emailField').placeholder = 'trace sent ✓';
+    document.getElementById('emailField').style.borderColor = 'var(--teal-mid)';
+  }
+
+  function restart() {
+    document.querySelectorAll('textarea, input[type="text"], input[type="email"]').forEach(el => {
+      el.value = '';
+      el.style.borderColor = '';
+    });
+    document.querySelectorAll('.continue-btn').forEach(b => b.disabled = true);
+    clearInterval(gapTimer);
+    const fill = document.getElementById('pauseRingFill');
+    fill.classList.remove('filling');
+    document.getElementById('pauseCount').textContent = 'holding · 15';
+    document.getElementById('pauseHold').style.display = 'flex';
+    document.getElementById('gapInputSection').style.display = 'none';
+    advance('stage-0');
+  }
+
+  updateSeqStrip('stage-0');
+  updateProgress();
+</script>
+</body>
+</html>
