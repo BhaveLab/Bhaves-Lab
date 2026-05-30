@@ -16,6 +16,8 @@
     { "source": "/muse-biowell", "destination": "/muse-biowell.html" },
     { "source": "/pattern-immersion", "destination": "/pattern-immersion.html" },
     { "source": "/events", "destination": "/events.html" },
-    { "source": "/tools", "destination": "/tools.html" }
+    { "source": "/tools", "destination": "/tools.html" },
+    { "source": "/the-trace", "destination": "/the-trace.html" },
+    { "source": "/the-trace-landing", "destination": "/the-trace-landing.html" }
   ]
 }
