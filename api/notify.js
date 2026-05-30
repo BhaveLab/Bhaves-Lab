@@ -30,17 +30,16 @@ Path guidance:
 - Pattern Immersion: patterns are named and understood but persist despite effort — deeper structural work over time is what moves them`;
 
 const TRACE_FIELDS = [
-  { key: 'stateWord',       label: 'State Word' },
-  { key: 'reality',         label: 'Reality' },
-  { key: 'experience',      label: 'Experience' },
-  { key: 'decision',        label: 'Decision' },
-  { key: 'stateAtDecision', label: 'State at Decision' },
-  { key: 'formation',       label: 'Formation' },
-  { key: 'perception',      label: 'Perception' },
-  { key: 'stateOrigin',     label: 'State Origin' },
-  { key: 'gapResponse1',    label: 'Gap Response 1' },
-  { key: 'gapResponse2',    label: 'Gap Response 2' },
-  { key: 'realityUpdate',   label: 'Reality Update', optional: true },
+  { key: 'stateWord',     label: 'State Word' },
+  { key: 'reality',       label: 'Reality' },
+  { key: 'experience',    label: 'Experience' },
+  { key: 'decision',      label: 'Decision' },
+  { key: 'formation',     label: 'Formation' },
+  { key: 'perception',    label: 'Perception' },
+  { key: 'stateOrigin',   label: 'State Origin' },
+  { key: 'gapResponse1',  label: 'Gap Response 1' },
+  { key: 'gapResponse2',  label: 'Gap Response 2' },
+  { key: 'realityUpdate', label: 'Reality Update', optional: true },
 ];
 
 function parseReflectionResponse(fullText) {

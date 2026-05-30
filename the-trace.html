@@ -1033,25 +1033,25 @@ body::after {
       return;
     }
 
-    const answers = [
-      'STATE WORD: '                      + (document.getElementById('stateWord')?.value        || '—'),
-      'REALITY — The Wall: '              + (document.getElementById('realityInput')?.value     || '—'),
-      'EXPERIENCE — The Output: '         + (document.getElementById('experienceInput')?.value  || '—'),
-      'DECISION — The Execution: '        + (document.getElementById('decisionInput')?.value    || '—'),
-      'FORMATION — The Hidden Layer: '    + (document.getElementById('formationInput')?.value   || '—'),
-      'PERCEPTION — The Filter: '         + (document.getElementById('perceptionInput')?.value  || '—'),
-      'STATE — The Origin: '              + (document.getElementById('stateOriginInput')?.value || '—'),
-      'THE GAP — First Read: '            + (document.getElementById('gapInput1')?.value        || '—'),
-      'THE GAP — What Else Was Present: ' + (document.getElementById('gapInput2')?.value        || '—'),
-      'REALITY UPDATE: '                  + (document.getElementById('realityUpdateInput')?.value || ''),
-    ];
+    const fields = {
+      stateWord:     document.getElementById('stateWord')?.value         || '',
+      reality:       document.getElementById('realityInput')?.value      || '',
+      experience:    document.getElementById('experienceInput')?.value   || '',
+      decision:      document.getElementById('decisionInput')?.value     || '',
+      formation:     document.getElementById('formationInput')?.value    || '',
+      perception:    document.getElementById('perceptionInput')?.value   || '',
+      stateOrigin:   document.getElementById('stateOriginInput')?.value  || '',
+      gapResponse1:  document.getElementById('gapInput1')?.value         || '',
+      gapResponse2:  document.getElementById('gapInput2')?.value         || '',
+      realityUpdate: document.getElementById('realityUpdateInput')?.value || '',
+    };
 
     if (btn) btn.textContent = 'Sending…';
 
     fetch('https://bhaveslab-backend.vercel.app/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, source: 'the-trace', answers })
+      body: JSON.stringify({ email, source: 'the-trace', fields })
     })
     .then(r => {
       if (!r.ok) throw new Error();
