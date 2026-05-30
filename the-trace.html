@@ -1014,14 +1014,46 @@ body::after {
   }
 
   function sendTrace() {
-    const email = document.getElementById('emailField').value;
+    const field = document.getElementById('emailField');
+    const btn   = document.querySelector('.email-btn');
+    const email = field.value.trim();
+
     if (!email || !email.includes('@')) {
-      document.getElementById('emailField').style.borderColor = 'var(--decision-color)';
+      field.style.borderColor = 'var(--decision-color)';
       return;
     }
-    document.getElementById('emailField').value = '';
-    document.getElementById('emailField').placeholder = 'trace sent ✓';
-    document.getElementById('emailField').style.borderColor = 'var(--teal-mid)';
+
+    const answers = [
+      'STATE WORD: '                      + (document.getElementById('stateWord')?.value        || '—'),
+      'REALITY — The Wall: '              + (document.getElementById('realityInput')?.value     || '—'),
+      'EXPERIENCE — The Output: '         + (document.getElementById('experienceInput')?.value  || '—'),
+      'DECISION — The Execution: '        + (document.getElementById('decisionInput')?.value    || '—'),
+      'FORMATION — The Hidden Layer: '    + (document.getElementById('formationInput')?.value   || '—'),
+      'PERCEPTION — The Filter: '         + (document.getElementById('perceptionInput')?.value  || '—'),
+      'STATE — The Origin: '              + (document.getElementById('stateOriginInput')?.value || '—'),
+      'THE GAP — First Read: '            + (document.getElementById('gapInput1')?.value        || '—'),
+      'THE GAP — What Else Was Present: ' + (document.getElementById('gapInput2')?.value        || '—'),
+    ];
+
+    if (btn) btn.textContent = 'Sending…';
+
+    fetch('https://bhaveslab-backend.vercel.app/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'the-trace', answers })
+    })
+    .then(r => {
+      if (!r.ok) throw new Error();
+      field.value = '';
+      field.placeholder = 'trace sent ✓';
+      field.style.borderColor = 'var(--teal-mid)';
+      if (btn) btn.textContent = 'Sent ✓';
+    })
+    .catch(() => {
+      field.style.borderColor = 'var(--decision-color)';
+      field.placeholder = 'send failed — try again';
+      if (btn) btn.textContent = 'Send trace →';
+    });
   }
 
   function restart() {
