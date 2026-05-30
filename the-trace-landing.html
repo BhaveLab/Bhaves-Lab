@@ -5,24 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Trace — Bhavé's Lab</title>
 <meta name="description" content="You bring the wall. The Lab holds the structure. The sequence does the rest.">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --void: #060809;
-  --deep: #090d11;
-  --surface: #0f1418;
-  --border: #181f28;
-  --border-lit: #22303f;
-  --teal: #3dd6c8;
-  --teal-mid: #1a7a72;
-  --teal-dim: rgba(61,214,200,0.06);
-  --teal-glow: rgba(61,214,200,0.12);
+  --void: #080808;
+  --deep: #0f0f0f;
+  --surface: #141414;
+  --border: #1e1e1e;
+  --border-lit: #2a2a2a;
+  --teal: #4ecdc4;
+  --teal-mid: #2a7a76;
+  --teal-dim: rgba(78,205,196,0.06);
+  --teal-glow: rgba(78,205,196,0.12);
   --text: #c8d4de;
   --text-2: #607888;
   --text-3: #2a3a48;
 }
+
+/* Back arrow */
+.back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(201, 168, 76, 0.35);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  z-index: 1000;
+}
+.back:hover { color: rgba(201, 168, 76, 0.75); }
 
 html { scroll-behavior: smooth; }
 
@@ -51,8 +67,8 @@ body::before {
   height: 800px;
   border-radius: 50%;
   background: radial-gradient(circle at center,
-    rgba(61,214,200,0.04) 0%,
-    rgba(61,214,200,0.02) 30%,
+    rgba(78,205,196,0.04) 0%,
+    rgba(78,205,196,0.02) 30%,
     transparent 70%);
   top: 50%;
   left: 50%;
@@ -476,13 +492,13 @@ nav {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(61,214,200,0.08);
+  background: rgba(78,205,196,0.08);
   transform: translateY(100%);
   transition: transform 0.3s ease;
 }
 
 .bottom-btn:hover::before { transform: translateY(0); }
-.bottom-btn:hover { border-color: var(--teal); box-shadow: 0 0 24px rgba(61,214,200,0.08); }
+.bottom-btn:hover { border-color: var(--teal); box-shadow: 0 0 24px rgba(78,205,196,0.08); }
 
 .bottom-price {
   margin-top: 16px;
@@ -537,6 +553,8 @@ footer a:hover { color: var(--text-2); }
 </style>
 </head>
 <body>
+
+<a class="back" href="https://tools.bhaveslab.com">← The Realm</a>
 
 <div class="orb"></div>
 
@@ -638,7 +656,7 @@ footer a:hover { color: var(--text-2); }
 
     <div class="layer-item">
       <div class="layer-item-label">
-        <div class="layer-item-tag" style="color:#3dd6c8;">State</div>
+        <div class="layer-item-tag" style="color:#4ecdc4;">State</div>
         <div class="layer-item-sub">The Origin</div>
       </div>
       <div class="layer-item-body">
