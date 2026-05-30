@@ -42,6 +42,30 @@ const TRACE_FIELDS = [
   { key: 'realityUpdate', label: 'Reality Update', optional: true },
 ];
 
+const TRACE_DEFINITIONS = {
+  stateWord:   'The physical frequency your system was running before interpretation began',
+  reality:     'The logged result of a sequence run enough times to feel like ground',
+  experience:  'Not what happened — the output your system generated from what it was told happened',
+  decision:    'The behavioral execution of meaning your system already assembled — feet before language',
+  formation:   'Where historical meaning is secretly assigned to raw data — making one reaction feel inevitable',
+  perception:  'A survival lens scanning for what confirms your baseline State — deletes what doesn\'t match',
+  stateOrigin: 'The pre-loaded frequency that set the entire sequence in motion',
+};
+
+const TRACE_SYNTHESIS_PROMPT = `You are operating inside Bhavé's Lab — a consciousness interface that runs structural diagnostics on human experience. The framework sequence is: State → Perception → Formation → Decision → Experience → Reality.
+
+You are not a coach. You do not validate emotions. You do not offer life advice. You surface the mechanical pattern visible in the sequence the person just traced.
+
+Your output has exactly three parts — no more, no less:
+
+PATTERN: One sentence naming what the sequence structurally reveals. Name the mechanism, not the emotion. No therapeutic language.
+
+GAP: One sentence identifying which layer is the primary intervention point and why.
+
+FORWARD: One precise question the person can carry into the next 24 hours. Not motivational. Not prescriptive. A question that opens observation.
+
+Do not use the words: healing, toxic, high vibe, manifest, hustle, grind, transformation, journey, growth, coaching, guidance, therapy.`;
+
 function parseReflectionResponse(fullText) {
   const pathMarker = 'PATH OPTIONS:';
   const pathIndex = fullText.indexOf(pathMarker);
@@ -93,6 +117,52 @@ async function getMirrorReflection(answers) {
 
   const fullText = data.content?.map(c => c.text || '').join('') || '';
   return parseReflectionResponse(fullText);
+}
+
+async function getTraceSynthesis(fields) {
+  const userMessage = [
+    `State Word: ${fields.stateWord || '—'}`,
+    `Reality: ${fields.reality || '—'}`,
+    `Experience: ${fields.experience || '—'}`,
+    `Decision: ${fields.decision || '—'}`,
+    `Formation: ${fields.formation || '—'}`,
+    `Perception: ${fields.perception || '—'}`,
+    `State Origin: ${fields.stateOrigin || '—'}`,
+    `Gap Response 1: ${fields.gapResponse1 || '—'}`,
+    `Gap Response 2: ${fields.gapResponse2 || '—'}`,
+    fields.realityUpdate ? `Reality Update: ${fields.realityUpdate}` : null,
+  ].filter(Boolean).join('\n');
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      system: TRACE_SYNTHESIS_PROMPT,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error('[notify] Claude trace synthesis error:', data);
+    return null;
+  }
+
+  return data.content?.map(c => c.text || '').join('') || null;
+}
+
+function parseTraceSynthesis(text) {
+  if (!text) return null;
+  const pattern = text.match(/PATTERN:\s*(.+?)(?=\nGAP:|\nFORWARD:|$)/s)?.[1]?.trim() || null;
+  const gap     = text.match(/GAP:\s*(.+?)(?=\nFORWARD:|$)/s)?.[1]?.trim() || null;
+  const forward = text.match(/FORWARD:\s*(.+?)$/s)?.[1]?.trim() || null;
+  return { pattern, gap, forward };
 }
 
 function escapeHtml(str) {
@@ -213,19 +283,47 @@ function buildReadoutHTML(answers, reflection, paths) {
 </html>`;
 }
 
-function buildTraceReadoutHTML(fields, date) {
-  const fieldRows = TRACE_FIELDS
+function buildTraceReadoutHTML(fields, date, synthesis) {
+  const comparisonRows = TRACE_FIELDS
     .filter(({ key, optional }) => !optional || fields[key])
     .map(({ key, label }) => {
-      const value = fields[key] ? escapeHtml(fields[key]) : '—';
+      const value      = fields[key] ? escapeHtml(fields[key]) : '—';
+      const definition = TRACE_DEFINITIONS[key];
       return `
       <tr>
-        <td style="padding:16px 0 6px;background-color:#080808;" bgcolor="#080808">
+        <td style="padding:16px 0 12px;background-color:#080808;border-bottom:1px solid #111;" bgcolor="#080808">
           <p style="margin:0 0 5px;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#c9a96e;opacity:0.5;">${escapeHtml(label)}</p>
-          <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#e8e4dc;line-height:1.7;">${value}</p>
+          <p style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#e8e4dc;line-height:1.7;">${value}</p>
+          ${definition ? `<p style="margin:0;font-family:'Courier New',Courier,monospace;font-size:10px;color:#2e2a1e;line-height:1.6;">${escapeHtml(definition)}</p>` : ''}
         </td>
       </tr>`;
     }).join('');
+
+  const parsed = synthesis ? parseTraceSynthesis(synthesis) : null;
+
+  const synthesisBlock = parsed ? `
+          <!-- AI Synthesis -->
+          <tr>
+            <td style="padding:32px 0 0;background-color:#080808;" bgcolor="#080808">
+              <p style="margin:0 0 16px;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#c9a96e;opacity:0.4;">Diagnostic</p>
+              <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#080808" style="background-color:#080808;">
+                <tr>
+                  <td width="2" style="width:2px;background-color:#c9a96e;" bgcolor="#c9a96e">&nbsp;</td>
+                  <td style="padding:18px 22px;background-color:#0d0b09;" bgcolor="#0d0b09">
+                    ${parsed.pattern ? `
+                    <p style="margin:0 0 4px;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#c9a96e;opacity:0.5;">Pattern</p>
+                    <p style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#e8e4dc;line-height:1.75;">${escapeHtml(parsed.pattern)}</p>` : ''}
+                    ${parsed.gap ? `
+                    <p style="margin:0 0 4px;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#c9a96e;opacity:0.5;">Gap</p>
+                    <p style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#e8e4dc;line-height:1.75;">${escapeHtml(parsed.gap)}</p>` : ''}
+                    ${parsed.forward ? `
+                    <p style="margin:0 0 4px;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#c9a96e;opacity:0.5;">Forward</p>
+                    <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:14px;font-style:italic;color:#e8e4dc;line-height:1.75;">${escapeHtml(parsed.forward)}</p>` : ''}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -235,7 +333,7 @@ function buildTraceReadoutHTML(fields, date) {
   <title>Your Trace</title>
 </head>
 <body style="margin:0;padding:0;background-color:#080808;" bgcolor="#080808">
-  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#080808" style="background-color:#080808;min-height:100vh;">
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#080808" style="background-color:#080808;">
     <tr>
       <td align="center" style="padding:48px 20px;background-color:#080808;" bgcolor="#080808">
         <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#080808" style="max-width:580px;background-color:#080808;">
@@ -249,14 +347,16 @@ function buildTraceReadoutHTML(fields, date) {
             </td>
           </tr>
 
-          <!-- Fields -->
+          <!-- Framework Comparison -->
           <tr>
             <td style="padding-top:8px;background-color:#080808;" bgcolor="#080808">
               <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#080808" style="background-color:#080808;">
-                ${fieldRows}
+                ${comparisonRows}
               </table>
             </td>
           </tr>
+
+          ${synthesisBlock}
 
           <!-- Footer -->
           <tr>
@@ -346,16 +446,17 @@ export default async function handler(req, res) {
       }
     }
 
-    // For trace submissions, send formatted trace readout to user
+    // For trace submissions, get AI synthesis then send formatted readout to user
     if (source === 'the-trace') {
       const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       const traceFields = fields || {};
+      const synthesis = await getTraceSynthesis(traceFields);
 
       const userRes = await sendEmail({
         from: "Bhavé's Lab <mirror@bhaveslab.com>",
         to: email,
         subject: `Your Trace — ${date}`,
-        html: buildTraceReadoutHTML(traceFields, date),
+        html: buildTraceReadoutHTML(traceFields, date, synthesis),
       });
 
       const userData = await userRes.json();
