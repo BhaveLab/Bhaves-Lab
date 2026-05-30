@@ -1130,7 +1130,7 @@ transition: background 0.3s;
     <h1 class="mirror-title">The <em>Consciousness</em><br>Mirror</h1>
     <p class="mirror-subtitle">$1 per session</p>
     <div class="divider"></div>
-    <a href="https://buy.stripe.com/aFadR2180fSidfwaRlbQY05" class="gate-enter-btn">Enter</a>
+    <a href="https://buy.stripe.com/eVqbIU2c4fSi2AS6B5bQY0j" class="gate-enter-btn">Enter</a>
   </div>
 
   <!-- INTRO -->
@@ -1210,11 +1210,15 @@ transition: background 0.3s;
 </div>
 
 <script>
-// Payment gate — show mirror only after Stripe success redirect
+// Payment gate — redirect to Stripe if ?paid=true not present
 (function() {
-  var paid = new URLSearchParams(window.location.search).get('success') === 'true';
-  document.getElementById('payment-gate').style.display = paid ? 'none' : 'block';
-  document.getElementById('intro').style.display = paid ? 'block' : 'none';
+  var paid = new URLSearchParams(window.location.search).get('paid') === 'true';
+  if (!paid) {
+    window.location.replace('https://buy.stripe.com/eVqbIU2c4fSi2AS6B5bQY0j');
+  } else {
+    document.getElementById('payment-gate').style.display = 'none';
+    document.getElementById('intro').style.display = 'block';
+  }
 })();
 
 const questions = [
