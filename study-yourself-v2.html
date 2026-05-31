@@ -1249,7 +1249,7 @@ async function callClaude(systemPrompt, answer) {
     response = await fetch(`${BACKEND}/api/reflect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ systemPrompt, answer, model: 'claude-sonnet-4-20250514', max_tokens: 300 }),
+      body: JSON.stringify({ systemPrompt, input: answer, model: 'claude-sonnet-4-20250514', max_tokens: 300 }),
       signal: controller.signal
     });
   } finally {
