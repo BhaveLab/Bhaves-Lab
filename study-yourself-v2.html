@@ -1239,9 +1239,9 @@ function recordAnswer(sIndex, qIndex, answer, reflection, movedThrough) {
 async function callClaude(systemPrompt, answer) {
   const controller = new AbortController();
   const timer = setTimeout(() => {
-    console.warn('[callClaude] 30s timeout — aborting fetch');
+    console.warn('[callClaude] 60s timeout — aborting fetch');
     controller.abort();
-  }, 30000);
+  }, 60000);
 
   let response;
   try {
@@ -1265,9 +1265,9 @@ async function callClaude(systemPrompt, answer) {
 
   const bodyController = new AbortController();
   const bodyTimer = setTimeout(() => {
-    console.warn('[callClaude] 45s body-read timeout — aborting');
+    console.warn('[callClaude] 75s body-read timeout — aborting');
     bodyController.abort();
-  }, 45000);
+  }, 75000);
   let rawBody;
   try {
     rawBody = await response.clone().text();
