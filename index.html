@@ -3,17 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="preload" href="https://fonts.gstatic.com/s/cormorantgaramond/v22/co3YmX5slCNuHLi8bLeY9MK7whWMhyjornFLsS6V7w.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5UAdzHgOiQkKMY.woff2" as="font" type="font/woff2" crossorigin>
 <title>Bhavé's Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-  body { opacity: 0; transition: opacity 0.4s ease; }
-  body.ready { opacity: 1; }
+
+  /* ── SPLASH SCREEN ── */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: #080A0C;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease;
+  }
+
+  #splash.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #splashCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .splash-mark {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 0.4s;
+  }
+
+  .splash-wordmark {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4ECDC4;
+  }
+
+  .splash-pulse {
+    width: 4px;
+    height: 4px;
+    background: #4ECDC4;
+    border-radius: 50%;
+    animation: splashDot 1.2s ease infinite;
+  }
+
+  @keyframes splashDot {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.8); }
+  }
 
   *, *::before, *::after {
     box-sizing: border-box;
@@ -515,6 +566,16 @@
 </head>
 <body>
 
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <canvas id="splashCanvas"></canvas>
+  <div class="splash-mark">
+    <div class="splash-wordmark">Bhavé's Lab</div>
+    <div class="splash-pulse"></div>
+  </div>
+</div>
+
 <canvas id="labField"></canvas>
 <div class="ambient ambient-1"></div>
 <div class="ambient ambient-2"></div>
@@ -647,7 +708,7 @@
   </footer>
 
   <!-- REALM ENTRY -->
-  <a href="/entry.html" class="realm-entry">
+  <a href="https://bhaveslab.com" class="realm-entry">
     Enter the Realm
   </a>
 
@@ -981,9 +1042,143 @@
   init();
   loop();
 })();
-</script>
 
-<script>document.fonts.ready.then(() => document.body.classList.add('ready'));</script>
+  // ── SPLASH SCREEN ─────────────────────────────────────
+  (function() {
+    const splash = document.getElementById('splash');
+    const sc     = document.getElementById('splashCanvas');
+    const sctx   = sc.getContext('2d');
+
+    sc.width  = window.innerWidth;
+    sc.height = window.innerHeight;
+
+    const SCX = sc.width  / 2;
+    const SCY = sc.height / 2;
+
+    const TEAL  = { r: 78,  g: 205, b: 196 };
+    const GOLD  = { r: 201, g: 169, b: 110 };
+    const WHITE = { r: 232, g: 228, b: 220 };
+
+    function srgba(c, a) { return `rgba(${c.r},${c.g},${c.b},${a})`; }
+
+    // Splash orbs
+    const sorbs = Array.from({ length: 12 }, (_, i) => ({
+      angle:  (Math.PI * 2 / 12) * i,
+      r:      60 + Math.random() * 140,
+      size:   8 + Math.random() * 28,
+      speed:  (Math.random() > 0.5 ? 1 : -1) * (0.003 + Math.random() * 0.006),
+      color:  Math.random() > 0.5 ? TEAL : GOLD,
+      pulse:  Math.random() * Math.PI * 2,
+      wobble: Math.random() * Math.PI * 2,
+    }));
+
+    // Splash shooting stars
+    const sstars = [];
+    function spawnSplashStar() {
+      if (sstars.length < 5 && Math.random() < 0.04) {
+        const angle = Math.PI * 0.2 + Math.random() * Math.PI * 0.2;
+        const speed = 6 + Math.random() * 8;
+        sstars.push({
+          x: Math.random() * sc.width,
+          y: -10,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          len: 50 + Math.random() * 100,
+          life: 0,
+          color: Math.random() > 0.5 ? TEAL : WHITE,
+          width: 0.5 + Math.random() * 1,
+        });
+      }
+    }
+
+    let sf = 0;
+    function splashLoop() {
+      sf++;
+      sctx.clearRect(0, 0, sc.width, sc.height);
+
+      // Core glow
+      const cp = 0.5 + 0.5 * Math.sin(sf * 0.04);
+      const cgrd = sctx.createRadialGradient(SCX, SCY, 0, SCX, SCY, 60 + cp * 20);
+      cgrd.addColorStop(0, srgba(TEAL, 0.15 * cp));
+      cgrd.addColorStop(1, srgba(TEAL, 0));
+      sctx.beginPath();
+      sctx.arc(SCX, SCY, 60 + cp * 20, 0, Math.PI * 2);
+      sctx.fillStyle = cgrd;
+      sctx.fill();
+
+      // Center dot
+      const cdgrd = sctx.createRadialGradient(SCX, SCY, 0, SCX, SCY, 4 + cp * 2);
+      cdgrd.addColorStop(0, srgba(WHITE, 0.9));
+      cdgrd.addColorStop(1, srgba(TEAL, 0));
+      sctx.beginPath();
+      sctx.arc(SCX, SCY, 4 + cp * 2, 0, Math.PI * 2);
+      sctx.fillStyle = cdgrd;
+      sctx.fill();
+
+      // Orbs
+      sorbs.forEach(o => {
+        o.angle  += o.speed;
+        o.wobble += 0.015;
+        const px = 0.6 + 0.4 * Math.sin(sf * 0.02 + o.pulse);
+        const x  = SCX + Math.cos(o.angle) * o.r + Math.sin(o.wobble) * 8;
+        const y  = SCY + Math.sin(o.angle) * o.r * 0.35 + Math.cos(o.wobble) * 5;
+
+        const grd = sctx.createRadialGradient(x, y, 0, x, y, o.size * px);
+        grd.addColorStop(0,   srgba(WHITE,   0.5 * px));
+        grd.addColorStop(0.3, srgba(o.color, 0.3 * px));
+        grd.addColorStop(1,   srgba(o.color, 0));
+        sctx.beginPath();
+        sctx.arc(x, y, o.size * px, 0, Math.PI * 2);
+        sctx.fillStyle = grd;
+        sctx.fill();
+
+        // Thread to core
+        sctx.beginPath();
+        sctx.moveTo(SCX, SCY);
+        sctx.lineTo(x, y);
+        sctx.strokeStyle = srgba(o.color, 0.04 * px);
+        sctx.lineWidth = 0.4;
+        sctx.stroke();
+      });
+
+      // Stars
+      spawnSplashStar();
+      for (let i = sstars.length - 1; i >= 0; i--) {
+        const s = sstars[i];
+        s.x += s.vx; s.y += s.vy; s.life += 0.03;
+        if (s.life >= 1 || s.x > sc.width || s.y > sc.height) { sstars.splice(i, 1); continue; }
+        const fade = s.life < 0.2 ? s.life / 0.2 : 1 - (s.life - 0.2) / 0.8;
+        const tx = s.x - s.vx / Math.sqrt(s.vx*s.vx+s.vy*s.vy) * s.len * s.life;
+        const ty = s.y - s.vy / Math.sqrt(s.vx*s.vx+s.vy*s.vy) * s.len * s.life;
+        const sgrd = sctx.createLinearGradient(tx, ty, s.x, s.y);
+        sgrd.addColorStop(0, srgba(s.color, 0));
+        sgrd.addColorStop(1, srgba(WHITE,   fade * 0.8));
+        sctx.beginPath();
+        sctx.moveTo(tx, ty);
+        sctx.lineTo(s.x, s.y);
+        sctx.strokeStyle = sgrd;
+        sctx.lineWidth = s.width;
+        sctx.lineCap = 'round';
+        sctx.stroke();
+      }
+
+      if (!splashDone) requestAnimationFrame(splashLoop);
+    }
+
+    let splashDone = false;
+    splashLoop();
+
+    // Dismiss when fonts + page ready
+    document.fonts.ready.then(() => {
+      setTimeout(() => {
+        splashDone = true;
+        splash.classList.add('hide');
+        setTimeout(() => { splash.style.display = 'none'; }, 900);
+      }, 800);
+    });
+  })();
+
+</script>
 
 </body>
 </html>
