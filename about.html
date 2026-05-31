@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhavé — Chief Source Scientist</title>
+<link rel="apple-touch-icon" href="/images/bhave-icon.png">
+<link rel="icon" type="image/png" href="/images/bhave-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --void: #080A0C;
+    --deep: #0D1014;
+    --surface: #141820;
+    --edge: #1E242E;
+    --teal: #4ECDC4;
+    --teal-dim: #2A7A76;
+    --gold: #C9A96E;
+    --gold-dim: #7A6240;
+    --text-primary: #E8E4DC;
+    --text-secondary: #8A8880;
+    --text-dim: #4A4844;
+    --mono: 'Space Mono', monospace;
+    --serif: 'Cormorant Garamond', serif;
+  }
+
+  /* ── SPLASH ── */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: #080A0C;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease;
+  }
+  #splash.hide { opacity: 0; pointer-events: none; }
+  #splashCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .splash-mark {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+    opacity: 0; animation: fadeIn 1s ease forwards 0.4s;
+  }
+  .splash-wordmark {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: #4ECDC4;
+  }
+  .splash-pulse {
+    width: 4px; height: 4px;
+    background: #4ECDC4; border-radius: 50%;
+    animation: splashDot 1.2s ease infinite;
+  }
+  @keyframes splashDot {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.8); }
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text-primary);
+    font-family: var(--serif);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.6;
+  }
+
+  /* ── FIELD CANVAS ── */
+  #labField {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none; z-index: 0;
+    opacity: 0; animation: fadeIn 2.5s ease forwards 0.6s;
+  }
+
+  /* ── AMBIENT ── */
+  .ambient {
+    position: fixed; border-radius: 50%;
+    filter: blur(120px); pointer-events: none; z-index: 0;
+  }
+  .ambient-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(78,205,196,0.04) 0%, transparent 70%);
+    top: -200px; left: -100px;
+  }
+  .ambient-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(201,169,110,0.03) 0%, transparent 70%);
+    bottom: 100px; right: -100px;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 64px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.2s;
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--text-secondary);
+  }
+  .wordmark span { color: var(--teal); }
+
+  .back-link {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .back-link:hover { color: var(--teal); }
+
+  /* ── PHOTO BLOCK ── */
+  .photo-section {
+    padding: 72px 0 0;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.4s;
+  }
+
+  .photo-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .photo-frame {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    filter: grayscale(20%) contrast(1.05);
+  }
+
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .photo-placeholder-mark {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* Corner accents on photo */
+  .photo-frame::before,
+  .photo-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    z-index: 2;
+  }
+  .photo-frame::before {
+    top: 12px; left: 12px;
+    border-top: 1px solid var(--teal-dim);
+    border-left: 1px solid var(--teal-dim);
+  }
+  .photo-frame::after {
+    bottom: 12px; right: 12px;
+    border-bottom: 1px solid var(--gold-dim);
+    border-right: 1px solid var(--gold-dim);
+  }
+
+  .photo-caption {
+    margin-top: 20px;
+  }
+
+  .photo-name {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+
+  .photo-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 8px;
+  }
+
+  /* ── RULE ── */
+  .rule {
+    width: 40px; height: 1px;
+    background: var(--teal-dim);
+    margin: 48px 0;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 0.8s;
+  }
+
+  /* ── BODY SECTIONS ── */
+  .section {
+    padding: 0 0 0;
+    opacity: 0;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 560px;
+  }
+
+  .section-block p {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .section-block p strong {
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  .section-block p em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .s1 { animation: fadeUp 0.8s ease forwards 0.6s; }
+  .s2 { animation: fadeUp 0.8s ease forwards 0.9s; }
+  .s3 { animation: fadeUp 0.8s ease forwards 1.1s; }
+
+  /* ── DISTINCTION BLOCK ── */
+  .distinction {
+    border-left: 1px solid var(--teal-dim);
+    padding: 24px 0 24px 28px;
+    margin: 48px 0;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 1.2s;
+  }
+
+  .distinction p {
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.65;
+    color: var(--text-primary);
+    max-width: 500px;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 64px 0 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 1.4s;
+  }
+
+  .cta-label {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+
+  .cta-text {
+    font-family: var(--serif);
+    font-size: 19px; font-weight: 300;
+    line-height: 1.7; color: var(--text-secondary);
+    max-width: 480px; margin-bottom: 36px;
+  }
+
+  .cta-text em {
+    font-style: italic;
+    color: var(--text-primary);
+  }
+
+  .btn-book {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--void);
+    background: var(--teal);
+    padding: 16px 36px;
+    text-decoration: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  .btn-book:hover { background: #5EDDD4; transform: translateY(-1px); }
+  .btn-book:active { transform: translateY(0); }
+
+  /* ── REACH ── */
+  .reach-section {
+    padding: 40px 0 80px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 1.55s;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .reach-rule { flex: 1; height: 1px; background: var(--edge); }
+  .reach-text {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-dim); white-space: nowrap;
+  }
+  .reach-text a {
+    color: var(--text-dim); text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .reach-text a:hover { color: var(--teal); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 40px 0 64px;
+    display: flex; justify-content: space-between; align-items: center;
+    opacity: 0; animation: fadeIn 1s ease forwards 1.7s;
+    border-top: 1px solid var(--edge);
+  }
+  .footer-mark {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.2em; color: var(--text-dim);
+  }
+  .footer-link {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.2em; color: var(--text-dim);
+    text-decoration: none; transition: color 0.3s ease;
+  }
+  .footer-link:hover { color: var(--teal); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 0 24px; }
+    header { padding-top: 48px; }
+    .photo-wrap { max-width: 100%; }
+    footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <canvas id="splashCanvas"></canvas>
+  <div class="splash-mark">
+    <div class="splash-wordmark">Bhavé's Lab</div>
+    <div class="splash-pulse"></div>
+  </div>
+</div>
+
+<canvas id="labField"></canvas>
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="wordmark">Bhavé<span>'</span>s Lab</div>
+    <a href="/" class="back-link">← Back</a>
+  </header>
+
+  <!-- PHOTO -->
+  <div class="photo-section">
+    <div class="photo-wrap">
+      <div class="photo-frame">
+        <!-- Replace src with actual photo path once uploaded -->
+        <!-- <img src="/images/bhave-photo.jpg" alt="Bhavé"> -->
+        <div class="photo-placeholder">
+          <div class="photo-placeholder-mark">[ photo ]</div>
+        </div>
+      </div>
+      <div class="photo-caption">
+        <div class="photo-name">Bhavé</div>
+        <div class="photo-title">Chief Source Scientist</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- ORIGIN -->
+  <section class="section s1">
+    <div class="section-label">[ origin ]</div>
+    <div class="section-block">
+      <p>
+        It started in meditation.
+        Not as a practice — as an observation.
+        Sitting long enough to watch the mind move,
+        Bhavé started noticing something precise:
+        <strong>what was running internally
+        was showing up directly in his external reality.</strong>
+        Not metaphorically. Mechanically.
+      </p>
+      <p>
+        He didn't read that somewhere.
+        He watched it happen. Repeatedly.
+        The same patterns, the same formations,
+        the same decisions — producing the same results.
+        Until he started interrupting them at the source.
+      </p>
+      <p>
+        The framework didn't come from a curriculum.
+        It came from <em>years of sitting inside
+        the exact conditions it maps.</em>
+        He built it by living it.
+      </p>
+    </div>
+  </section>
+
+  <!-- DISTINCTION PULL QUOTE -->
+  <div class="distinction">
+    <p>
+      "I'm not here to solve your problem.
+      I'm here to show you what's generating it —
+      so you can operate from a different position entirely."
+    </p>
+  </div>
+
+  <!-- THE WORK -->
+  <section class="section s2">
+    <div class="section-label">[ the work ]</div>
+    <div class="section-block">
+      <p>
+        Bhavé is a <strong>Source Practitioner.</strong>
+        Not a consultant. Not a coach.
+        He doesn't deliver strategy, solutions, or answers.
+      </p>
+      <p>
+        What he does is create the conditions
+        where what's actually operating in you
+        becomes directly visible to you.
+        The pattern running your decisions.
+        The formation happening before you choose.
+        The mechanism generating your results —
+        in business, in relationships, in anything.
+      </p>
+      <p>
+        Once you see it clearly,
+        <em>you move from there.</em>
+        The authority was always yours.
+        It just wasn't visible yet.
+      </p>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- WHO THIS IS FOR -->
+  <section class="section s3">
+    <div class="section-label">[ who this is for ]</div>
+    <div class="section-block">
+      <p>
+        People who have already done the work elsewhere
+        and know something is still running underneath it.
+        People whose results keep reflecting
+        something they haven't been able to locate yet.
+      </p>
+      <p>
+        Business owners, creatives, people in the middle
+        of decisions that won't move —
+        the surface doesn't determine whether this is right.
+        <strong>The willingness to actually look does.</strong>
+      </p>
+      <p>
+        This isn't for everyone.
+        It's for the person who is done
+        managing the pattern
+        and ready to see what's generating it.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-label">[ work with Bhavé ]</div>
+    <p class="cta-text">
+      Start with a conversation.
+      Bring <em>the actual situation</em> —
+      not the version you've already edited.
+    </p>
+    <a href="https://calendly.com/bhaveslab/30min" target="_blank" class="btn-book">
+      Start with a conversation
+    </a>
+  </div>
+
+  <!-- REACH -->
+  <div class="reach-section">
+    <div class="reach-rule"></div>
+    <div class="reach-text">
+      <a href="mailto:info@bhaveslab.com">info@bhaveslab.com</a>
+    </div>
+    <div class="reach-rule"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-mark">© 2026 Bhavé's Lab LLC</span>
+    <a href="/" class="footer-link">bhaveslab.com</a>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('labField');
+  const ctx = canvas.getContext('2d');
+
+  const TEAL  = { r: 78,  g: 205, b: 196 };
+  const GOLD  = { r: 201, g: 169, b: 110 };
+  const WHITE = { r: 232, g: 228, b: 220 };
+
+  function rgba(c, a) { return `rgba(${c.r},${c.g},${c.b},${a})`; }
+
+  let W, H, cx, cy, frame = 0;
+  let particles = [], orbitals = [], threads = [], shootingStars = [], driftOrbs = [];
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    cx = W / 2; cy = H * 0.42;
+  }
+
+  class Orbital {
+    constructor(radius, speed, tilt, color, nodeCount) {
+      this.radius = radius; this.speed = speed;
+      this.tilt = tilt; this.color = color;
+      this.angle = Math.random() * Math.PI * 2;
+      this.nodes = Array.from({ length: nodeCount }, (_, i) => ({
+        offset: (Math.PI * 2 / nodeCount) * i,
+        size: Math.random() * 1.8 + 0.6,
+        pulse: Math.random() * Math.PI * 2
+      }));
+    }
+    draw(t) {
+      this.angle += this.speed;
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(this.tilt);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.radius, this.radius * 0.28, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(this.color, 0.05); ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.restore();
+      this.nodes.forEach(node => {
+        const a = this.angle + node.offset;
+        const ex = Math.cos(a) * this.radius;
+        const ey = Math.sin(a) * this.radius * 0.28;
+        const rx = cx + ex * Math.cos(this.tilt) - ey * Math.sin(this.tilt);
+        const ry = cy + ex * Math.sin(this.tilt) + ey * Math.cos(this.tilt);
+        const depth = 0.3 + 0.7 * ((ry - cy + this.radius * 0.28) / (this.radius * 0.56));
+        const pm = 0.6 + 0.4 * Math.sin(t * 0.02 + node.pulse);
+        const size = node.size * (0.6 + 0.4 * depth) * pm;
+        ctx.beginPath(); ctx.arc(rx, ry, size, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(this.color, depth * pm * 0.75); ctx.fill();
+        if (depth > 0.72) {
+          const grd = ctx.createRadialGradient(rx, ry, 0, rx, ry, size * 6);
+          grd.addColorStop(0, rgba(this.color, 0.18 * pm));
+          grd.addColorStop(1, rgba(this.color, 0));
+          ctx.beginPath(); ctx.arc(rx, ry, size * 6, 0, Math.PI * 2);
+          ctx.fillStyle = grd; ctx.fill();
+        }
+      });
+    }
+  }
+
+  class Particle {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * W;
+      this.y = init ? Math.random() * H : H + 4;
+      this.vx = (Math.random() - 0.5) * 0.22;
+      this.vy = (Math.random() - 0.5) * 0.15;
+      this.life = 0; this.maxLife = 0.35 + Math.random() * 0.55;
+      this.size = Math.random() * 1.2 + 0.2;
+      this.color = Math.random() > 0.55 ? TEAL : (Math.random() > 0.5 ? GOLD : WHITE);
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy; this.life += 0.003;
+      if (this.life > this.maxLife) this.reset(false);
+    }
+    draw() {
+      const t = this.life / this.maxLife;
+      const a = t < 0.2 ? t / 0.2 : t > 0.8 ? (1 - t) / 0.2 : 1;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(this.color, a * 0.28); ctx.fill();
+    }
+  }
+
+  class ShootingStar {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * W; this.y = -10;
+      const angle = Math.PI * 0.18 + Math.random() * Math.PI * 0.22;
+      this.speed = 5 + Math.random() * 9;
+      this.vx = Math.cos(angle) * this.speed;
+      this.vy = Math.sin(angle) * this.speed;
+      this.len = 60 + Math.random() * 140;
+      this.life = 0; this.active = true;
+      this.color = Math.random() > 0.4 ? TEAL : (Math.random() > 0.5 ? WHITE : GOLD);
+      this.width = 0.6 + Math.random() * 1.0;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy; this.life += 0.028;
+      if (this.life >= 1 || this.x > W + 50 || this.y > H + 50) this.active = false;
+    }
+    draw() {
+      const fade = this.life < 0.15 ? this.life / 0.15 : 1 - (this.life - 0.15) / 0.85;
+      const tx = this.x - this.vx / this.speed * this.len * (1 - this.life * 0.5);
+      const ty = this.y - this.vy / this.speed * this.len * (1 - this.life * 0.5);
+      const grd = ctx.createLinearGradient(tx, ty, this.x, this.y);
+      grd.addColorStop(0, rgba(this.color, 0));
+      grd.addColorStop(0.7, rgba(this.color, fade * 0.35));
+      grd.addColorStop(1, rgba(WHITE, fade * 0.9));
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(this.x, this.y);
+      ctx.strokeStyle = grd; ctx.lineWidth = this.width; ctx.lineCap = 'round'; ctx.stroke();
+      const hgrd = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 5);
+      hgrd.addColorStop(0, rgba(WHITE, fade * 0.9));
+      hgrd.addColorStop(1, rgba(this.color, 0));
+      ctx.beginPath(); ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = hgrd; ctx.fill();
+    }
+  }
+
+  class DriftOrb {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * W;
+      this.y = init ? Math.random() * H : H + 40;
+      this.r = 18 + Math.random() * 55;
+      this.vx = (Math.random() - 0.5) * 0.35;
+      this.vy = -(0.15 + Math.random() * 0.35);
+      this.life = init ? Math.random() : 0;
+      this.maxLife = 0.6 + Math.random() * 0.35;
+      this.color = Math.random() > 0.5 ? TEAL : GOLD;
+      this.wobble = Math.random() * Math.PI * 2;
+      this.wobbleSpeed = 0.008 + Math.random() * 0.012;
+    }
+    update() {
+      this.wobble += this.wobbleSpeed;
+      this.x += this.vx + Math.sin(this.wobble) * 0.3;
+      this.y += this.vy; this.life += 0.0025;
+      if (this.life > this.maxLife || this.y < -this.r - 20) this.reset(false);
+    }
+    draw() {
+      const t = this.life / this.maxLife;
+      const a = t < 0.2 ? t / 0.2 : t > 0.75 ? (1 - t) / 0.25 : 1;
+      const grd = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+      grd.addColorStop(0, rgba(this.color, a * 0.14));
+      grd.addColorStop(0.5, rgba(this.color, a * 0.06));
+      grd.addColorStop(1, rgba(this.color, 0));
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = grd; ctx.fill();
+      const inner = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 0.3);
+      inner.addColorStop(0, rgba(WHITE, a * 0.5));
+      inner.addColorStop(1, rgba(this.color, 0));
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = inner; ctx.fill();
+    }
+  }
+
+  function drawCore(t) {
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.025);
+    const r1 = 3 + pulse * 2; const r2 = 20 + pulse * 10; const r3 = 50 + pulse * 22;
+    let grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r3);
+    grd.addColorStop(0, rgba(TEAL, 0.10 * pulse)); grd.addColorStop(1, rgba(TEAL, 0));
+    ctx.beginPath(); ctx.arc(cx, cy, r3, 0, Math.PI * 2); ctx.fillStyle = grd; ctx.fill();
+    grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r1);
+    grd.addColorStop(0, rgba(WHITE, 0.95)); grd.addColorStop(1, rgba(TEAL, 0));
+    ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI * 2); ctx.fillStyle = grd; ctx.fill();
+  }
+
+  function maybeSpawnThread() {
+    if (Math.random() < 0.022) {
+      const angle = Math.random() * Math.PI * 2;
+      threads.push({ angle, len: 80 + Math.random() * 200, life: 0, speed: 0.035 + Math.random() * 0.03 });
+    }
+  }
+  function drawThreads() {
+    threads = threads.filter(th => th.life < 1);
+    threads.forEach(th => {
+      th.life += th.speed;
+      const fade = th.life < 0.3 ? th.life / 0.3 : 1 - (th.life - 0.3) / 0.7;
+      const ex = cx + Math.cos(th.angle) * th.len * th.life;
+      const ey = cy + Math.sin(th.angle) * th.len * th.life;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey);
+      ctx.strokeStyle = rgba(TEAL, fade * 0.14); ctx.lineWidth = 0.7; ctx.stroke();
+    });
+  }
+
+  function maybeSpawnStar() {
+    if (Math.random() < 0.008 && shootingStars.filter(s => s.active).length < 4)
+      shootingStars.push(new ShootingStar());
+  }
+
+  function init() {
+    resize();
+    const base = Math.min(W, H);
+    orbitals = [
+      new Orbital(base * 0.32,  0.0018,  0.30, TEAL,  5),
+      new Orbital(base * 0.52, -0.0014,  0.65, GOLD,  4),
+      new Orbital(base * 0.22,  0.0032,  1.05, TEAL,  6),
+      new Orbital(base * 0.72, -0.0008,  0.18, WHITE, 3),
+      new Orbital(base * 0.88,  0.0006,  0.88, GOLD,  2),
+    ];
+    particles  = Array.from({ length: 140 }, () => new Particle());
+    driftOrbs  = Array.from({ length: 9   }, () => new DriftOrb());
+    shootingStars = [];
+  }
+
+  function loop() {
+    requestAnimationFrame(loop);
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    driftOrbs.forEach(o => { o.update(); o.draw(); });
+    particles.forEach(p => { p.update(); p.draw(); });
+    orbitals.forEach(o => o.draw(frame));
+    maybeSpawnThread(); drawThreads();
+    maybeSpawnStar();
+    shootingStars.forEach(s => { if (s.active) { s.update(); s.draw(); } });
+    drawCore(frame);
+  }
+
+  window.addEventListener('resize', init);
+  init(); loop();
+
+  // SPLASH
+  (function() {
+    const splash = document.getElementById('splash');
+    const sc = document.getElementById('splashCanvas');
+    const sctx = sc.getContext('2d');
+    sc.width = window.innerWidth; sc.height = window.innerHeight;
+    const SCX = sc.width / 2; const SCY = sc.height / 2;
+    const sorbs = Array.from({ length: 12 }, (_, i) => ({
+      angle: (Math.PI * 2 / 12) * i, r: 60 + Math.random() * 140,
+      size: 8 + Math.random() * 28,
+      speed: (Math.random() > 0.5 ? 1 : -1) * (0.003 + Math.random() * 0.006),
+      color: Math.random() > 0.5 ? TEAL : GOLD,
+      pulse: Math.random() * Math.PI * 2, wobble: Math.random() * Math.PI * 2,
+    }));
+    let sf = 0; let splashDone = false;
+    function srgba(c, a) { return `rgba(${c.r},${c.g},${c.b},${a})`; }
+    function splashLoop() {
+      sf++;
+      sctx.clearRect(0, 0, sc.width, sc.height);
+      const cp = 0.5 + 0.5 * Math.sin(sf * 0.04);
+      const cgrd = sctx.createRadialGradient(SCX, SCY, 0, SCX, SCY, 60 + cp * 20);
+      cgrd.addColorStop(0, srgba(TEAL, 0.15 * cp)); cgrd.addColorStop(1, srgba(TEAL, 0));
+      sctx.beginPath(); sctx.arc(SCX, SCY, 60 + cp * 20, 0, Math.PI * 2);
+      sctx.fillStyle = cgrd; sctx.fill();
+      sorbs.forEach(o => {
+        o.angle += o.speed; o.wobble += 0.015;
+        const px = 0.6 + 0.4 * Math.sin(sf * 0.02 + o.pulse);
+        const x = SCX + Math.cos(o.angle) * o.r + Math.sin(o.wobble) * 8;
+        const y = SCY + Math.sin(o.angle) * o.r * 0.35 + Math.cos(o.wobble) * 5;
+        const grd = sctx.createRadialGradient(x, y, 0, x, y, o.size * px);
+        grd.addColorStop(0, srgba(WHITE, 0.5 * px));
+        grd.addColorStop(0.3, srgba(o.color, 0.3 * px));
+        grd.addColorStop(1, srgba(o.color, 0));
+        sctx.beginPath(); sctx.arc(x, y, o.size * px, 0, Math.PI * 2);
+        sctx.fillStyle = grd; sctx.fill();
+      });
+      if (!splashDone) requestAnimationFrame(splashLoop);
+    }
+    splashLoop();
+    document.fonts.ready.then(() => {
+      setTimeout(() => {
+        splashDone = true;
+        splash.classList.add('hide');
+        setTimeout(() => { splash.style.display = 'none'; }, 900);
+      }, 800);
+    });
+  })();
+})();
+</script>
+
+</body>
+</html>

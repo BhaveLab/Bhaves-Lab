@@ -3,6 +3,7 @@
   "outputDirectory": ".",
   "framework": null,
   "rewrites": [
+    { "source": "/about", "destination": "/about.html" },
     { "source": "/consciousness-mirror", "destination": "/consciousness-mirror.html" },
     { "source": "/study-session", "destination": "/study-session.html" },
     { "source": "/study-yourself", "destination": "/study-yourself.html" },
