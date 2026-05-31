@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhavé's Lab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080808;
+}
+
+/* Canvas sits at base layer */
+#cv {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* Overlay — sits above field, fades in after delay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 48px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
+.brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 15px;
+  letter-spacing: 0.38em;
+  color: rgba(201, 168, 76, 0.55);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(
+    to bottom,
+    rgba(201, 168, 76, 0),
+    rgba(201, 168, 76, 0.25),
+    rgba(201, 168, 76, 0)
+  );
+  margin-bottom: 16px;
+}
+
+.enter-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: all;
+}
+
+.enter-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 300;
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  color: rgba(201, 168, 76, 0.35);
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: all;
+  cursor: pointer;
+  border: 1px solid rgba(201, 168, 76, 0.12);
+  padding: 8px 18px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.enter-link:hover {
+  color: rgba(201, 168, 76, 0.75);
+  border-color: rgba(201, 168, 76, 0.28);
+}
+
+/* ENTER THE REALM — standalone above all canvas layers */
+#enter-realm-fixed {
+  position: fixed;
+  bottom: 48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+#enter-realm-fixed.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#enter-realm-fixed .enter-link {
+  pointer-events: auto;
+}
+
+/* Minimal seed indicator — invisible, for internal reference only */
+.seed-ref {
+  position: fixed;
+  bottom: 10px;
+  right: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.04);
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* ── BL NAV ─────────────────────────────────────────────── */
+.bl-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: rgba(8,8,8,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201,168,76,0.08); }
+.bl-nav-brand { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 13px; letter-spacing: 0.3em; color: rgba(201,168,76,0.7); text-transform: uppercase; text-decoration: none; }
+.bl-hamburger { background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-direction: column; gap: 5px; z-index: 1001; }
+.bl-hamburger span { display: block; width: 22px; height: 1px; background: rgba(201,168,76,0.6); transition: all 0.3s ease; transform-origin: center; }
+.bl-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); background: rgba(201,168,76,0.9); }
+.bl-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.bl-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: rgba(201,168,76,0.9); }
+.bl-menu { position: fixed; inset: 0; z-index: 999; background: rgba(8,8,8,0.97); display: flex; flex-direction: column; justify-content: center; padding: 80px 32px 48px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.bl-menu.open { opacity: 1; pointer-events: all; }
+.bl-nav-section { margin-bottom: 28px; opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.bl-menu.open .bl-nav-section:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
+.bl-menu.open .bl-nav-section:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.bl-menu.open .bl-nav-section:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
+.bl-menu.open .bl-nav-section:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.bl-menu.open .bl-nav-section:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
+.bl-menu.open .bl-nav-section:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.bl-nav-main { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 26px; letter-spacing: 0.06em; color: rgba(201,168,76,0.85); text-decoration: none; display: block; margin-bottom: 10px; transition: color 0.2s; }
+.bl-nav-main:hover { color: #c9a84c; }
+.bl-nav-subs { display: flex; flex-direction: column; gap: 6px; padding-left: 16px; border-left: 1px solid rgba(201,168,76,0.12); }
+.bl-nav-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: rgba(201,168,76,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+.bl-nav-sub:hover { color: rgba(201,168,76,0.7); }
+.bl-nav-divider { width: 100%; height: 1px; background: rgba(201,168,76,0.06); margin-bottom: 28px; opacity: 0; transition: opacity 0.3s ease 0.2s; }
+.bl-menu.open .bl-nav-divider { opacity: 1; }
+.bl-nav-cta { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.25em; color: rgba(201,168,76,0.85); text-decoration: none; text-transform: uppercase; border: 1px solid rgba(201,168,76,0.3); padding: 12px 24px; display: inline-block; transition: all 0.2s; }
+.bl-nav-cta:hover { border-color: rgba(201,168,76,0.7); color: #c9a84c; background: rgba(201,168,76,0.04); }
+.bl-nav-home { font-size: 8px; letter-spacing: 0.18em; color: rgba(201,168,76,0.2); text-decoration: none; text-transform: uppercase; margin-top: 24px; display: block; transition: color 0.2s; }
+.bl-nav-home:hover { color: rgba(201,168,76,0.5); }
+
+/* ── ATMOSPHERIC DEPTH ──────────────────────────────────── */
+.atm-fog {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 88% 62% at 10% 20%, rgba(3,2,11,0.72) 0%, transparent 60%),
+    radial-gradient(ellipse 78% 68% at 90% 80%, rgba(4,3,13,0.62) 0%, transparent 58%),
+    radial-gradient(ellipse 96% 44% at 50% 2%,  rgba(2,2,10,0.75) 0%, transparent 52%),
+    radial-gradient(ellipse 68% 55% at 48% 98%, rgba(3,3,12,0.55) 0%, transparent 58%),
+    radial-gradient(ellipse 58% 50% at 80% 30%, rgba(3,4,13,0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 44% at 22% 72%, rgba(2,3,11,0.40) 0%, transparent 62%);
+  animation: fogDrift 36s ease-in-out infinite alternate;
+}
+@keyframes fogDrift {
+  0%   { transform: translate(0px, 0px)   scale(1.000); }
+  20%  { transform: translate(14px, -9px)  scale(1.018); }
+  45%  { transform: translate(-9px, 7px)   scale(0.985); }
+  70%  { transform: translate(7px, 12px)   scale(1.012); }
+  100% { transform: translate(-12px,-5px)  scale(1.006); }
+}
+.atm-vignette {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 16%,
+    rgba(2,1,7,0.28) 50%,
+    rgba(1,1,5,0.78) 100%
+  );
+}
+
+/* ── STAGE REVEAL ───────────────────────────────────────── */
+.stage-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+.stage-reveal.visible { opacity: 1; }
+.reveal-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.38em;
+  color: rgba(201, 168, 76, 0.5);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.reveal-divider {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, rgba(201,168,76,0), rgba(201,168,76,0.22), rgba(201,168,76,0));
+  margin: 0 auto 22px;
+}
+.reveal-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(17px, 3.2vw, 23px);
+  line-height: 1.65;
+  color: rgba(201, 168, 76, 0.78);
+  letter-spacing: 0.02em;
+  text-align: center;
+  max-width: 440px;
+  padding: 0 32px;
+}
+</style>
+</head>
+<body>
+<!-- ── NAV BAR ────────────────────────────────────────────── -->
+<nav class="bl-nav">
+  <a class="bl-nav-brand" href="index.html">Bhavé's Lab</a>
+  <button class="bl-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- ── MENU OVERLAY ───────────────────────────────────────── -->
+<div class="bl-menu" id="bl-menu">
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#work" onclick="closeMenu()">The Work</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+      <a class="bl-nav-sub" href="home.html#inner-mining" onclick="closeMenu()">Inner Mining</a>
+      <a class="bl-nav-sub" href="home.html#pattern-immersion" onclick="closeMenu()">Pattern Immersion</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#framework" onclick="closeMenu()">Framework</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="home.html#sequence" onclick="closeMenu()">The Sequence</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#workshops" onclick="closeMenu()">Workshops</a>
+  </div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-main" href="home.html#realm" onclick="closeMenu()">The Realm</a>
+    <div class="bl-nav-subs">
+      <a class="bl-nav-sub" href="mirror-landing.html" onclick="closeMenu()">Consciousness Mirror</a>
+      <a class="bl-nav-sub" href="study-yourself-landing.html" onclick="closeMenu()">Study Yourself</a>
+      <a class="bl-nav-sub" href="https://gospel.bhaveslab.com" onclick="closeMenu()">Source Archive</a>
+    </div>
+  </div>
+
+  <div class="bl-nav-divider"></div>
+
+  <div class="bl-nav-section">
+    <a class="bl-nav-cta" href="home.html#book" onclick="closeMenu()">Book a Session</a>
+    <a class="bl-nav-home" href="index.html" onclick="closeMenu()">← Back to the Field</a>
+  </div>
+
+</div>
+<div id="cv"></div>
+<div class="atm-fog"></div>
+<div class="atm-vignette"></div>
+
+<div class="overlay" id="overlay">
+  <div class="brand">Bhavé's Lab</div>
+  <div class="divider"></div>
+</div>
+
+<div id="enter-realm-fixed">
+  <a class="enter-link" href="tools.html">Enter the Realm</a>
+</div>
+
+<div id="stage-reveal" class="stage-reveal">
+  <div class="reveal-name" id="reveal-name"></div>
+  <div class="reveal-divider"></div>
+  <div class="reveal-body" id="reveal-body"></div>
+</div>
+
+<div class="seed-ref" id="seed-ref">SEED_12345</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// BHAVÉ'S LAB — STATE VISUALIZATION (UX)
+//
+// The framework runs silently. No controls. No labels.
+// Users enter a living field — they do not read about one.
+//
+// STATE → PERCEPTION → FORMATION → DECISION → EXPERIENCE →
+// REALITY → SOURCE → CURIOSITY → STATE
+//
+// Cursor creates a gentle void around the user.
+// The field parts. It flows back in.
+// ════════════════════════════════════════════════════════════════════════
+
+const PLANETS = [
+  { label: 'STATE',      color: [78,  205, 196], desc: 'The actual operating condition before interpretation. Body, environment, history — all of it running before you\'ve formed a thought about it.' },
+  { label: 'PERCEPTION', color: [90,  208, 175], desc: 'How State is being read. The filter layer. Most distortion originates here, not in reality itself.' },
+  { label: 'FORMATION',  color: [115, 210, 148], desc: 'Where meaning begins to organize. Before a decision is made, something is already forming. This is that layer.' },
+  { label: 'DECISION',   color: [158, 207, 108], desc: 'What gets chosen based on perceived reality — not actual reality. The gap between the two is where most patterns live.' },
+  { label: 'EXPERIENCE', color: [193, 188,  85], desc: 'The output of the decision in context. What gets generated when the decision meets the field.' },
+  { label: 'REALITY',    color: [201, 168,  76], desc: 'The feedback from Experience that becomes the next State. The loop closes here.' },
+  { label: 'CURIOSITY',  color: [88,  212, 200], desc: 'The signal that something in the sequence wants attention. Not anxiety. The system pointing at itself.' },
+];
+
+const STAGES = [
+  { name: 'STATE',       color: [78,  205, 196], isCenter: false },
+  { name: 'PERCEPTION',  color: [90,  208, 175], isCenter: false },
+  { name: 'FORMATION',   color: [115, 210, 148], isCenter: false },
+  { name: 'DECISION',    color: [158, 207, 108], isCenter: false },
+  { name: 'EXPERIENCE',  color: [193, 188,  85], isCenter: false },
+  { name: 'REALITY',     color: [201, 168,  76], isCenter: false },
+  { name: 'SOURCE',      color: [225, 208, 125], isCenter: true  },
+  { name: 'CURIOSITY',   color: [88,  212, 200], isCenter: false },
+];
+
+// Hardcoded — no controls in UX build
+const CFG = {
+  seed:          42,
+  particleCount: 1800,
+  flowSpeed:     2.2,
+  noiseScale:    0.0038,
+  trailLength:   24,
+  attraction:    0.082,
+  // Cursor repulsion
+  cursorRadius:  95,
+  cursorForce:   0.22,
+};
+
+let particles        = [];
+let stagePos         = [];
+let stageCounts      = new Array(8).fill(0);
+let planetBaseAngles = [];
+let orbitAngle       = 0;
+let activePlanet     = -1;
+let pulseTimer       = 0;
+
+// ── STAGE POSITIONS ───────────────────────────────────────────────────
+function computeStagePos() {
+  const cx = width  / 2;
+  const cy = height / 2;
+  // On wider screens pull the ring out more; maintain proportions
+  const r  = min(width, height) * 0.36;
+
+  stagePos = [];
+  let ringIdx = 0;
+  for (let i = 0; i < 8; i++) {
+    if (STAGES[i].isCenter) {
+      stagePos.push({ x: cx, y: cy });
+    } else {
+      const angle = -HALF_PI + (ringIdx * TWO_PI / 7);
+      stagePos.push({
+        x: cx + r * cos(angle),
+        y: cy + r * sin(angle),
+      });
+      ringIdx++;
+    }
+  }
+}
+
+// ── SETUP ─────────────────────────────────────────────────────────────
+function setup() {
+  const cv = createCanvas(windowWidth, windowHeight);
+  cv.parent('cv');
+  colorMode(RGB, 255, 255, 255, 255);
+  smooth();
+
+  randomSeed(CFG.seed);
+  noiseSeed(CFG.seed);
+  computeStagePos();
+
+  for (let i = 0; i < 7; i++) {
+    planetBaseAngles.push(-HALF_PI + (i * TWO_PI / 7));
+  }
+
+  for (let i = 0; i < CFG.particleCount; i++) {
+    particles.push(new Particle(true));
+  }
+
+  background(8, 8, 8);
+
+  // Fade in overlay after field has a moment to breathe
+  setTimeout(() => {
+    document.getElementById('overlay').classList.add('visible');
+    document.getElementById('enter-realm-fixed').classList.add('visible');
+  }, 2200);
+
+  document.getElementById('seed-ref').textContent = `SEED_${CFG.seed}`;
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  randomSeed(CFG.seed);
+  noiseSeed(CFG.seed);
+  computeStagePos();
+  for (let pt of particles) pt.resetToScattered();
+  background(8, 8, 8);
+}
+
+// ── DRAW ──────────────────────────────────────────────────────────────
+function draw() {
+  // Void fade
+  fill(8, 8, 8, 16);
+  noStroke();
+  rect(0, 0, width, height);
+
+  drawPaths();
+  drawNodes();
+
+  stageCounts = new Array(8).fill(0);
+  for (let pt of particles) {
+    pt.update();
+    pt.draw();
+    stageCounts[pt.si]++;
+  }
+
+  orbitAngle += 0.00030;
+  if (activePlanet >= 0) pulseTimer++;
+  drawPlanets();
+}
+
+// ── PATH LINES ────────────────────────────────────────────────────────
+// Barely visible — the sequence exists as structural truth, not a diagram
+function drawPaths() {
+  const seq = [0, 1, 2, 3, 4, 5, 6, 7, 0];
+  noFill();
+  for (let i = 0; i < seq.length - 1; i++) {
+    const a  = seq[i], b = seq[i + 1];
+    const pa = stagePos[a], pb = stagePos[b];
+    const col = STAGES[a].color;
+    const dens = stageCounts[a] / max(CFG.particleCount * 0.14, 1);
+    const alpha = constrain(3 + dens * 14, 2, 20);
+    stroke(col[0], col[1], col[2], alpha);
+    strokeWeight(0.35);
+    line(pa.x, pa.y, pb.x, pb.y);
+  }
+}
+
+// ── STAGE NODES ───────────────────────────────────────────────────────
+// In UX build: nodes are felt, not seen. Labels ghost in with activity.
+function drawNodes() {
+  for (let i = 0; i < 8; i++) {
+    const s       = STAGES[i];
+    if (s.name === 'CURIOSITY') continue;
+    const pos     = stagePos[i];
+    const count   = stageCounts[i];
+    const density = count / max(CFG.particleCount / 8, 1);
+    const col     = s.color;
+    const isSrc   = s.isCenter;
+
+    // Outer glow — nearly invisible at rest, brightens with density
+    const glowR = (isSrc ? 20 : 8) + density * 14;
+    const glowA = constrain(4 + density * 40, 3, 55);
+    noFill();
+    stroke(col[0], col[1], col[2], glowA);
+    strokeWeight(0.4);
+    ellipse(pos.x, pos.y, glowR * 2, glowR * 2);
+
+    if (isSrc) {
+      // SOURCE — lunar glass sphere, cool white-silver
+      const SR  = 15;
+      const ctx = drawingContext;
+      // Breathing corona rings
+      const pulse = sin(frameCount * 0.035) * 6;
+      noFill();
+      stroke(220, 235, 255, glowA * 0.30); strokeWeight(0.5);
+      ellipse(pos.x, pos.y, (glowR + 22) * 2, (glowR + 22) * 2);
+      stroke(200, 220, 255, glowA * 0.12);
+      ellipse(pos.x, pos.y, (glowR + 44 + pulse) * 2, (glowR + 44 + pulse) * 2);
+      // Blue-teal radial glow — 3-second cycle, peaks at rgba(78,205,196,0.4)
+      // frameCount * 0.03491 = 2π / (60fps * 3s) → one full cycle per 3 seconds
+      const tealT = sin(frameCount * 0.03491) * 0.5 + 0.5; // 0..1
+      ctx.save();
+      const tg = ctx.createRadialGradient(pos.x, pos.y, SR*0.8, pos.x, pos.y, SR*3.8);
+      tg.addColorStop(0,   `rgba(78,205,196,${(tealT * 0.40).toFixed(3)})`);
+      tg.addColorStop(0.5, `rgba(78,205,196,${(tealT * 0.15).toFixed(3)})`);
+      tg.addColorStop(1,   'rgba(78,205,196,0)');
+      ctx.fillStyle = tg;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR*3.8, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 4 wisps — #4ECDC4 drifting outward, each staggered 25% in cycle
+      ctx.save();
+      for (let w = 0; w < 4; w++) {
+        const wPhase = (frameCount * 0.008 + w * 0.25) % 1; // 0→1 continuously
+        const wAng   = (w / 4) * TWO_PI + frameCount * 0.005;
+        const wDist  = SR * (1.3 + wPhase * 3.2);
+        const wR     = SR * 0.45 * (1 - wPhase * 0.5);
+        const wA     = (0.50 * (1 - wPhase)).toFixed(3); // bright near orb, fades out
+        const wx     = pos.x + cos(wAng) * wDist;
+        const wy     = pos.y + sin(wAng) * wDist;
+        const wg = ctx.createRadialGradient(wx, wy, 0, wx, wy, wR);
+        wg.addColorStop(0, `rgba(78,205,196,${wA})`);
+        wg.addColorStop(1, 'rgba(78,205,196,0)');
+        ctx.fillStyle = wg;
+        ctx.beginPath(); ctx.arc(wx, wy, wR, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+      // Glass sphere body
+      ctx.save();
+      ctx.fillStyle = 'rgba(220,235,255,0.20)';
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR, 0, Math.PI*2); ctx.fill();
+      const ig = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, SR);
+      ig.addColorStop(0,    'rgba(255,255,255,0.95)');
+      ig.addColorStop(0.20, 'rgba(240,248,255,0.75)');
+      ig.addColorStop(0.55, 'rgba(210,228,252,0.35)');
+      ig.addColorStop(1,    'rgba(185,210,245,0)');
+      ctx.fillStyle = ig;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, SR, 0, Math.PI*2); ctx.fill();
+      // Glass rim — upper-left arc
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, SR * 0.88, Math.PI, Math.PI * 1.5);
+      ctx.lineWidth = Math.max(1, SR * 0.07);
+      ctx.strokeStyle = 'rgba(255,255,255,0.82)';
+      ctx.stroke();
+      // Specular dot
+      const spx = pos.x - SR*0.38, spy = pos.y - SR*0.38;
+      const sp = ctx.createRadialGradient(spx, spy, 0, spx, spy, SR*0.26);
+      sp.addColorStop(0, 'rgba(255,255,255,0.95)');
+      sp.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sp; ctx.beginPath(); ctx.arc(spx, spy, SR*0.26, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      noStroke();
+    } else {
+      const coreA = constrain(30 + density * 150, 25, 200);
+      fill(col[0], col[1], col[2], coreA);
+      noStroke();
+      ellipse(pos.x, pos.y, 5, 5);
+    }
+
+  }
+}
+
+// ── PLANETS ───────────────────────────────────────────────────────────
+function drawPlanets() {
+  const cx = width / 2, cy = height / 2;
+  const orbitR = min(width, height) * 0.36;
+  const ctx = drawingContext;
+
+  for (let i = 0; i < 7; i++) {
+    const angle   = planetBaseAngles[i] + orbitAngle;
+    const px      = cx + orbitR * Math.cos(angle);
+    const py      = cy + orbitR * Math.sin(angle);
+    const p       = PLANETS[i];
+    const isLarge = !!p.large;
+    const r       = isLarge ? 8 : 5.5;
+    const active  = (i === activePlanet);
+
+    ctx.save();
+
+    // Ambient glow
+    const glowAlpha = active ? 0.50 : 0.22;
+    const glowR     = r * 3.8;
+    const g = ctx.createRadialGradient(px, py, r * 0.4, px, py, glowR);
+    g.addColorStop(0, `rgba(${p.color[0]},${p.color[1]},${p.color[2]},${glowAlpha})`);
+    g.addColorStop(1, `rgba(${p.color[0]},${p.color[1]},${p.color[2]},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(px, py, glowR, 0, Math.PI * 2); ctx.fill();
+
+    // Expanding pulse ring on activation
+    if (active && pulseTimer < 55) {
+      const pt = pulseTimer / 55;
+      ctx.strokeStyle = `rgba(${p.color[0]},${p.color[1]},${p.color[2]},${0.80 * (1 - pt)})`;
+      ctx.lineWidth = 0.9;
+      ctx.beginPath(); ctx.arc(px, py, r + pt * 24, 0, Math.PI * 2); ctx.stroke();
+    }
+
+    // Glass sphere body
+    const sg = ctx.createRadialGradient(px - r * 0.35, py - r * 0.35, 0, px, py, r);
+    sg.addColorStop(0,    'rgba(255,255,255,0.92)');
+    sg.addColorStop(0.25, `rgba(${p.color[0]},${p.color[1]},${p.color[2]},0.88)`);
+    sg.addColorStop(0.75, `rgba(${Math.max(0,p.color[0]-30)},${Math.max(0,p.color[1]-30)},${Math.max(0,p.color[2]-30)},0.55)`);
+    sg.addColorStop(1,    `rgba(${Math.max(0,p.color[0]-60)},${Math.max(0,p.color[1]-60)},${Math.max(0,p.color[2]-60)},0.18)`);
+    ctx.fillStyle = sg;
+    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
+
+    ctx.restore();
+
+    // Store for hit-testing
+    p._px = px;
+    p._py = py;
+    p._r  = r;
+  }
+}
+
+function handlePlanetTap(mx, my) {
+  if (document.getElementById('bl-menu').classList.contains('open')) return;
+  const reveal = document.getElementById('stage-reveal');
+
+  // Center Source orb — stagePos[6] is SOURCE (isCenter: true)
+  const srcPos = stagePos[6];
+  if (srcPos) {
+    const d = Math.hypot(mx - srcPos.x, my - srcPos.y);
+    if (d < 32) {
+      if (activePlanet === 99) {
+        activePlanet = -1;
+        pulseTimer   = 0;
+        reveal.classList.remove('visible');
+      } else {
+        activePlanet = 99;
+        pulseTimer   = 0;
+        document.getElementById('reveal-name').textContent = 'SOURCE';
+        document.getElementById('reveal-body').textContent = 'The observer beneath all of it. The one that notices. Always present, never absent.';
+        reveal.classList.add('visible');
+      }
+      return;
+    }
+  }
+
+  for (let i = 0; i < 7; i++) {
+    const p = PLANETS[i];
+    if (p._px === undefined) continue;
+    const d = Math.hypot(mx - p._px, my - p._py);
+    if (d < p._r + 20) {
+      if (activePlanet === i) {
+        activePlanet = -1;
+        pulseTimer   = 0;
+        reveal.classList.remove('visible');
+      } else {
+        activePlanet = i;
+        pulseTimer   = 0;
+        document.getElementById('reveal-name').textContent = p.label;
+        document.getElementById('reveal-body').textContent = p.desc;
+        reveal.classList.add('visible');
+      }
+      return;
+    }
+  }
+
+  // Tapped elsewhere — dismiss
+  if (activePlanet >= 0) {
+    activePlanet = -1;
+    pulseTimer   = 0;
+    reveal.classList.remove('visible');
+  }
+}
+
+function mousePressed(event) {
+  if (event && event.target && !event.target.matches('canvas')) return;
+  handlePlanetTap(mouseX, mouseY);
+}
+
+function touchStarted(event) {
+  if (event && event.target && !event.target.matches('canvas')) return;
+  if (touches.length > 0) handlePlanetTap(touches[0].x, touches[0].y);
+  return false;
+}
+
+// ── PARTICLE ──────────────────────────────────────────────────────────
+class Particle {
+  constructor(scattered = false) {
+    this.si     = 0;
+    this.maxAge = 0;
+    this.age    = 0;
+    this.sz     = 0;
+    this.vx     = 0;
+    this.vy     = 0;
+    this.x      = 0;
+    this.y      = 0;
+    this.trail  = [];
+    if (scattered) this.resetToScattered();
+    else           this.resetToState();
+  }
+
+  resetToScattered() {
+    this.si     = floor(random(8));
+    this.maxAge = random(320, 820);
+    this.age    = random(0, this.maxAge);
+    this.sz     = random(0.35, 1.55);
+    this.vx     = 0;
+    this.vy     = 0;
+    this.trail  = [];
+    const sp    = stagePos[this.si];
+    this.x      = sp.x + random(-70, 70);
+    this.y      = sp.y + random(-70, 70);
+  }
+
+  resetToState() {
+    this.si     = 0;
+    this.maxAge = random(320, 820);
+    this.age    = 0;
+    this.sz     = random(0.35, 1.55);
+    this.vx     = 0;
+    this.vy     = 0;
+    this.trail  = [];
+    const sp    = stagePos[0];
+    this.x      = sp.x + random(-22, 22);
+    this.y      = sp.y + random(-22, 22);
+  }
+
+  update() {
+    const tgt    = stagePos[this.si];
+    const dx     = tgt.x - this.x;
+    const dy     = tgt.y - this.y;
+    const dist   = sqrt(dx * dx + dy * dy);
+    const capR   = (this.si === 6) ? 16 : 30;
+
+    if (dist < capR) {
+      this.si = (this.si + 1) % 8;
+    }
+
+    // Stage behavior
+    let attrMod  = 1.0;
+    let noiseMod = 0.28;
+    if (this.si === 1) { attrMod = 0.50; noiseMod = 0.92; }
+    if (this.si === 2) { attrMod = 0.72; noiseMod = 0.42; }
+    if (this.si === 6) { attrMod = 2.65; noiseMod = 0.05; }
+    if (this.si === 7) { attrMod = 1.55; noiseMod = 0.18; }
+
+    // Noise field
+    const ns     = CFG.noiseScale;
+    const t      = frameCount * 0.0020;
+    const nAng   = noise(this.x * ns, this.y * ns, t) * TWO_PI * 3;
+    const attr   = CFG.attraction;
+
+    if (dist > 0) {
+      this.vx += (dx / dist) * attr * attrMod + cos(nAng) * noiseMod * attr;
+      this.vy += (dy / dist) * attr * attrMod + sin(nAng) * noiseMod * attr;
+    }
+
+    // Cursor repulsion — the void opens around the user
+    const cdx  = this.x - mouseX;
+    const cdy  = this.y - mouseY;
+    const cd   = sqrt(cdx * cdx + cdy * cdy);
+    if (cd < CFG.cursorRadius && cd > 0) {
+      const strength = ((CFG.cursorRadius - cd) / CFG.cursorRadius) * CFG.cursorForce;
+      this.vx += (cdx / cd) * strength;
+      this.vy += (cdy / cd) * strength;
+    }
+
+    // Speed cap
+    const spd  = sqrt(this.vx * this.vx + this.vy * this.vy);
+    const maxS = CFG.flowSpeed;
+    if (spd > maxS) {
+      this.vx = (this.vx / spd) * maxS;
+      this.vy = (this.vy / spd) * maxS;
+    }
+
+    this.vx *= 0.91;
+    this.vy *= 0.91;
+    this.x  += this.vx;
+    this.y  += this.vy;
+
+    this.trail.push({ x: this.x, y: this.y, si: this.si });
+    if (this.trail.length > CFG.trailLength) this.trail.shift();
+
+    this.age++;
+
+    const oob = (this.x < -60 || this.x > width + 60 || this.y < -60 || this.y > height + 60);
+    if (this.age > this.maxAge || oob) {
+      this.resetToState();
+    }
+  }
+
+  draw() {
+    const lifeT = 1 - this.age / this.maxAge;
+
+    // Trails — slightly boosted alpha so they read as light through atmosphere
+    for (let i = 1; i < this.trail.length; i++) {
+      const t   = i / this.trail.length;
+      const col = STAGES[this.trail[i].si].color;
+      stroke(col[0], col[1], col[2], t * 148 * lifeT);
+      strokeWeight(this.sz * t * 1.1);
+      line(this.trail[i - 1].x, this.trail[i - 1].y, this.trail[i].x, this.trail[i].y);
+    }
+
+    // Head dot — bloom glow makes each particle a light source cutting through the fog
+    const col = STAGES[this.si].color;
+    drawingContext.shadowBlur = 14 + this.sz * 6;
+    drawingContext.shadowColor = `rgba(${col[0]},${col[1]},${col[2]},0.95)`;
+    fill(col[0], col[1], col[2], 205 * lifeT);
+    noStroke();
+    ellipse(this.x, this.y, this.sz * 2.5, this.sz * 2.5);
+    drawingContext.shadowBlur = 0;
+  }
+}
+</script>
+<script>
+function toggleMenu() {
+  const menu   = document.getElementById('bl-menu');
+  const burger = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  burger.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('bl-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+</script>
+</body>
+</html>
