@@ -153,6 +153,23 @@
     padding: 64px 0 0;
     opacity: 0;
     animation: fadeUp 1s ease forwards 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-about {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-about:hover {
+    color: var(--teal);
   }
 
   .wordmark {
@@ -589,6 +606,7 @@
   <!-- HEADER -->
   <header>
     <div class="wordmark">Bhavé<span>'</span>s Lab</div>
+    <a href="about.html" class="nav-about">About Bhavé</a>
   </header>
 
   <!-- HERO -->
