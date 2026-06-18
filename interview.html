@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/assets/images/logo-primary.png">
+<title>Source Interview — Bhavé's Lab</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void:    #040506;
+  --deep:    #080a0d;
+  --surface: #0d1117;
+  --edge:    #1a2230;
+  --teal:    #3dd6c8;
+  --teal-dim:#1e7a73;
+  --gold:    #c8a96e;
+  --gold-dim:#7a6340;
+  --text:    #ddeaf2;
+  --muted:   #9ab0bc;
+  --dim:     #4a5a64;
+  --mono: 'Courier New', Courier, monospace;
+  --serif: Georgia, 'Times New Roman', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+.wrapper {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 28px 120px;
+}
+
+/* ── HEADER ── */
+.page-header {
+  padding: 64px 0 48px;
+  border-bottom: 1px solid var(--edge);
+  margin-bottom: 56px;
+}
+
+.lab-mark {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: normal;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.page-intro {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 580px;
+  line-height: 1.8;
+}
+
+/* ── SECTION BLOCKS ── */
+.form-section {
+  margin-bottom: 64px;
+}
+
+.section-header {
+  margin-bottom: 36px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--edge);
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: normal;
+  font-style: italic;
+  color: var(--text);
+}
+
+.section-desc {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 8px;
+}
+
+/* ── FORM FIELDS ── */
+.field-group {
+  margin-bottom: 28px;
+}
+
+.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.field-label .required {
+  color: var(--teal);
+  margin-left: 4px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  background: var(--deep);
+  border: 1px solid var(--edge);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--teal-dim);
+}
+
+input::placeholder,
+textarea::placeholder { color: var(--dim); }
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%233dd6c8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+select option { background: var(--deep); }
+
+/* ── RADIO GROUP (CTA) ── */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  width: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--edge);
+  border-radius: 50%;
+  background: var(--deep);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  padding: 0;
+}
+
+.radio-option input[type="radio"]:checked {
+  border-color: var(--teal);
+  background: radial-gradient(circle at center, var(--teal) 40%, transparent 40%);
+}
+
+.radio-option input[type="radio"]:focus {
+  border-color: var(--teal-dim);
+}
+
+.radio-option span {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── QUESTION BLOCKS ── */
+.question-block {
+  margin-bottom: 44px;
+  padding-bottom: 44px;
+  border-bottom: 1px solid var(--edge);
+}
+
+.question-block:last-of-type {
+  border-bottom: none;
+}
+
+.question-number {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.question-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: normal;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.record-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.record-note span {
+  color: var(--teal-dim);
+}
+
+/* ── FILE UPLOAD ── */
+.file-upload-wrap {
+  position: relative;
+}
+
+input[type="file"] {
+  width: 100%;
+  background: var(--deep);
+  border: 1px dashed var(--edge);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  border-radius: 0;
+}
+
+input[type="file"]:hover,
+input[type="file"]:focus {
+  border-color: var(--teal-dim);
+  outline: none;
+}
+
+input[type="file"]::file-selector-button {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--teal-dim);
+  color: var(--teal);
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-right: 14px;
+  transition: background 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(61, 214, 200, 0.08);
+}
+
+/* ── ASSETS CHECKLIST ── */
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.check-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.check-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--edge);
+  background: var(--deep);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  border-radius: 0;
+}
+
+.check-option input[type="checkbox"]:checked {
+  background: var(--teal);
+  border-color: var(--teal);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23040506' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.check-option span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── SUBMIT ── */
+.submit-section {
+  padding-top: 48px;
+  border-top: 1px solid var(--edge);
+}
+
+.submit-note {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  max-width: 520px;
+  line-height: 1.8;
+}
+
+.submit-note em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.btn-submit {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--void);
+  background: var(--teal);
+  border: none;
+  padding: 16px 44px;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.15s ease;
+  border-radius: 0;
+}
+
+.btn-submit:hover { background: #52e0d3; transform: translateY(-1px); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled {
+  background: var(--teal-dim);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── STATUS MESSAGES ── */
+#formStatus {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 14px 16px;
+  display: none;
+}
+
+#formStatus.success {
+  display: block;
+  border: 1px solid var(--teal-dim);
+  color: var(--teal);
+  background: rgba(61,214,200,0.04);
+}
+
+#formStatus.error {
+  display: block;
+  border: 1px solid #8b3a3a;
+  color: #e07070;
+  background: rgba(139,58,58,0.06);
+}
+
+/* ── DIVIDER ── */
+.section-rule {
+  width: 32px;
+  height: 1px;
+  background: var(--teal-dim);
+  margin: 48px 0;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  .wrapper { padding: 0 20px 80px; }
+  .page-header { padding: 48px 0 36px; }
+  .checklist { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="lab-mark">Bhavé's Lab &nbsp;/&nbsp; Source Interview</div>
+    <h1 class="page-title">The Source Interview</h1>
+    <p class="page-intro">
+      These questions exist to draw out what is actually true about your work —
+      not the polished version, but the living thing underneath it.
+      Answer as fully as you can. If you'd rather speak than type,
+      record yourself and attach the file beneath any question.
+    </p>
+  </div>
+
+  <form id="sourceForm" novalidate>
+
+    <!-- ══ BUSINESS INFORMATION ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Business Information</div>
+        <h2 class="section-title">About You & Your Work</h2>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="bizName">Business Name <span class="required">*</span></label>
+        <input type="text" id="bizName" name="bizName" required placeholder="Your business or practice name">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="yourName">Your Name <span class="required">*</span></label>
+        <input type="text" id="yourName" name="yourName" required placeholder="First and last name">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="titleRole">Title / Role</label>
+        <input type="text" id="titleRole" name="titleRole" placeholder="e.g. Founder, Lead Practitioner, Coach">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="email">Email <span class="required">*</span></label>
+        <input type="email" id="email" name="email" required placeholder="your@email.com">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" placeholder="+1 (000) 000-0000">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="City, State / Country">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="website">Website (if applicable)</label>
+        <input type="url" id="website" name="website" placeholder="https://yoursite.com">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="socialLinks">Social Media Links</label>
+        <textarea id="socialLinks" name="socialLinks" rows="3" placeholder="Instagram, LinkedIn, TikTok, YouTube — paste links one per line"></textarea>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Primary Call to Action <span class="required">*</span></div>
+        <div class="section-desc" style="margin-bottom:16px;">What would you like visitors to do?</div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Book a Session" required>
+            <span>Book a Session</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Schedule a Consultation">
+            <span>Schedule a Consultation</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Apply for a Program">
+            <span>Apply for a Program</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Join a Waitlist">
+            <span>Join a Waitlist</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Contact You">
+            <span>Contact You</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="primaryCTA" value="Other">
+            <span>Other</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 1 — THE PERSON ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 1</div>
+        <h2 class="section-title">The Person</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 1</div>
+        <div class="question-text">Who are you?</div>
+        <textarea name="q1" placeholder="Beyond your title or role — who are you at the source of this work?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q1_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 2</div>
+        <div class="question-text">What do you do?</div>
+        <textarea name="q2" placeholder="Describe your work in plain terms."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q2_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 3</div>
+        <div class="question-text">How did you find this work?</div>
+        <textarea name="q3" placeholder="The origin story — what brought you here?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q3_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 4</div>
+        <div class="question-text">What experiences shaped your approach?</div>
+        <textarea name="q4" placeholder="The moments, people, or paths that formed how you work."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q4_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 5</div>
+        <div class="question-text">What keeps you committed to this work?</div>
+        <textarea name="q5" placeholder="What sustains the commitment when it's hard?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q5_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 6</div>
+        <div class="question-text">What makes your approach different from others in your field?</div>
+        <textarea name="q6" placeholder="Not better or worse — different. What is the specific thing only you bring?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q6_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 2 — THE MISSION ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 2</div>
+        <h2 class="section-title">The Mission</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 7</div>
+        <div class="question-text">Why does this work matter to you?</div>
+        <textarea name="q7" placeholder="The real reason — not the professional answer."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q7_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 8</div>
+        <div class="question-text">What problem are you trying to help solve?</div>
+        <textarea name="q8" placeholder="The specific thing in the world you are working against."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q8_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 9</div>
+        <div class="question-text">What do you wish more people understood about your work?</div>
+        <textarea name="q9" placeholder="The thing that gets missed or misread most often."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q9_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 10</div>
+        <div class="question-text">What change are you hoping to create in the lives of the people you serve?</div>
+        <textarea name="q10" placeholder="Describe the shift you are working toward."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q10_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 11</div>
+        <div class="question-text">What future are you helping build?</div>
+        <textarea name="q11" placeholder="Zoomed out — what does the world look like if this work succeeds?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q11_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 3 — THE PEOPLE YOU SERVE ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 3</div>
+        <h2 class="section-title">The People You Serve</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 12</div>
+        <div class="question-text">Who do you primarily help?</div>
+        <textarea name="q12" placeholder="Describe the person — not just demographics, but where they are in life."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q12_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 13</div>
+        <div class="question-text">What are they struggling with when they first come to you?</div>
+        <textarea name="q13" placeholder="The surface and the underneath."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q13_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 14</div>
+        <div class="question-text">What are they searching for?</div>
+        <textarea name="q14" placeholder="What outcome, feeling, or state are they actually after?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q14_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 15</div>
+        <div class="question-text">What usually brings them to you?</div>
+        <textarea name="q15" placeholder="The moment or event that tips them into reaching out."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q15_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 16</div>
+        <div class="question-text">What keeps them stuck?</div>
+        <textarea name="q16" placeholder="The pattern that has them cycling without resolution."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q16_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 17</div>
+        <div class="question-text">What happens if they continue down the same path without support?</div>
+        <textarea name="q17" placeholder="The cost of not getting help."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q17_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 4 — THE TRANSFORMATION ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 4</div>
+        <h2 class="section-title">The Transformation</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 18</div>
+        <div class="question-text">What shifts do clients typically experience through your work?</div>
+        <textarea name="q18" placeholder="Internal, external, relational — all of it."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q18_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 19</div>
+        <div class="question-text">What surprises them most about the process?</div>
+        <textarea name="q19" placeholder="The thing they didn't expect."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q19_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 20</div>
+        <div class="question-text">What changes after working with you?</div>
+        <textarea name="q20" placeholder="Tangible and intangible. What is different?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q20_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 21</div>
+        <div class="question-text">What do former clients often say about their experience?</div>
+        <textarea name="q21" placeholder="Actual words or themes that come back to you."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q21_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 22</div>
+        <div class="question-text">What makes the transformation sustainable over time?</div>
+        <textarea name="q22" placeholder="Why doesn't it just fade?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q22_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 5 — THE WORK ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 5</div>
+        <h2 class="section-title">The Work</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 23</div>
+        <div class="question-text">What services, programs, or experiences do you currently offer?</div>
+        <textarea name="q23" placeholder="Name them. Describe each one briefly."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q23_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 24</div>
+        <div class="question-text">Walk us through your process from beginning to end.</div>
+        <textarea name="q24" placeholder="From the first contact to the final touchpoint — what happens?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q24_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 25</div>
+        <div class="question-text">What happens during the first interaction?</div>
+        <textarea name="q25" placeholder="The first call, session, or intake — what does it look like?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q25_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 26</div>
+        <div class="question-text">What should a client expect during the journey?</div>
+        <textarea name="q26" placeholder="The arc of the experience — what will they move through?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q26_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 27</div>
+        <div class="question-text">How do you support integration, accountability, or follow-through?</div>
+        <textarea name="q27" placeholder="What happens between sessions or after the work ends?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q27_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ SECTION 6 — THE ENVIRONMENT ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Section 6</div>
+        <h2 class="section-title">The Environment</h2>
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 28</div>
+        <div class="question-text">Where does your work take place?</div>
+        <textarea name="q28" placeholder="In person, virtual, retreat, studio, online — describe the setting."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q28_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 29</div>
+        <div class="question-text">Describe the environment someone will experience when working with you.</div>
+        <textarea name="q29" placeholder="The feel of it — what would they say about being in your space?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q29_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 30</div>
+        <div class="question-text">What should someone know before reaching out or arriving?</div>
+        <textarea name="q30" placeholder="Practical details, energetic expectations, what this is not."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q30_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 31</div>
+        <div class="question-text">If someone remembers only one thing about you or your work, what would you want it to be?</div>
+        <textarea name="q31" placeholder="The single true thing."></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q31_file" accept="audio/*,video/*">
+      </div>
+
+      <div class="question-block">
+        <div class="question-number">Question 32</div>
+        <div class="question-text">What is the next step for someone who feels called to work with you?</div>
+        <textarea name="q32" placeholder="The exact action — what do they do right now?"></textarea>
+        <div class="record-note"><span>◎</span> Prefer to speak? Record yourself and attach the file below. (audio or video)</div>
+        <input type="file" name="q32_file" accept="audio/*,video/*">
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- ══ WEBSITE ASSETS ══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-label">Website Assets — Optional</div>
+        <h2 class="section-title">What You Already Have</h2>
+        <p class="section-desc">Check any assets you can provide. Upload them together below.</p>
+      </div>
+
+      <div class="checklist">
+        <label class="check-option"><input type="checkbox" name="assets" value="Logo"><span>Logo</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Brand Colors"><span>Brand Colors</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Professional Photos"><span>Professional Photos</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Team Photos"><span>Team Photos</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Service Photos"><span>Service Photos</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Testimonials"><span>Testimonials</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Certifications"><span>Certifications</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Licenses"><span>Licenses</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Retreat Photos"><span>Retreat Photos</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Videos"><span>Videos</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Existing Marketing Materials"><span>Marketing Materials</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Booking Link"><span>Booking Link</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Pricing Information"><span>Pricing Information</span></label>
+        <label class="check-option"><input type="checkbox" name="assets" value="Frequently Asked Questions"><span>FAQs</span></label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="assetFiles">Upload Files</label>
+        <input type="file" id="assetFiles" name="assetFiles" multiple accept="image/*,video/*,application/pdf,.doc,.docx,.zip">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="assetNotes">Notes on Assets</label>
+        <textarea id="assetNotes" name="assetNotes" rows="3" placeholder="Anything we should know about what you're sending, or links to shared folders (Google Drive, Dropbox, etc.)"></textarea>
+      </div>
+    </div>
+
+    <!-- ══ SUBMIT ══ -->
+    <div class="submit-section">
+      <p class="submit-note">
+        Thank you. These answers will be used to create your website messaging,
+        service descriptions, calls to action, and overall digital presence.
+        <em>Nothing you write here will be published without your review and approval.</em>
+      </p>
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Interview</button>
+      <div id="formStatus"></div>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+const BACKEND_URL = 'https://bhaveslab-backend.vercel.app/api/source-interview';
+
+const form = document.getElementById('sourceForm');
+const submitBtn = document.getElementById('submitBtn');
+const formStatus = document.getElementById('formStatus');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const bizName = form.bizName.value.trim();
+  const yourName = form.yourName.value.trim();
+  const email = form.email.value.trim();
+  const cta = form.querySelector('input[name="primaryCTA"]:checked');
+
+  if (!bizName || !yourName || !email || !cta) {
+    showStatus('error', 'Please fill in the required fields: Business Name, Your Name, Email, and Primary Call to Action.');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+  formStatus.className = '';
+  formStatus.style.display = 'none';
+
+  const data = new FormData(form);
+
+  // Collect checked assets as a comma-separated string
+  const checkedAssets = [...form.querySelectorAll('input[name="assets"]:checked')]
+    .map(cb => cb.value).join(', ');
+  data.set('assets', checkedAssets);
+
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      body: data
+    });
+
+    if (res.ok) {
+      form.reset();
+      showStatus('success', 'Interview received. Bhavé will be in touch once she has reviewed your answers.');
+      submitBtn.textContent = 'Submitted';
+    } else {
+      const msg = await res.text().catch(() => '');
+      showStatus('error', 'Something went wrong on our end. Please try again or email directly at info@bhaveslab.com.' + (msg ? ' (' + msg + ')' : ''));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Interview';
+    }
+  } catch (err) {
+    showStatus('error', 'Could not reach the server. Please check your connection and try again, or email info@bhaveslab.com.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Interview';
+  }
+});
+
+function showStatus(type, msg) {
+  formStatus.className = type;
+  formStatus.textContent = msg;
+  formStatus.style.display = 'block';
+  formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+
+</body>
+</html>
