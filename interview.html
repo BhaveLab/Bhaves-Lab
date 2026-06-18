@@ -899,7 +899,7 @@ input[type="file"]::file-selector-button:hover {
 </div>
 
 <script>
-const BACKEND_URL = 'https://bhaveslab-backend.vercel.app/api/source-interview';
+const BACKEND_URL = '/api/source-interview';
 
 const form = document.getElementById('sourceForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -923,17 +923,19 @@ form.addEventListener('submit', async function(e) {
   formStatus.className = '';
   formStatus.style.display = 'none';
 
-  const data = new FormData(form);
-
-  // Collect checked assets as a comma-separated string
-  const checkedAssets = [...form.querySelectorAll('input[name="assets"]:checked')]
+  // Collect text fields as JSON (file uploads noted in email for follow-up)
+  const payload = {};
+  new FormData(form).forEach((value, key) => {
+    if (!(value instanceof File)) payload[key] = value;
+  });
+  payload.assets = [...form.querySelectorAll('input[name="assets"]:checked')]
     .map(cb => cb.value).join(', ');
-  data.set('assets', checkedAssets);
 
   try {
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
-      body: data
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
 
     if (res.ok) {
