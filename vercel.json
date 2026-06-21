@@ -18,6 +18,7 @@
     { "source": "/thread-landing", "destination": "/thread-landing.html" },
     { "source": "/home.html", "destination": "/index.html" },
     { "source": "/workshops-landing.html", "destination": "/events.html" },
-    { "source": "/interview", "destination": "/interview.html" }
+    { "source": "/interview", "destination": "/interview.html" },
+    { "source": "/card", "destination": "/card.html" }
   ]
 }
