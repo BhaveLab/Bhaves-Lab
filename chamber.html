@@ -493,22 +493,19 @@ const statusEl   = document.getElementById('status-text');
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function appendMsg(type, content, delay) {
-  return new Promise(async resolve => {
-    if (delay) await sleep(delay);
-    const el = document.createElement('div');
-    el.className = `msg ${type}`;
-    if (type === 'chamber') {
-      el.innerHTML = `<span class="msg-label">CHAMBER</span><div class="msg-body">${content}</div>`;
-    } else if (type === 'user') {
-      el.innerHTML = `<span class="msg-label">INPUT_RECEIVED</span><div class="msg-body">${escHtml(content)}</div>`;
-    } else {
-      el.innerHTML = `<div class="msg-body">${content}</div>`;
-    }
-    messagesEl.appendChild(el);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    resolve();
-  });
+async function appendMsg(type, content, delay) {
+  if (delay) await sleep(delay);
+  const el = document.createElement('div');
+  el.className = `msg ${type}`;
+  if (type === 'chamber') {
+    el.innerHTML = `<span class="msg-label">CHAMBER</span><div class="msg-body">${content}</div>`;
+  } else if (type === 'user') {
+    el.innerHTML = `<span class="msg-label">INPUT_RECEIVED</span><div class="msg-body">${escHtml(content)}</div>`;
+  } else {
+    el.innerHTML = `<div class="msg-body">${content}</div>`;
+  }
+  messagesEl.appendChild(el);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 function showTyping() {
