@@ -327,6 +327,49 @@
     padding: 8px 0;
   }
 
+  /* Completion screen */
+  .completion-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .completion-mark {
+    width: 1px;
+    height: 48px;
+    background: var(--teal-dim);
+    margin: 0 auto;
+  }
+
+  .completion-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--teal-dim);
+  }
+
+  .completion-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+  }
+
+  .completion-sig {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-top: 8px;
+  }
+
   /* Email gate */
   .email-gate {
     display: flex;
@@ -423,6 +466,14 @@
 
 <div id="app">
 
+  <!-- Shown when session was already completed this browser session -->
+  <div id="completion-screen" class="completion-screen" style="display:none;">
+    <div class="completion-mark"></div>
+    <div class="completion-label">[ SESSION COMPLETE ]</div>
+    <div class="completion-title">Your reflection has been delivered.</div>
+    <div class="completion-sig">— Bhavé</div>
+  </div>
+
   <!-- Email gate shown first -->
   <div id="email-gate-screen" class="email-gate">
     <div>
@@ -493,6 +544,21 @@ let responses = [];
 let sessionComplete = false;
 let isLoading = false;
 let userEmail = '';
+
+/* ── Session protection ──────────────────────────────────────────────────── */
+// Show completion screen immediately if this session is already done
+if (sessionStorage.getItem('chamber_complete') === '1') {
+  document.getElementById('email-gate-screen').style.display = 'none';
+  document.getElementById('completion-screen').style.display = 'flex';
+}
+
+// Warn before leaving mid-session (active only when responses are in progress)
+window.addEventListener('beforeunload', function(e) {
+  if (currentQ > 0 && !sessionComplete) {
+    e.preventDefault();
+    e.returnValue = 'Your responses will be lost if you leave.';
+  }
+});
 
 const msgsEl    = document.getElementById('messages');
 const inputEl   = document.getElementById('user-input');
@@ -682,6 +748,7 @@ async function handleSend() {
     removeTyping();
     addReport(report);
     sessionComplete = true;
+    sessionStorage.setItem('chamber_complete', '1');
     statusEl.textContent = 'COMPLETE';
     progressEl.style.width = '100%';
     if (userEmail) {
