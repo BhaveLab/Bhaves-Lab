@@ -327,6 +327,63 @@
     padding: 8px 0;
   }
 
+  /* Email gate */
+  .email-gate {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .email-gate-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--teal-dim);
+    margin-bottom: 4px;
+  }
+
+  .email-gate-title {
+    font-size: 18px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .email-gate-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .email-gate input[type="email"] {
+    background: var(--void-surface);
+    border: 1px solid var(--void-border);
+    border-left: 2px solid var(--teal-dim);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    outline: none;
+    border-radius: 2px;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .email-gate input[type="email"]:focus { border-left-color: var(--teal); }
+  .email-gate input[type="email"]::placeholder { color: var(--text-dim); }
+
+  .email-gate-error {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    display: none;
+  }
+
   /* Typing indicator */
   .typing-dots {
     display: flex;
@@ -365,7 +422,21 @@
 </div>
 
 <div id="app">
-  <div class="chamber">
+
+  <!-- Email gate shown first -->
+  <div id="email-gate-screen" class="email-gate">
+    <div>
+      <div class="email-gate-label">[ CHAMBER — PRE-SESSION ]</div>
+      <div class="email-gate-title">Before we begin</div>
+    </div>
+    <div class="email-gate-sub">Your reflection will be sent to you after the session. Enter your email to receive it.</div>
+    <input type="email" id="gate-email" placeholder="your@email.com" />
+    <div class="email-gate-error" id="gate-error">Please enter a valid email address.</div>
+    <button onclick="startChamber()">[ BEGIN THE CHAMBER ]</button>
+  </div>
+
+  <!-- Chamber session (hidden until email submitted) -->
+  <div id="chamber-screen" class="chamber" style="display:none;">
     <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     <div class="messages" id="messages"></div>
     <div class="input-area" id="input-area">
@@ -376,10 +447,12 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <script>
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
+const CHAMBER_API = '/api/chamber';
 
 const QUESTIONS = [
   "What brought you here today?",
@@ -413,34 +486,13 @@ const SEQ = {
   20: "SEQUENCE_05 — DIRECTION"
 };
 
-const SYSTEM_PROMPT = `You are The Chamber's Reflection Engine inside Bhavé's Lab.
-
-Your purpose is to analyze a user's 21 responses and generate a Chamber Reflection report.
-
-RULES:
-- Do not diagnose, prescribe, motivate, or fix.
-- Do not use these terms: healing, toxic, high vibe, manifest, hustle, grind, coaching, therapy, transformation, journey, growth, spiritual, tribe, community.
-- Do not tell the user what to do.
-- Observe only. Reflect only. Name what appears.
-- Be precise. Be direct. Not harsh. Not warm in a therapeutic way.
-- Language is observational, not instructional.
-- Use the word "study" not "learn". Use "awareness" not "consciousness growth".
-
-OUTPUT FORMAT — return ONLY this JSON structure, no markdown, no preamble:
-{
-  "signal": "2-3 sentences on what appears to be calling for attention across the responses",
-  "pattern": "2-3 sentences on what repeats — recurring words, emotions, situations",
-  "state": "2-3 sentences on the dominant state influencing perception in these responses",
-  "negotiation": "2-3 sentences on what the user appears to already know but continues to negotiate with",
-  "direction": "2-3 sentences on what naturally emerges from the observations — not a prescription, just what is visible"
-}`;
-
 const WELCOME = "Welcome to The Chamber.\n\nThis is not a test.\n\nThis is not an assessment.\n\nThis is an observation.\n\nAnswer honestly.\n\nThere are no correct responses.";
 
 let currentQ = 0;
 let responses = [];
 let sessionComplete = false;
 let isLoading = false;
+let userEmail = '';
 
 const msgsEl    = document.getElementById('messages');
 const inputEl   = document.getElementById('user-input');
@@ -551,6 +603,28 @@ function addReport(report) {
   msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
+/* ── Email gate ──────────────────────────────────────────────────────────── */
+function startChamber() {
+  var emailInput = document.getElementById('gate-email');
+  var errorEl = document.getElementById('gate-error');
+  var email = emailInput.value.trim();
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    errorEl.style.display = 'block';
+    emailInput.style.borderLeftColor = 'var(--gold)';
+    return;
+  }
+
+  userEmail = email;
+  document.getElementById('email-gate-screen').style.display = 'none';
+  document.getElementById('chamber-screen').style.display = 'flex';
+  init();
+}
+
+document.getElementById('gate-email').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startChamber();
+});
+
 /* ── Init ────────────────────────────────────────────────────────────────── */
 async function init() {
   sendBtn.disabled = true;
@@ -610,26 +684,23 @@ async function handleSend() {
     sessionComplete = true;
     statusEl.textContent = 'COMPLETE';
     progressEl.style.width = '100%';
-    showLeadCapture();
+    if (userEmail) {
+      addMsg('system', '[ REFLECTION SENT TO ' + userEmail + ' ]');
+    }
   }
 }
 
 /* ── AI report ───────────────────────────────────────────────────────────── */
 async function generateReport() {
-  var text = responses.map(function(r, i) {
-    return 'Q' + (i + 1) + ': ' + r.q + '\nA: ' + r.a;
-  }).join('\n\n');
-
   try {
-    var res = await fetch(BACKEND + '/api/reflect', {
+    var res = await fetch(CHAMBER_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: 'Here are the 21 responses:\n\n' + text, systemPrompt: SYSTEM_PROMPT })
+      body: JSON.stringify({ email: userEmail, responses: responses })
     });
     if (!res.ok) throw new Error('backend error');
     var data = await res.json();
-    var clean = (data.text || '').replace(/```json|```/g, '').trim();
-    return JSON.parse(clean);
+    return data.report;
   } catch (e) {
     return {
       signal: "Something brought you here — and it wasn't random. The responses suggest something is actively seeking attention.",
@@ -641,65 +712,6 @@ async function generateReport() {
   }
 }
 
-/* ── Lead capture ────────────────────────────────────────────────────────── */
-function showLeadCapture() {
-  var cta = document.createElement('div');
-  cta.className = 'lead-cta';
-
-  var ctaLbl = document.createElement('div');
-  ctaLbl.className = 'lead-cta-label';
-  ctaLbl.textContent = '[ CONTINUE THE STUDY ]';
-  cta.appendChild(ctaLbl);
-
-  var ctaTxt = document.createElement('div');
-  ctaTxt.className = 'lead-cta-text';
-  ctaTxt.textContent = 'Seven books. One framework. The full sequence — State through Source.\nEnter your email to receive the library.';
-  cta.appendChild(ctaTxt);
-
-  var emailInput = document.createElement('input');
-  emailInput.type = 'email';
-  emailInput.id = 'lead-email';
-  emailInput.placeholder = 'Your email';
-  cta.appendChild(emailInput);
-
-  var btn = document.createElement('button');
-  btn.className = 'cta-btn';
-  btn.textContent = '[ SEND THE LIBRARY ]';
-  btn.onclick = submitLead;
-  cta.appendChild(btn);
-
-  msgsEl.appendChild(cta);
-  msgsEl.scrollTop = msgsEl.scrollHeight;
-}
-
-async function submitLead() {
-  var emailInput = document.getElementById('lead-email');
-  var email = emailInput.value.trim();
-  if (!email || !email.includes('@')) {
-    emailInput.style.borderColor = 'var(--gold)';
-    return;
-  }
-
-  var btn = msgsEl.querySelector('.cta-btn');
-  btn.disabled = true;
-  btn.textContent = '[ LOGGING... ]';
-
-  try {
-    await fetch(BACKEND + '/api/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, source: 'the-chamber' })
-    });
-  } catch (e) { /* silent */ }
-
-  btn.style.display = 'none';
-  emailInput.style.display = 'none';
-  var ok = document.createElement('div');
-  ok.className = 'cta-success';
-  ok.textContent = '[ SIGNAL_RECEIVED — CHECK YOUR INBOX ]';
-  btn.parentNode.appendChild(ok);
-}
-
 inputEl.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -707,7 +719,7 @@ inputEl.addEventListener('keydown', function(e) {
   }
 });
 
-init();
+// Chamber initializes via startChamber() after email is collected
 </script>
 </body>
 </html>
