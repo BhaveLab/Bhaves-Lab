@@ -121,18 +121,10 @@
   }
   .messages::-webkit-scrollbar { display: none; }
 
-  /* animation-fill-mode: both applies the 'from' state before the animation
-     starts, removing the need for a conflicting base opacity: 0 rule */
   .msg {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    animation: fadeIn 0.5s ease both;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
   }
 
   .msg-label {
@@ -314,6 +306,11 @@
     flex-direction: column;
     gap: 12px;
     animation: fadeIn 0.5s ease 0.3s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .lead-cta-label {
@@ -503,9 +500,8 @@ function escHtml(str) {
     .replace(/"/g,'&quot;');
 }
 
-/* Build a message element explicitly — textContent for plain text,
-   innerHTML only when content is known to contain markup (<br> etc.) */
 function buildMsg(type, content) {
+  console.log('[Chamber] buildMsg type=' + type + ' content=' + JSON.stringify(content));
   const el = document.createElement('div');
   el.className = 'msg ' + type;
 
@@ -515,12 +511,8 @@ function buildMsg(type, content) {
     label.textContent = 'CHAMBER';
     const body = document.createElement('div');
     body.className = 'msg-body';
-    /* Use innerHTML only when content contains markup; otherwise textContent */
-    if (content.indexOf('<') !== -1) {
-      body.innerHTML = content;
-    } else {
-      body.textContent = content;
-    }
+    body.innerHTML = content.indexOf('<') !== -1 ? content : escHtml(content);
+    console.log('[Chamber] body.innerHTML=' + body.innerHTML);
     el.appendChild(label);
     el.appendChild(body);
   } else if (type === 'user') {
@@ -669,7 +661,7 @@ async function renderReport(report) {
     '<div class="report-section"><span class="report-label">[ NEGOTIATION ]</span><div class="report-text">' + escHtml(report.negotiation) + '</div></div>' +
     '<div class="report-divider"></div>' +
     '<div class="report-section"><span class="report-label">[ DIRECTION ]</span><div class="report-text">' + escHtml(report.direction) + '</div></div>' +
-    '<div class="closing-quote">“The mystery is not the information.<br>The mystery is why we continue negotiating with what we already know.”<br><br>— Bhavé</div>';
+    '<div class="closing-quote">"The mystery is not the information.<br>The mystery is why we continue negotiating with what we already know."<br><br>— Bhavé</div>';
 
   await appendMsg('system', '[ CHAMBER REFLECTION ]', 200);
   const reportEl = buildMsg('chamber', html);
