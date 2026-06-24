@@ -490,18 +490,24 @@ const statusEl   = document.getElementById('status-text');
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function scrollBottom() {
-  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
-}
-
 function escHtml(str) {
   return String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;');
 }
 
+function setChamberBody(body, content) {
+  /* For plain text use createTextNode — bypasses HTML parser entirely.
+     For content containing markup (<br> etc.) use innerHTML. */
+  if (content.indexOf('<') !== -1) {
+    body.innerHTML = content;
+  } else {
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.appendChild(document.createTextNode(content));
+  }
+}
+
 function buildMsg(type, content) {
-  console.log('[Chamber] buildMsg type=' + type + ' content=' + JSON.stringify(content));
   const el = document.createElement('div');
   el.className = 'msg ' + type;
 
@@ -511,8 +517,7 @@ function buildMsg(type, content) {
     label.textContent = 'CHAMBER';
     const body = document.createElement('div');
     body.className = 'msg-body';
-    body.innerHTML = content.indexOf('<') !== -1 ? content : escHtml(content);
-    console.log('[Chamber] body.innerHTML=' + body.innerHTML);
+    setChamberBody(body, content);
     el.appendChild(label);
     el.appendChild(body);
   } else if (type === 'user') {
@@ -538,7 +543,17 @@ async function appendMsg(type, content, delay) {
   if (delay) await sleep(delay);
   const el = buildMsg(type, content);
   messagesEl.appendChild(el);
-  scrollBottom();
+  requestAnimationFrame(() => {
+    /* Verify chamber body rendered; re-set if empty (catches post-append clearing) */
+    if (type === 'chamber') {
+      const body = el.querySelector('.msg-body');
+      if (body && !body.textContent.trim()) {
+        console.warn('[Chamber] body empty after rAF — re-setting:', JSON.stringify(content));
+        setChamberBody(body, content);
+      }
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
 }
 
 function showTyping() {
@@ -550,7 +565,7 @@ function showTyping() {
   dots.innerHTML = '<span></span><span></span><span></span>';
   el.appendChild(dots);
   messagesEl.appendChild(el);
-  scrollBottom();
+  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
 }
 
 function removeTyping() {
@@ -667,7 +682,7 @@ async function renderReport(report) {
   const reportEl = buildMsg('chamber', html);
   reportEl.querySelector('.msg-label').textContent = 'REFLECTION_COMPLETE';
   messagesEl.appendChild(reportEl);
-  scrollBottom();
+  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
   await sleep(300);
 }
 
@@ -680,7 +695,7 @@ function showLeadCapture() {
     '<input type="email" id="lead-email" placeholder="Your email" />' +
     '<button class="cta-btn" id="lead-btn" onclick="submitLead()">[ SEND THE LIBRARY ]</button>';
   messagesEl.appendChild(cta);
-  scrollBottom();
+  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
 }
 
 async function submitLead() {
