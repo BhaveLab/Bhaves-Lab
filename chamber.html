@@ -40,19 +40,6 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    position: relative;
-  }
-
-  #app::before {
-    content: '';
-    position: fixed;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(61,214,200,0.03) 0%, transparent 70%);
-    pointer-events: none;
   }
 
   .header {
@@ -103,24 +90,23 @@
     max-width: 620px;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    max-height: calc(100vh - 100px);
+    height: calc(100vh - 100px);
     margin-top: 60px;
-    overflow: hidden;
   }
 
   .messages {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 0 0 24px;
+    padding: 24px 0;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
     scrollbar-width: none;
   }
   .messages::-webkit-scrollbar { display: none; }
 
+  /* No animation — messages appear immediately */
   .msg {
     display: flex;
     flex-direction: column;
@@ -135,8 +121,8 @@
     color: var(--text-dim);
   }
 
-  .msg.chamber .msg-label { color: var(--teal-dim); }
-  .msg.user .msg-label { color: var(--gold); text-align: right; align-self: flex-end; }
+  .msg.chamber > .msg-label { color: var(--teal-dim); }
+  .msg.user > .msg-label { color: var(--gold); align-self: flex-end; }
 
   .msg-body {
     padding: 16px 20px;
@@ -149,52 +135,45 @@
     white-space: pre-wrap;
   }
 
-  .msg.chamber .msg-body {
+  .msg.chamber > .msg-body {
     border-left: 2px solid var(--teal-dim);
     background: var(--void-mid);
   }
 
-  .msg.user .msg-body {
+  .msg.user > .msg-body {
     border-right: 2px solid var(--gold);
     border-left: 1px solid var(--void-border);
-    background: var(--void-surface);
     text-align: right;
   }
 
-  .msg.system .msg-body {
-    border: 1px solid var(--void-border);
+  .msg.system > .msg-body {
+    border: none;
     background: transparent;
     color: var(--text-dim);
     font-family: 'Space Mono', monospace;
     font-size: 11px;
     text-align: center;
     letter-spacing: 0.05em;
+    padding: 4px 0;
   }
 
   .progress-bar {
     height: 1px;
     background: var(--void-border);
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
+    flex-shrink: 0;
   }
 
   .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--teal-dim), var(--teal));
     transition: width 0.6s ease;
+    width: 0%;
   }
 
   .input-area {
     border-top: 1px solid var(--void-border);
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .input-wrapper {
-    position: relative;
+    padding-top: 16px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -209,20 +188,16 @@
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     line-height: 1.7;
-    padding: 14px 16px;
+    padding: 12px 16px;
     resize: none;
     outline: none;
     border-radius: 2px;
-    min-height: 72px;
-    max-height: 160px;
+    min-height: 68px;
+    max-height: 140px;
     transition: border-color 0.2s;
   }
 
-  textarea:focus {
-    border-color: #2a2a2a;
-    border-left-color: var(--gold-light);
-  }
-
+  textarea:focus { border-left-color: var(--gold-light); }
   textarea::placeholder { color: var(--text-dim); font-style: italic; }
 
   .input-actions {
@@ -252,17 +227,11 @@
     transition: all 0.2s;
   }
 
-  button:hover:not(:disabled) {
-    background: var(--teal);
-    color: var(--void);
-  }
+  button:hover:not(:disabled) { background: var(--teal); color: var(--void); }
+  button:disabled { opacity: 0.3; cursor: default; }
 
-  button:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
-
-  .report-section { margin-bottom: 20px; }
+  /* Report styles */
+  .report-section { margin-bottom: 16px; }
 
   .report-label {
     font-family: 'Space Mono', monospace;
@@ -270,20 +239,21 @@
     letter-spacing: 0.2em;
     color: var(--teal);
     text-transform: uppercase;
-    margin-bottom: 8px;
     display: block;
+    margin-bottom: 6px;
   }
 
   .report-text {
     color: var(--text-primary);
     font-size: 14px;
     line-height: 1.8;
+    white-space: pre-wrap;
   }
 
   .report-divider {
     height: 1px;
     background: var(--void-border);
-    margin: 20px 0;
+    margin: 16px 0;
   }
 
   .closing-quote {
@@ -291,13 +261,15 @@
     font-size: 11px;
     color: var(--gold);
     line-height: 1.8;
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 16px;
+    padding-top: 16px;
     border-top: 1px solid var(--void-border);
+    white-space: pre-wrap;
   }
 
+  /* Lead capture */
   .lead-cta {
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 20px;
     border: 1px solid var(--gold);
     background: rgba(184, 146, 42, 0.04);
@@ -305,12 +277,6 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    animation: fadeIn 0.5s ease 0.3s both;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
   }
 
   .lead-cta-label {
@@ -325,6 +291,7 @@
     font-size: 13px;
     color: var(--text-mid);
     line-height: 1.7;
+    white-space: pre-wrap;
   }
 
   .lead-cta input[type="email"] {
@@ -349,10 +316,7 @@
     padding: 12px;
   }
 
-  .cta-btn:hover:not(:disabled) {
-    background: var(--gold);
-    color: var(--void);
-  }
+  .cta-btn:hover:not(:disabled) { background: var(--gold); color: var(--void); }
 
   .cta-success {
     font-family: 'Space Mono', monospace;
@@ -363,7 +327,8 @@
     padding: 8px 0;
   }
 
-  .typing {
+  /* Typing indicator */
+  .typing-dots {
     display: flex;
     gap: 6px;
     padding: 16px 20px;
@@ -374,14 +339,14 @@
     width: fit-content;
   }
 
-  .typing span {
+  .typing-dots span {
     width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--teal-dim);
     animation: blink 1.4s ease-in-out infinite;
   }
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
   @keyframes blink {
     0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
@@ -401,19 +366,13 @@
 
 <div id="app">
   <div class="chamber">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress" style="width:0%"></div>
-    </div>
-
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     <div class="messages" id="messages"></div>
-
     <div class="input-area" id="input-area">
-      <div class="input-wrapper">
-        <textarea id="user-input" placeholder="Respond honestly. There are no correct answers." rows="3"></textarea>
-        <div class="input-actions">
-          <span class="q-counter" id="q-counter">SIGNAL_01 / 21</span>
-          <button id="send-btn" onclick="handleSend()">[ ENTER ]</button>
-        </div>
+      <textarea id="user-input" placeholder="Respond honestly. There are no correct answers." rows="3"></textarea>
+      <div class="input-actions">
+        <span class="q-counter" id="q-counter">01 / 21</span>
+        <button id="send-btn" onclick="handleSend()">[ ENTER ]</button>
       </div>
     </div>
   </div>
@@ -446,7 +405,7 @@ const QUESTIONS = [
   "What appears to be asking for your attention now?"
 ];
 
-const SEQUENCE_LABELS = {
+const SEQ = {
   0:  "SEQUENCE_01 — SIGNAL",
   5:  "SEQUENCE_02 — PATTERN",
   10: "SEQUENCE_03 — STATE",
@@ -476,128 +435,141 @@ OUTPUT FORMAT — return ONLY this JSON structure, no markdown, no preamble:
   "direction": "2-3 sentences on what naturally emerges from the observations — not a prescription, just what is visible"
 }`;
 
+const WELCOME = "Welcome to The Chamber.\n\nThis is not a test.\n\nThis is not an assessment.\n\nThis is an observation.\n\nAnswer honestly.\n\nThere are no correct responses.";
+
 let currentQ = 0;
 let responses = [];
 let sessionComplete = false;
 let isLoading = false;
 
-const messagesEl = document.getElementById('messages');
-const inputEl    = document.getElementById('user-input');
-const sendBtn    = document.getElementById('send-btn');
-const qCounter   = document.getElementById('q-counter');
+const msgsEl    = document.getElementById('messages');
+const inputEl   = document.getElementById('user-input');
+const sendBtn   = document.getElementById('send-btn');
+const qCounter  = document.getElementById('q-counter');
 const progressEl = document.getElementById('progress');
-const statusEl   = document.getElementById('status-text');
+const statusEl  = document.getElementById('status-text');
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
+/* ── Core message renderer ─────────────────────────────────────────────────
+   Single function. Text set via textContent once. No innerHTML, no async
+   DOM, no animation, no requestAnimationFrame.                             */
+function addMsg(type, text) {
+  var wrap = document.createElement('div');
+  wrap.className = 'msg ' + type;
 
-function setChamberBody(body, content) {
-  /* For plain text use createTextNode — bypasses HTML parser entirely.
-     For content containing markup (<br> etc.) use innerHTML. */
-  if (content.indexOf('<') !== -1) {
-    body.innerHTML = content;
-  } else {
-    while (body.firstChild) body.removeChild(body.firstChild);
-    body.appendChild(document.createTextNode(content));
-  }
-}
-
-function buildMsg(type, content) {
-  const el = document.createElement('div');
-  el.className = 'msg ' + type;
-
-  if (type === 'chamber') {
-    const label = document.createElement('span');
-    label.className = 'msg-label';
-    label.textContent = 'CHAMBER';
-    const body = document.createElement('div');
-    body.className = 'msg-body';
-    setChamberBody(body, content);
-    el.appendChild(label);
-    el.appendChild(body);
-  } else if (type === 'user') {
-    const label = document.createElement('span');
-    label.className = 'msg-label';
-    label.textContent = 'INPUT_RECEIVED';
-    const body = document.createElement('div');
-    body.className = 'msg-body';
-    body.textContent = content;
-    el.appendChild(label);
-    el.appendChild(body);
-  } else {
-    const body = document.createElement('div');
-    body.className = 'msg-body';
-    body.innerHTML = content;
-    el.appendChild(body);
+  if (type === 'chamber' || type === 'user') {
+    var lbl = document.createElement('div');
+    lbl.className = 'msg-label';
+    lbl.textContent = type === 'chamber' ? 'CHAMBER' : 'INPUT_RECEIVED';
+    wrap.appendChild(lbl);
   }
 
-  return el;
-}
+  var body = document.createElement('div');
+  body.className = 'msg-body';
+  body.textContent = text;
+  wrap.appendChild(body);
 
-async function appendMsg(type, content, delay) {
-  if (delay) await sleep(delay);
-  const el = buildMsg(type, content);
-  messagesEl.appendChild(el);
-  requestAnimationFrame(() => {
-    /* Verify chamber body rendered; re-set if empty (catches post-append clearing) */
-    if (type === 'chamber') {
-      const body = el.querySelector('.msg-body');
-      if (body && !body.textContent.trim()) {
-        console.warn('[Chamber] body empty after rAF — re-setting:', JSON.stringify(content));
-        setChamberBody(body, content);
-      }
-    }
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  });
+  msgsEl.appendChild(wrap);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  return wrap;
 }
 
 function showTyping() {
-  const el = document.createElement('div');
-  el.id = 'typing-indicator';
-  el.className = 'msg chamber';
-  const dots = document.createElement('div');
-  dots.className = 'typing';
-  dots.innerHTML = '<span></span><span></span><span></span>';
-  el.appendChild(dots);
-  messagesEl.appendChild(el);
-  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
+  var wrap = document.createElement('div');
+  wrap.id = 'typing';
+  wrap.className = 'msg chamber';
+  var dots = document.createElement('div');
+  dots.className = 'typing-dots';
+  for (var i = 0; i < 3; i++) dots.appendChild(document.createElement('span'));
+  wrap.appendChild(dots);
+  msgsEl.appendChild(wrap);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
 function removeTyping() {
-  const el = document.getElementById('typing-indicator');
+  var el = document.getElementById('typing');
   if (el) el.remove();
 }
 
 function updateProgress() {
   progressEl.style.width = Math.round((currentQ / 21) * 100) + '%';
-  if (currentQ < 21) {
-    qCounter.textContent = 'SIGNAL_' + String(currentQ + 1).padStart(2,'0') + ' / 21';
-  }
+  qCounter.textContent = String(currentQ + 1).padStart(2, '0') + ' / 21';
 }
 
+/* ── Report renderer — DOM methods throughout ────────────────────────────── */
+function addReport(report) {
+  var wrap = document.createElement('div');
+  wrap.className = 'msg chamber';
+
+  var lbl = document.createElement('div');
+  lbl.className = 'msg-label';
+  lbl.textContent = 'REFLECTION_COMPLETE';
+  wrap.appendChild(lbl);
+
+  var body = document.createElement('div');
+  body.className = 'msg-body';
+
+  var sections = [
+    ['SIGNAL',      report.signal],
+    ['PATTERN',     report.pattern],
+    ['STATE',       report.state],
+    ['NEGOTIATION', report.negotiation],
+    ['DIRECTION',   report.direction]
+  ];
+
+  sections.forEach(function(pair, i) {
+    var sec = document.createElement('div');
+    sec.className = 'report-section';
+
+    var secLbl = document.createElement('span');
+    secLbl.className = 'report-label';
+    secLbl.textContent = '[ ' + pair[0] + ' ]';
+    sec.appendChild(secLbl);
+
+    var txt = document.createElement('div');
+    txt.className = 'report-text';
+    txt.textContent = pair[1];
+    sec.appendChild(txt);
+
+    body.appendChild(sec);
+
+    if (i < sections.length - 1) {
+      var divider = document.createElement('div');
+      divider.className = 'report-divider';
+      body.appendChild(divider);
+    }
+  });
+
+  var quote = document.createElement('div');
+  quote.className = 'closing-quote';
+  quote.textContent = '"The mystery is not the information.\nThe mystery is why we continue negotiating with what we already know."\n\n— Bhavé';
+  body.appendChild(quote);
+
+  wrap.appendChild(body);
+  msgsEl.appendChild(wrap);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+/* ── Init ────────────────────────────────────────────────────────────────── */
 async function init() {
   sendBtn.disabled = true;
-  await appendMsg('system', '[ CHAMBER INITIALIZED ]', 200);
-  await sleep(800);
-  const welcome = 'Welcome to The Chamber.<br><br>This is not a test.<br><br>This is not an assessment.<br><br>This is an observation.<br><br>Answer honestly.<br><br>There are no correct responses.';
-  await appendMsg('chamber', welcome, 300);
+  addMsg('system', '[ CHAMBER INITIALIZED ]');
   await sleep(600);
-  await appendMsg('system', '— ' + SEQUENCE_LABELS[0] + ' —', 100);
+  addMsg('chamber', WELCOME);
+  await sleep(500);
+  addMsg('system', '— ' + SEQ[0] + ' —');
   await sleep(300);
-  await appendMsg('chamber', QUESTIONS[0], 400);
+  addMsg('chamber', QUESTIONS[0]);
   sendBtn.disabled = false;
   inputEl.focus();
   updateProgress();
 }
 
+/* ── Send handler ────────────────────────────────────────────────────────── */
 async function handleSend() {
   if (isLoading || sessionComplete) return;
-  const val = inputEl.value.trim();
+  var val = inputEl.value.trim();
   if (!val) return;
 
   isLoading = true;
@@ -605,20 +577,20 @@ async function handleSend() {
   inputEl.disabled = true;
 
   responses.push({ q: QUESTIONS[currentQ], a: val });
-  await appendMsg('user', val);
+  addMsg('user', val);
   inputEl.value = '';
   currentQ++;
   updateProgress();
 
   if (currentQ < 21) {
     showTyping();
-    await sleep(900 + Math.random() * 400);
+    await sleep(800 + Math.random() * 400);
     removeTyping();
-    if (SEQUENCE_LABELS[currentQ]) {
-      await appendMsg('system', '— ' + SEQUENCE_LABELS[currentQ] + ' —', 100);
-      await sleep(300);
+    if (SEQ[currentQ]) {
+      addMsg('system', '— ' + SEQ[currentQ] + ' —');
+      await sleep(200);
     }
-    await appendMsg('chamber', QUESTIONS[currentQ], 100);
+    addMsg('chamber', QUESTIONS[currentQ]);
     isLoading = false;
     sendBtn.disabled = false;
     inputEl.disabled = false;
@@ -628,13 +600,13 @@ async function handleSend() {
     statusEl.textContent = 'ANALYSIS_RUNNING';
     document.getElementById('input-area').style.display = 'none';
     showTyping();
-    await sleep(600);
+    await sleep(500);
     removeTyping();
-    await appendMsg('system', '— REFLECTION ENGINE ENGAGED —', 100);
+    addMsg('system', '[ REFLECTION ENGINE ENGAGED ]');
     showTyping();
-    const report = await generateReport(responses);
+    var report = await generateReport();
     removeTyping();
-    await renderReport(report);
+    addReport(report);
     sessionComplete = true;
     statusEl.textContent = 'COMPLETE';
     progressEl.style.width = '100%';
@@ -642,19 +614,23 @@ async function handleSend() {
   }
 }
 
-async function generateReport(responses) {
-  const responseText = responses.map((r, i) => 'Q' + (i+1) + ': ' + r.q + '\nA: ' + r.a).join('\n\n');
+/* ── AI report ───────────────────────────────────────────────────────────── */
+async function generateReport() {
+  var text = responses.map(function(r, i) {
+    return 'Q' + (i + 1) + ': ' + r.q + '\nA: ' + r.a;
+  }).join('\n\n');
+
   try {
-    const res = await fetch(BACKEND + '/api/reflect', {
+    var res = await fetch(BACKEND + '/api/reflect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: 'Here are the 21 responses:\n\n' + responseText, systemPrompt: SYSTEM_PROMPT })
+      body: JSON.stringify({ input: 'Here are the 21 responses:\n\n' + text, systemPrompt: SYSTEM_PROMPT })
     });
     if (!res.ok) throw new Error('backend error');
-    const data = await res.json();
-    const clean = (data.text || '').replace(/```json|```/g, '').trim();
+    var data = await res.json();
+    var clean = (data.text || '').replace(/```json|```/g, '').trim();
     return JSON.parse(clean);
-  } catch(e) {
+  } catch (e) {
     return {
       signal: "Something brought you here — and it wasn't random. The responses suggest something is actively seeking attention.",
       pattern: "A recurring structure appears across multiple answers. The same situation arrives in different forms.",
@@ -665,47 +641,46 @@ async function generateReport(responses) {
   }
 }
 
-async function renderReport(report) {
-  const html =
-    '<div class="report-section"><span class="report-label">[ SIGNAL ]</span><div class="report-text">' + escHtml(report.signal) + '</div></div>' +
-    '<div class="report-divider"></div>' +
-    '<div class="report-section"><span class="report-label">[ PATTERN ]</span><div class="report-text">' + escHtml(report.pattern) + '</div></div>' +
-    '<div class="report-divider"></div>' +
-    '<div class="report-section"><span class="report-label">[ STATE ]</span><div class="report-text">' + escHtml(report.state) + '</div></div>' +
-    '<div class="report-divider"></div>' +
-    '<div class="report-section"><span class="report-label">[ NEGOTIATION ]</span><div class="report-text">' + escHtml(report.negotiation) + '</div></div>' +
-    '<div class="report-divider"></div>' +
-    '<div class="report-section"><span class="report-label">[ DIRECTION ]</span><div class="report-text">' + escHtml(report.direction) + '</div></div>' +
-    '<div class="closing-quote">"The mystery is not the information.<br>The mystery is why we continue negotiating with what we already know."<br><br>— Bhavé</div>';
-
-  await appendMsg('system', '[ CHAMBER REFLECTION ]', 200);
-  const reportEl = buildMsg('chamber', html);
-  reportEl.querySelector('.msg-label').textContent = 'REFLECTION_COMPLETE';
-  messagesEl.appendChild(reportEl);
-  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
-  await sleep(300);
-}
-
+/* ── Lead capture ────────────────────────────────────────────────────────── */
 function showLeadCapture() {
-  const cta = document.createElement('div');
+  var cta = document.createElement('div');
   cta.className = 'lead-cta';
-  cta.innerHTML =
-    '<span class="lead-cta-label">[ CONTINUE THE STUDY ]</span>' +
-    '<div class="lead-cta-text">Seven books. One framework. The full sequence — State through Source.<br>Enter your email to receive the library.</div>' +
-    '<input type="email" id="lead-email" placeholder="Your email" />' +
-    '<button class="cta-btn" id="lead-btn" onclick="submitLead()">[ SEND THE LIBRARY ]</button>';
-  messagesEl.appendChild(cta);
-  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
+
+  var ctaLbl = document.createElement('div');
+  ctaLbl.className = 'lead-cta-label';
+  ctaLbl.textContent = '[ CONTINUE THE STUDY ]';
+  cta.appendChild(ctaLbl);
+
+  var ctaTxt = document.createElement('div');
+  ctaTxt.className = 'lead-cta-text';
+  ctaTxt.textContent = 'Seven books. One framework. The full sequence — State through Source.\nEnter your email to receive the library.';
+  cta.appendChild(ctaTxt);
+
+  var emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.id = 'lead-email';
+  emailInput.placeholder = 'Your email';
+  cta.appendChild(emailInput);
+
+  var btn = document.createElement('button');
+  btn.className = 'cta-btn';
+  btn.textContent = '[ SEND THE LIBRARY ]';
+  btn.onclick = submitLead;
+  cta.appendChild(btn);
+
+  msgsEl.appendChild(cta);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
 async function submitLead() {
-  const emailInput = document.getElementById('lead-email');
-  const email = emailInput.value.trim();
+  var emailInput = document.getElementById('lead-email');
+  var email = emailInput.value.trim();
   if (!email || !email.includes('@')) {
     emailInput.style.borderColor = 'var(--gold)';
     return;
   }
-  const btn = document.getElementById('lead-btn');
+
+  var btn = msgsEl.querySelector('.cta-btn');
   btn.disabled = true;
   btn.textContent = '[ LOGGING... ]';
 
@@ -713,19 +688,19 @@ async function submitLead() {
     await fetch(BACKEND + '/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, source: 'the-chamber' })
+      body: JSON.stringify({ email: email, source: 'the-chamber' })
     });
-  } catch(e) { /* silent */ }
+  } catch (e) { /* silent */ }
 
   btn.style.display = 'none';
   emailInput.style.display = 'none';
-  const success = document.createElement('div');
-  success.className = 'cta-success';
-  success.textContent = '[ SIGNAL_RECEIVED — CHECK YOUR INBOX ]';
-  btn.parentNode.appendChild(success);
+  var ok = document.createElement('div');
+  ok.className = 'cta-success';
+  ok.textContent = '[ SIGNAL_RECEIVED — CHECK YOUR INBOX ]';
+  btn.parentNode.appendChild(ok);
 }
 
-inputEl.addEventListener('keydown', e => {
+inputEl.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     handleSend();
