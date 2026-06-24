@@ -111,27 +111,28 @@
 
   .messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 0 0 24px;
     display: flex;
     flex-direction: column;
     gap: 32px;
     scrollbar-width: none;
-    scroll-behavior: smooth;
   }
   .messages::-webkit-scrollbar { display: none; }
 
+  /* animation-fill-mode: both applies the 'from' state before the animation
+     starts, removing the need for a conflicting base opacity: 0 rule */
   .msg {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    animation: fadeIn 0.5s ease forwards;
-    opacity: 0;
+    animation: fadeIn 0.5s ease both;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .msg-label {
@@ -312,8 +313,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    animation: fadeIn 0.5s ease 0.3s forwards;
-    opacity: 0;
+    animation: fadeIn 0.5s ease 0.3s both;
   }
 
   .lead-cta-label {
@@ -493,28 +493,72 @@ const statusEl   = document.getElementById('status-text');
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+function scrollBottom() {
+  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+/* Build a message element explicitly — textContent for plain text,
+   innerHTML only when content is known to contain markup (<br> etc.) */
+function buildMsg(type, content) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + type;
+
+  if (type === 'chamber') {
+    const label = document.createElement('span');
+    label.className = 'msg-label';
+    label.textContent = 'CHAMBER';
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    /* Use innerHTML only when content contains markup; otherwise textContent */
+    if (content.indexOf('<') !== -1) {
+      body.innerHTML = content;
+    } else {
+      body.textContent = content;
+    }
+    el.appendChild(label);
+    el.appendChild(body);
+  } else if (type === 'user') {
+    const label = document.createElement('span');
+    label.className = 'msg-label';
+    label.textContent = 'INPUT_RECEIVED';
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    body.textContent = content;
+    el.appendChild(label);
+    el.appendChild(body);
+  } else {
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    body.innerHTML = content;
+    el.appendChild(body);
+  }
+
+  return el;
+}
+
 async function appendMsg(type, content, delay) {
   if (delay) await sleep(delay);
-  const el = document.createElement('div');
-  el.className = `msg ${type}`;
-  if (type === 'chamber') {
-    el.innerHTML = `<span class="msg-label">CHAMBER</span><div class="msg-body">${content}</div>`;
-  } else if (type === 'user') {
-    el.innerHTML = `<span class="msg-label">INPUT_RECEIVED</span><div class="msg-body">${escHtml(content)}</div>`;
-  } else {
-    el.innerHTML = `<div class="msg-body">${content}</div>`;
-  }
+  const el = buildMsg(type, content);
   messagesEl.appendChild(el);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollBottom();
 }
 
 function showTyping() {
   const el = document.createElement('div');
   el.id = 'typing-indicator';
   el.className = 'msg chamber';
-  el.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+  const dots = document.createElement('div');
+  dots.className = 'typing';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  el.appendChild(dots);
   messagesEl.appendChild(el);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollBottom();
 }
 
 function removeTyping() {
@@ -525,23 +569,18 @@ function removeTyping() {
 function updateProgress() {
   progressEl.style.width = Math.round((currentQ / 21) * 100) + '%';
   if (currentQ < 21) {
-    qCounter.textContent = `SIGNAL_${String(currentQ + 1).padStart(2,'0')} / 21`;
+    qCounter.textContent = 'SIGNAL_' + String(currentQ + 1).padStart(2,'0') + ' / 21';
   }
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
 }
 
 async function init() {
   sendBtn.disabled = true;
   await appendMsg('system', '[ CHAMBER INITIALIZED ]', 200);
   await sleep(800);
-  await appendMsg('chamber', `Welcome to The Chamber.\n\nThis is not a test.\n\nThis is not an assessment.\n\nThis is an observation.\n\nAnswer honestly.\n\nThere are no correct responses.`.replace(/\n/g,'<br>'), 300);
+  const welcome = 'Welcome to The Chamber.<br><br>This is not a test.<br><br>This is not an assessment.<br><br>This is an observation.<br><br>Answer honestly.<br><br>There are no correct responses.';
+  await appendMsg('chamber', welcome, 300);
   await sleep(600);
-  if (SEQUENCE_LABELS[0]) await appendMsg('system', `— ${SEQUENCE_LABELS[0]} —`, 100);
+  await appendMsg('system', '— ' + SEQUENCE_LABELS[0] + ' —', 100);
   await sleep(300);
   await appendMsg('chamber', QUESTIONS[0], 400);
   sendBtn.disabled = false;
@@ -569,7 +608,7 @@ async function handleSend() {
     await sleep(900 + Math.random() * 400);
     removeTyping();
     if (SEQUENCE_LABELS[currentQ]) {
-      await appendMsg('system', `— ${SEQUENCE_LABELS[currentQ]} —`, 100);
+      await appendMsg('system', '— ' + SEQUENCE_LABELS[currentQ] + ' —', 100);
       await sleep(300);
     }
     await appendMsg('chamber', QUESTIONS[currentQ], 100);
@@ -597,12 +636,12 @@ async function handleSend() {
 }
 
 async function generateReport(responses) {
-  const responseText = responses.map((r, i) => `Q${i+1}: ${r.q}\nA: ${r.a}`).join('\n\n');
+  const responseText = responses.map((r, i) => 'Q' + (i+1) + ': ' + r.q + '\nA: ' + r.a).join('\n\n');
   try {
-    const res = await fetch(`${BACKEND}/api/reflect`, {
+    const res = await fetch(BACKEND + '/api/reflect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: `Here are the 21 responses:\n\n${responseText}`, systemPrompt: SYSTEM_PROMPT })
+      body: JSON.stringify({ input: 'Here are the 21 responses:\n\n' + responseText, systemPrompt: SYSTEM_PROMPT })
     });
     if (!res.ok) throw new Error('backend error');
     const data = await res.json();
@@ -620,59 +659,41 @@ async function generateReport(responses) {
 }
 
 async function renderReport(report) {
-  const html = `
-    <div class="report-section">
-      <span class="report-label">[ SIGNAL ]</span>
-      <div class="report-text">${escHtml(report.signal)}</div>
-    </div>
-    <div class="report-divider"></div>
-    <div class="report-section">
-      <span class="report-label">[ PATTERN ]</span>
-      <div class="report-text">${escHtml(report.pattern)}</div>
-    </div>
-    <div class="report-divider"></div>
-    <div class="report-section">
-      <span class="report-label">[ STATE ]</span>
-      <div class="report-text">${escHtml(report.state)}</div>
-    </div>
-    <div class="report-divider"></div>
-    <div class="report-section">
-      <span class="report-label">[ NEGOTIATION ]</span>
-      <div class="report-text">${escHtml(report.negotiation)}</div>
-    </div>
-    <div class="report-divider"></div>
-    <div class="report-section">
-      <span class="report-label">[ DIRECTION ]</span>
-      <div class="report-text">${escHtml(report.direction)}</div>
-    </div>
-    <div class="closing-quote">"The mystery is not the information.<br>The mystery is why we continue negotiating with what we already know."<br><br>— Bhavé</div>`;
+  const html =
+    '<div class="report-section"><span class="report-label">[ SIGNAL ]</span><div class="report-text">' + escHtml(report.signal) + '</div></div>' +
+    '<div class="report-divider"></div>' +
+    '<div class="report-section"><span class="report-label">[ PATTERN ]</span><div class="report-text">' + escHtml(report.pattern) + '</div></div>' +
+    '<div class="report-divider"></div>' +
+    '<div class="report-section"><span class="report-label">[ STATE ]</span><div class="report-text">' + escHtml(report.state) + '</div></div>' +
+    '<div class="report-divider"></div>' +
+    '<div class="report-section"><span class="report-label">[ NEGOTIATION ]</span><div class="report-text">' + escHtml(report.negotiation) + '</div></div>' +
+    '<div class="report-divider"></div>' +
+    '<div class="report-section"><span class="report-label">[ DIRECTION ]</span><div class="report-text">' + escHtml(report.direction) + '</div></div>' +
+    '<div class="closing-quote">“The mystery is not the information.<br>The mystery is why we continue negotiating with what we already know.”<br><br>— Bhavé</div>';
 
   await appendMsg('system', '[ CHAMBER REFLECTION ]', 200);
-  const reportEl = document.createElement('div');
-  reportEl.className = 'msg chamber';
-  reportEl.style.animationDelay = '0.1s';
-  reportEl.innerHTML = `<span class="msg-label">REFLECTION_COMPLETE</span><div class="msg-body">${html}</div>`;
+  const reportEl = buildMsg('chamber', html);
+  reportEl.querySelector('.msg-label').textContent = 'REFLECTION_COMPLETE';
   messagesEl.appendChild(reportEl);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollBottom();
   await sleep(300);
 }
 
 function showLeadCapture() {
   const cta = document.createElement('div');
   cta.className = 'lead-cta';
-  cta.innerHTML = `
-    <span class="lead-cta-label">[ CONTINUE THE STUDY ]</span>
-    <div class="lead-cta-text">Seven books. One framework. The full sequence — State through Source.<br>Enter your email to receive the library.</div>
-    <input type="email" id="lead-email" placeholder="Your email" />
-    <button class="cta-btn" id="lead-btn" onclick="submitLead()">[ SEND THE LIBRARY ]</button>
-  `;
+  cta.innerHTML =
+    '<span class="lead-cta-label">[ CONTINUE THE STUDY ]</span>' +
+    '<div class="lead-cta-text">Seven books. One framework. The full sequence — State through Source.<br>Enter your email to receive the library.</div>' +
+    '<input type="email" id="lead-email" placeholder="Your email" />' +
+    '<button class="cta-btn" id="lead-btn" onclick="submitLead()">[ SEND THE LIBRARY ]</button>';
   messagesEl.appendChild(cta);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollBottom();
 }
 
 async function submitLead() {
-  const email = document.getElementById('lead-email').value.trim();
   const emailInput = document.getElementById('lead-email');
+  const email = emailInput.value.trim();
   if (!email || !email.includes('@')) {
     emailInput.style.borderColor = 'var(--gold)';
     return;
@@ -682,12 +703,12 @@ async function submitLead() {
   btn.textContent = '[ LOGGING... ]';
 
   try {
-    await fetch(`${BACKEND}/api/notify`, {
+    await fetch(BACKEND + '/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, source: 'the-chamber' })
     });
-  } catch(e) { /* silent — still show success */ }
+  } catch(e) { /* silent */ }
 
   btn.style.display = 'none';
   emailInput.style.display = 'none';
