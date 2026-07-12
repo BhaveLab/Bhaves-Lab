@@ -130,6 +130,8 @@
   /* ── REFLECTION PANEL ── */
   .reflection-panel { display: none; margin: 1.5rem 0; padding: 1.5rem 1.75rem; border: 1px solid rgba(201,169,110,0.2); background: rgba(201,169,110,0.03); }
   .reflection-panel.sit-with-it { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.05); }
+  .reflection-panel.unseen { border-color: rgba(107,107,107,0.3); background: rgba(107,107,107,0.03); }
+  .reflection-panel.unseen .reflection-tag { color: var(--ash); }
   .reflection-tag { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 0.75rem; }
   .reflection-text { font-size: 1rem; font-weight: 300; font-style: italic; color: var(--smoke); line-height: 1.75; }
   .sit-action { margin-top: 1.25rem; display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -542,6 +544,63 @@
 </div>
 
 <script>
+// ── NUMEROLOGY ENGINE — PYTHAGOREAN SYSTEM ──────────────────────────────────
+// Pure functions. No API calls. Master numbers (11, 22, 33) are preserved,
+// not reduced further, per standard convention.
+const LETTER_VALUES = {
+  a:1, j:1, s:1,
+  b:2, k:2, t:2,
+  c:3, l:3, u:3,
+  d:4, m:4, v:4,
+  e:5, n:5, w:5,
+  f:6, o:6, x:6,
+  g:7, p:7, y:7,
+  h:8, q:8, z:8,
+  i:9, r:9
+};
+const VOWELS = new Set(['a','e','i','o','u']);
+const MASTER_NUMBERS = new Set([11, 22, 33]);
+
+function reduceNumber(n) {
+  while (n > 9 && !MASTER_NUMBERS.has(n)) {
+    n = String(n).split('').reduce((sum, d) => sum + Number(d), 0);
+  }
+  return n;
+}
+
+// birthDate expected as 'DD/MM/YYYY' (matches existing birthDate variable)
+function calculateLifePath(birthDateStr) {
+  const digits = birthDateStr.replace(/\D/g, '');
+  const sum = digits.split('').reduce((acc, d) => acc + Number(d), 0);
+  return reduceNumber(sum);
+}
+
+function calculateExpressionNumber(fullName) {
+  const letters = fullName.toLowerCase().replace(/[^a-z]/g, '');
+  const sum = letters.split('').reduce((acc, ch) => acc + (LETTER_VALUES[ch] || 0), 0);
+  return reduceNumber(sum);
+}
+
+function calculateSoulUrgeNumber(fullName) {
+  const letters = fullName.toLowerCase().replace(/[^a-z]/g, '');
+  const sum = letters.split('').reduce((acc, ch) => {
+    return VOWELS.has(ch) ? acc + (LETTER_VALUES[ch] || 0) : acc;
+  }, 0);
+  return reduceNumber(sum);
+}
+
+// Master entry point — call this once at completion, same place birthData is read
+function computeNumerology(name, birthDateStr) {
+  if (!name || !birthDateStr) return null;
+  return {
+    lifePath:    calculateLifePath(birthDateStr),
+    expression:  calculateExpressionNumber(name),
+    soulUrge:    calculateSoulUrgeNumber(name)
+  };
+}
+</script>
+
+<script>
 // ── COSMOS ──────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('cosmos');
 const ctx = canvas.getContext('2d');
@@ -656,20 +715,25 @@ setTimeout(spawnShooter, 1000);
 // ── EVAL PROMPT ──────────────────────────────────────────────────────────────
 const EVAL_PROMPT = `The student's name is {{userName}}. Address them by their first name directly in your reflection — not they/them. Example: [Name], that answer…
 
-You are evaluating a course answer for depth and completeness. The question was: {{question}}
+You are evaluating a course answer. The question was: {{question}}
 The user answered: {{answer}}
 
-Did they actually answer what was asked with specific, embodied detail — not just conceptual language?
+Calibration note: For sections 01 and 02, accept answers that name a real pattern with genuine personal specificity even without body-level or phenomenological detail. Save the deeper depth requirements for sections 04 through 10.
 
-Calibration note: For sections 01 and 02, accept answers that name a real pattern with genuine personal specificity even without body-level or phenomenological detail. Only flag as surface if the answer is truly vague, generic, or avoidant. Save the deeper depth requirements for sections 04 through 10.
+Classify this answer into exactly one of three categories:
 
-If the answer is complete and specific return:
-{ "signal": false, "mirror": "one sentence reflecting the structural pattern in what they said — observational, not affirming" }
+1. "complete" — They engaged honestly and said something specific and real, whether or not it matches expected framework language. Accept genuine attempts in their own words. Do not require precise terminology.
 
-If incomplete return:
-{ "signal": true, "gap": "exactly what was not addressed" }
+2. "unseen" — They genuinely do not see a pattern here and said so honestly ("I don't know," "nothing comes up," "I've never noticed"). This is NOT a gap to close. This is valid data. Do not push them to try harder.
 
-Return JSON only. No other text.`;
+3. "avoidant" — The answer is vague, deflecting, or clearly stops short of something the person could say if they were being honest ("everything's fine," "not sure" with no actual attempt to look).
+
+The difference between "unseen" and "avoidant" is effort, not certainty. Someone who tried and came up empty is "unseen." Someone who didn't try is "avoidant."
+
+Return JSON only. No other text.
+- If complete: { "signal": "complete", "mirror": "one sentence reflecting the structural pattern in what they said — observational, not affirming" }
+- If unseen: { "signal": "unseen", "mirror": "one sentence acknowledging this honestly — do not name a pattern that isn't there, do not encourage them to look harder. Just name that this hasn't surfaced yet." }
+- If avoidant: { "signal": "avoidant", "gap": "exactly what was not addressed" }`;
 
 // ── SECTIONS DATA ────────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -678,7 +742,7 @@ const SECTIONS = [
     layer: 'ENTRY LAYER', activeNodes: [],
     context: 'Before anything can be studied, something has to be noticed. Most of what runs your experience has never been looked at directly. Not because it is hidden — because looking at it directly has never been the instruction. This section begins there.',
     questions: [
-      { text: 'What is one thing about how you operate — a pattern, a reaction, a way of moving through situations — that you have noticed but never fully examined?', placeholder: 'Write what actually comes up, not what sounds right.' },
+      { text: "What's one thing about how you operate — a pattern, a reaction, a habit — that you've noticed in yourself but never really looked at closely?", placeholder: 'Write what actually comes up, not what sounds right.' },
       { text: 'What do the people closest to you see in you that you tend to dismiss or deflect?', placeholder: 'What they say, and what you do with it.' },
       { text: 'When something goes wrong in your life, what is the first explanation you reach for?', placeholder: 'The go-to explanation. Where does the cause land?' },
       { text: 'What behavior do you repeat that you do not fully understand?', placeholder: 'Something you keep doing without knowing exactly why.' },
@@ -703,12 +767,12 @@ const SECTIONS = [
     layer: 'SEQUENCE LAYER', activeNodes: ['State','Perception','Formation','Decision','Experience','Reality'],
     context: 'State — Perception — Formation — Decision — Experience — Reality. This is the actual sequence through which every experience you have is generated. Not a model. The operating architecture. Each layer runs on top of the one before it. This section walks you through it using a real situation from your own life.',
     questions: [
-      { text: 'Think of a situation in your life right now that feels unresolved or stuck. What is your actual State when you think about it — physically, energetically, right now?', placeholder: 'The body-level condition when this situation enters your awareness.' },
-      { text: 'In that same situation — what are you Perceiving? What are you noticing, and what might you be filtering out?', placeholder: 'What registers as real or significant. What your attention selects.' },
-      { text: 'What meaning are you forming about that situation — what story, conclusion, or interpretation has solidified?', placeholder: 'The meaning that feels like fact. The formation layer.' },
-      { text: 'From the position you just described — what decisions feel available to you? What options can you actually see?', placeholder: 'The choices visible from inside your current State and Perception.' },
-      { text: 'What decisions are invisible or unavailable from that same position — and why?', placeholder: 'What you cannot see or reach from where you currently stand.' },
-      { text: 'What would change if your State going into this situation were different?', placeholder: 'If the ground-level condition shifted — what else would shift?' }
+      { text: "Think of something in your life right now that feels stuck. What's actually happening in your body when you think about it?", placeholder: 'The body-level condition when this situation enters your awareness.' },
+      { text: "In that same situation — what do you notice first? And what might you be missing, or not letting yourself see?", placeholder: 'What registers as real or significant. What your attention selects.' },
+      { text: "What story have you settled on about that situation — the explanation that now feels like fact?", placeholder: 'The meaning that feels like fact. The formation layer.' },
+      { text: "Given all that — what choices do you feel like you actually have right now?", placeholder: 'The choices visible from inside your current State and Perception.' },
+      { text: "What choices might exist that you can't see from where you're standing right now? Any guess why they're hard to see?", placeholder: 'What you cannot see or reach from where you currently stand.' },
+      { text: "If you walked into this situation in a completely different mood or condition — what do you think would actually change?", placeholder: 'If the ground-level condition shifted — what else would shift?' }
     ]
   },
   {
@@ -721,7 +785,7 @@ const SECTIONS = [
       { text: 'What does the pattern protect you from?', placeholder: 'What it keeps at a distance. What it makes unnecessary to face.' },
       { text: 'What triggers it — and how quickly does it run before you become aware of it?', placeholder: 'The conditions that activate it. The speed at which it operates.' },
       { text: 'What have you told yourself about this pattern that might not be accurate?', placeholder: 'The story you carry about why it exists or what it means.' },
-      { text: 'When the pattern runs — what does life look like from inside it compared to when it is not running?', placeholder: 'Two different operational realities. What is different between them?' }
+      { text: "When this pattern is running, what does your day actually look like? What's different when it's not running?", placeholder: 'Two different operational realities. What is different between them?' }
     ]
   },
   {
@@ -730,11 +794,11 @@ const SECTIONS = [
     context: 'The Observer is the part of awareness that can watch what is happening without merging with it. Most people are inside their patterns — living them, driven by them, identified with them. The Observer is not a different self. It is the same awareness turned toward itself. The moment you notice you are in a pattern is already the Observer working.',
     questions: [
       { text: 'Describe a recent moment when you caught yourself in a pattern while it was happening — not after, but during. What was happening?', placeholder: 'The situation. The pattern. The moment of recognition while inside it.' },
-      { text: 'What does it actually feel like to watch yourself from inside a pattern — the specific quality of that double awareness?', placeholder: 'The phenomenology of it. What is it like to be in it and watching it simultaneously.' },
+      { text: "What does it actually feel like to notice yourself doing something while you're still doing it? Describe the actual feeling, not the idea of it.", placeholder: 'The phenomenology of it. What is it like to be in it and watching it simultaneously.' },
       { text: 'What is the difference between observing something in yourself and judging it?', placeholder: 'Not the conceptual answer — what is the actual felt difference in your experience?' },
       { text: 'What patterns are hardest for you to observe without becoming them?', placeholder: 'Where the Observer collapses back into identification.' },
-      { text: 'When you are in a strong emotional state — what can you still observe, and what goes completely dark?', placeholder: 'The boundary of your Observer capacity. Where it holds and where it loses ground.' },
-      { text: 'What does the Observer notice that the person inside the pattern cannot see?', placeholder: 'The view that only becomes available from outside the pattern.' }
+      { text: "When you're in a strong emotional state, what can you still notice about yourself — and what do you completely lose sight of?", placeholder: 'The boundary of your Observer capacity. Where it holds and where it loses ground.' },
+      { text: "What can you only see about yourself after the fact — once you've stepped back — that you couldn't see while you were in it?", placeholder: 'The view that only becomes available from outside the pattern.' }
     ]
   },
   {
@@ -742,13 +806,13 @@ const SECTIONS = [
     layer: 'PERCEPTION TO FORMATION', activeNodes: ['Perception','Formation'],
     context: 'Patterns are not random. They have structure. The same core pattern often runs underneath very different surface situations — relationships, work, money, conflict — wearing different costumes. Recognizing the structure underneath the content is the shift from reacting to observing. The pattern is not the problem. Not seeing it is.',
     questions: [
-      { text: 'What is one pattern that has appeared in multiple areas of your life — different circumstances, different people, different contexts — but with a recognizable structure underneath?', placeholder: 'Name the pattern and at least two different areas it appears.' },
-      { text: 'Describe the structure of that pattern — not the individual stories, the actual underlying shape. What is the same in all of them?', placeholder: 'Strip the context away. What is the repeating architecture?' },
+      { text: "What's one pattern that shows up in more than one area of your life — different people, different situations — but feels like the same thing underneath?", placeholder: 'Name the pattern and at least two different areas it appears.' },
+      { text: "Strip away the specific details — the people, the situations. What's the actual shape that repeats every time?", placeholder: 'Strip the context away. What is the repeating architecture?' },
       { text: 'What role do you consistently play when that pattern runs?', placeholder: 'The position you take. The function you serve inside the pattern.' },
       { text: 'What does the pattern cost you — and what does it give you?', placeholder: 'Both sides. What is lost and what is gained by its operation.' },
       { text: 'At what point in the pattern do you have the most awareness? At what point do you have the least?', placeholder: 'Where in the pattern can you see clearly, and where do you go blind?' },
       { text: 'If this pattern disappeared tomorrow — what would you have to face that it currently keeps at a distance?', placeholder: 'What the pattern is protecting you from having to encounter.' },
-      { text: 'Where in the sequence does this pattern initiate — at State, Perception, or Formation?', placeholder: 'The layer at which the pattern begins to organize. Your best observation.' }
+      { text: "Does this pattern seem to start with how your body feels, with what you notice first, or with the meaning you jump to? Just take your best guess.", placeholder: 'The layer at which the pattern begins to organize. Your best observation.' }
     ]
   },
   {
@@ -756,9 +820,9 @@ const SECTIONS = [
     layer: 'DECISION LAYER', activeNodes: ['Decision'],
     context: 'A loop returns to the same point. A spiral returns to the same position but at a different depth — same territory, different layer of understanding. Most people cannot tell the difference from the inside. The loop feels like movement. The spiral feels like being stuck. The question is not which one is happening — it is whether you can see which one is happening.',
     questions: [
-      { text: 'Pick something you have been working on, thinking about, or moving through for a long time. Describe what the territory looks like from where you currently stand.', placeholder: 'The situation as it actually appears right now. Not the history — the present position.' },
-      { text: 'What is the evidence that you are in a spiral — that genuine depth has been added even if the territory is familiar?', placeholder: 'Specific evidence. What has actually changed in how you engage with this?' },
-      { text: 'What would the loop version of this look like — if you were looping and could not see it, what would the evidence be?', placeholder: 'Make the case for the loop. What would indicate it is not movement at all?' },
+      { text: "Pick something you've been dealing with or working on for a long time. Describe where things actually stand right now.", placeholder: 'The situation as it actually appears right now. Not the history — the present position.' },
+      { text: "What's the evidence that you've actually grown with this, even though it feels familiar? What's genuinely different this time?", placeholder: 'Specific evidence. What has actually changed in how you engage with this?' },
+      { text: "If you were actually stuck in a repeat loop and couldn't tell — what would that look like? Make the case for it.", placeholder: 'Make the case for the loop. What would indicate it is not movement at all?' },
       { text: 'What decision keeps getting made in the same way — producing a similar result?', placeholder: 'The recurring decision point. The choice that repeats.' },
       { text: 'What have you actually learned in this territory — and how has that learning changed your behavior, not just your understanding?', placeholder: 'Behavior change, not insight. What do you do differently?' },
       { text: 'What is the decision you keep approaching and not making — that, if made, would actually break the pattern?', placeholder: 'The avoided decision. The one that would change the shape of things.' }
@@ -770,7 +834,7 @@ const SECTIONS = [
     context: 'This section does not introduce a new concept. It asks you to apply everything from the previous seven sections to something happening right now. Not a memory. Not a hypothetical. What is actually active in your experience at this moment — and can you watch it as it runs?',
     questions: [
       { text: 'What is most active in your awareness right now — in this moment, doing this work?', placeholder: 'Real-time. What is present right now, not what you think should be.' },
-      { text: 'Where in the sequence can you feel what is active most clearly — State, Perception, Formation, or Decision?', placeholder: 'Locate it in the sequence. Which layer is it most alive at?' },
+      { text: "Right now, is what's active more in your body, in what you're noticing, in the meaning you're making, or in a choice you're facing? Take your best guess.", placeholder: 'Locate it in the sequence. Which layer is it most alive at?' },
       { text: 'What are you noticing about how you are engaging with this study — honestly?', placeholder: 'The quality of your engagement. What you have brought to it and what you have withheld.' },
       { text: 'What sections have you moved through quickly — and what does that movement tell you?', placeholder: 'Speed is information. Where did you not slow down when the question asked for it?' },
       { text: 'What has surfaced across this work that you did not expect?', placeholder: 'What arrived that was not part of the plan. What showed up uninvited.' },
@@ -782,12 +846,12 @@ const SECTIONS = [
     layer: 'DECISION TO EXPERIENCE', activeNodes: ['Decision','Experience'],
     context: 'Between the pattern initiating and the behavior executing, there is a gap. Most of the time that gap is invisible — the pattern runs before there is any awareness of it. But the gap exists. The Interruption Point is not about willpower or stopping the pattern. It is about finding the gap — the moment before the automatic becomes complete — and recognizing it as the actual location of choice.',
     questions: [
-      { text: 'In one of the patterns you identified in this session — can you locate the Interruption Point? The moment between the trigger and the automatic response where something else is possible?', placeholder: 'Describe that moment as specifically as you can. What is present there?' },
-      { text: 'What does the gap actually feel like — its texture, its duration, its quality?', placeholder: 'Not what you should do in the gap. What is it actually like to be there?' },
-      { text: 'What makes it hard to stay in the gap rather than letting the pattern complete?', placeholder: 'The pressure that pushes you through it. What makes the gap uncomfortable to inhabit.' },
-      { text: 'What has happened on the occasions when you did interrupt the pattern — what actually changed?', placeholder: 'A real instance. What was different when you stayed in the gap.' },
+      { text: "Think of one of the patterns from this session. Is there a moment — right between what sets it off and what you do automatically — where you could do something different? Try to find that moment.", placeholder: 'Describe that moment as specifically as you can. What is present there?' },
+      { text: "What does that moment actually feel like? How long does it last? What's it like to be in it?", placeholder: 'Not what you should do in the gap. What is it actually like to be there?' },
+      { text: "What makes it hard to stay in that moment instead of just letting the pattern run?", placeholder: 'The pressure that pushes you through it. What makes the gap uncomfortable to inhabit.' },
+      { text: "Think of a time you actually caught the pattern before it finished running. What happened instead?", placeholder: 'A real instance. What was different when you stayed in the gap.' },
       { text: 'What does the pattern tell you will happen if you do not let it complete?', placeholder: 'The threat or prediction the pattern makes. What it says will occur if interrupted.' },
-      { text: 'What would need to be different — internally, not externally — for you to reach that gap more consistently?', placeholder: 'The internal condition that would allow you to meet the Interruption Point more often.' }
+      { text: "What would need to change inside you — not around you — to catch that moment more often?", placeholder: 'The internal condition that would allow you to meet the Interruption Point more often.' }
     ]
   },
   {
@@ -795,11 +859,11 @@ const SECTIONS = [
     layer: 'REALITY LAYER', activeNodes: ['Reality'],
     context: 'The sequence completes and begins again. Reality is not the end — it is the feedback that informs the next State. Integration is not a conclusion. It is a recognition: what you have observed across this work is now part of the system that is observing. The map has changed because you looked at it.',
     questions: [
-      { text: 'What is the most significant thing that surfaced across this entire session — not the most comfortable, not the most conceptually interesting, but the thing with the most actual weight for how you operate?', placeholder: 'The thing with the most charge. Not the easiest insight — the most significant one.' },
-      { text: 'What pattern showed up most consistently across the ten sections — appearing in different forms but with the same underlying structure?', placeholder: 'The thread that ran through the most territory.' },
+      { text: "Out of everything that came up in this session, what feels like it actually matters most — not the most interesting idea, but the thing with the most real weight?", placeholder: 'The thing with the most charge. Not the easiest insight — the most significant one.' },
+      { text: "What pattern kept showing up across different sections, even when it looked different each time?", placeholder: 'The thread that ran through the most territory.' },
       { text: 'What did you move past quickly that deserves more attention?', placeholder: 'The question you answered fast. The section you did not slow down for.' },
       { text: 'What has shifted — even slightly — in how you see yourself, a pattern, or a situation after this session?', placeholder: 'Not what you think should have shifted. What actually has.' },
-      { text: 'What is the one thing you now know that changes what is possible?', placeholder: 'A specific observation. Not a general insight — a particular thing that changes the field.' },
+      { text: "What's one thing you know now that opens up new options?", placeholder: 'A specific observation. Not a general insight — a particular thing that changes the field.' },
       { text: 'What will you observe differently — starting today — that you were not observing before this session?', placeholder: 'Concrete and specific. What will your attention move toward that it was not moving toward before.' }
     ]
   }
@@ -818,6 +882,11 @@ let sectionFlags = [];
 let openingState = '';
 let pendingGap        = '';
 let overallPatternText = '';
+let numerologyData = null;
+let sectionSummaries = {};
+let mirrorAwarenessText = '';
+let movingForwardText = '';
+let numerologyReadingText = '';
 let isReflecting      = false;  // true while an API call is in-flight; reset by renderQuestion
 
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
@@ -965,7 +1034,7 @@ function renderQuestion(sIndex, qIndex) {
 
   // ── Reset all response panels before rendering new HTML ─────────────────────
   // Guards against leftover state from the previous question bleeding through.
-  ['sit-panel', 'claude-panel', 'advance-block', 'sit-text', 'claude-text'].forEach(function(id) {
+  ['sit-panel', 'claude-panel', 'unseen-panel', 'advance-block', 'sit-text', 'claude-text', 'unseen-text'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   });
@@ -1029,6 +1098,10 @@ function renderQuestion(sIndex, qIndex) {
       <div class="reflection-tag">[ REFLECTED ]</div>
       <div class="reflection-text" id="claude-text"></div>
     </div>
+    <div class="reflection-panel unseen" id="unseen-panel">
+      <div class="reflection-tag">[ NOT YET VISIBLE ]</div>
+      <div class="reflection-text" id="unseen-text"></div>
+    </div>
     <div class="advance-block" id="advance-block" style="display:none">
       <button class="btn-advance" id="next-btn">${
         qIndex < totalQuestions - 1
@@ -1065,7 +1138,7 @@ function renderQuestion(sIndex, qIndex) {
   const advanceAnywayEl = document.getElementById('advance-anyway-btn');
   if (advanceAnywayEl) advanceAnywayEl.addEventListener('click', () => {
     const answer      = (document.getElementById('answer-input') || { value: '' }).value.trim();
-    recordAnswer(currentSection, currentQuestion, answer, pendingGap, true);
+    recordAnswer(currentSection, currentQuestion, answer, pendingGap, 'avoidant');
     const sitPanel    = document.getElementById('sit-panel');
     const btn         = document.getElementById('submit-btn');
     const advBlock    = document.getElementById('advance-block');
@@ -1169,7 +1242,9 @@ async function handleReflectClick() {
     const result = await callClaude(prompt, answer);
     console.log('API response:', JSON.stringify(result));
 
-    const isIncomplete = result.signal === true || result.signal === 'true' || result.signal === 1;
+    const isComplete  = result.signal === 'complete';
+    const isUnseen    = result.signal === 'unseen';
+    const isAvoidant  = result.signal === 'avoidant';
 
     unlockSubmit();
 
@@ -1179,12 +1254,13 @@ async function handleReflectClick() {
     console.log('sit-panel exists:', !!document.getElementById('sit-panel'));
     console.log('claude-panel exists:', !!document.getElementById('claude-panel'));
 
-    const sitPanelEl    = document.getElementById('sit-panel');
-    const claudePanelEl = document.getElementById('claude-panel');
-    const submitBtnEl   = document.getElementById('submit-btn');
+    const sitPanelEl     = document.getElementById('sit-panel');
+    const claudePanelEl  = document.getElementById('claude-panel');
+    const unseenPanelEl  = document.getElementById('unseen-panel');
+    const submitBtnEl    = document.getElementById('submit-btn');
     const advanceBlockEl = document.getElementById('advance-block');
 
-    if (isIncomplete) {
+    if (isAvoidant) {
       sectionFlags.push({ section: s.title, num: s.num, question: qIndex + 1, type: 'SIGNAL' });
       pendingGap = result.gap || 'There is more here — sit with the question again.';
       const sitTextEl = document.getElementById('sit-text');
@@ -1195,6 +1271,24 @@ async function handleReflectClick() {
         sitPanelEl.style.visibility = 'visible';
         sitPanelEl.style.opacity    = '1';
         console.log('sit-panel computed display:', window.getComputedStyle(document.getElementById('sit-panel')).display);
+      }
+    } else if (isUnseen) {
+      const mirrorText = result.mirror || '';
+      const unseenTextEl = document.getElementById('unseen-text');
+      if (unseenTextEl) unseenTextEl.textContent = mirrorText;
+      if (unseenPanelEl) {
+        unseenPanelEl.classList.remove('hidden');
+        unseenPanelEl.style.display    = 'block';
+        unseenPanelEl.style.visibility = 'visible';
+        unseenPanelEl.style.opacity    = '1';
+      }
+      if (submitBtnEl) submitBtnEl.style.display = 'none';
+      recordAnswer(sIndex, qIndex, answer, mirrorText, 'unseen');
+      if (advanceBlockEl) {
+        advanceBlockEl.classList.remove('hidden');
+        advanceBlockEl.style.display    = 'block';
+        advanceBlockEl.style.visibility = 'visible';
+        advanceBlockEl.style.opacity    = '1';
       }
     } else {
       const mirrorText = result.mirror || '';
@@ -1207,7 +1301,7 @@ async function handleReflectClick() {
         claudePanelEl.style.opacity    = '1';
       }
       if (submitBtnEl) submitBtnEl.style.display = 'none';
-      recordAnswer(sIndex, qIndex, answer, mirrorText, false);
+      recordAnswer(sIndex, qIndex, answer, mirrorText, 'complete');
       if (advanceBlockEl) {
         advanceBlockEl.classList.remove('hidden');
         advanceBlockEl.style.display    = 'block';
@@ -1222,7 +1316,7 @@ async function handleReflectClick() {
       const loadingEl = document.getElementById('loading');
       if (loadingEl) { loadingEl.textContent = 'Response timed out — try again'; loadingEl.style.display = 'block'; }
     } else {
-      recordAnswer(sIndex, qIndex, answer, '', false);
+      recordAnswer(sIndex, qIndex, answer, '', null);
       const advBlock = document.getElementById('advance-block');
       if (advBlock) advBlock.style.display = 'block';
     }
@@ -1230,10 +1324,10 @@ async function handleReflectClick() {
 }
 
 // ── RECORD ANSWER ────────────────────────────────────────────────────────────
-function recordAnswer(sIndex, qIndex, answer, reflection, movedThrough) {
+function recordAnswer(sIndex, qIndex, answer, reflection, outcome) {
   const s = SECTIONS[sIndex];
   const q = s.questions[qIndex];
-  sessionData[sIndex][qIndex] = { section: s.title, num: s.num, layer: s.layer, questionNum: qIndex + 1, question: q.text, answer, reflection, movedThrough, timestamp: new Date().toISOString() };
+  sessionData[sIndex][qIndex] = { section: s.title, num: s.num, layer: s.layer, questionNum: qIndex + 1, question: q.text, answer, reflection, outcome, timestamp: new Date().toISOString() };
 }
 
 // ── CALL CLAUDE ──────────────────────────────────────────────────────────────
@@ -1342,21 +1436,23 @@ function saveProgress() {
 }
 
 // ── CALL CLAUDE (plain text) ──────────────────────────────────────────────────
-async function callClaudeText(systemPrompt, userMessage) {
+async function callClaudeText(systemPrompt, userMessage, maxTokens) {
   const resp = await fetch(`${BACKEND}/api/reflect`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, answer: userMessage, max_tokens: 400 })
+    body: JSON.stringify({ systemPrompt, input: userMessage, max_tokens: maxTokens || 400 })
   });
   if (!resp.ok) throw new Error('Backend ' + resp.status);
   const data = await resp.json();
   return data.content?.[0]?.text || data.text || '';
 }
 
-// ── OVERALL PATTERN SUMMARY ───────────────────────────────────────────────────
-async function generateOverallPattern() {
+// ── PATTERN MAP SYNTHESIS ─────────────────────────────────────────────────────
+async function generatePatternMapSynthesis() {
   const el = document.getElementById('overall-pattern');
-  el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.15);background:rgba(201,169,110,0.03);"><div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div><div style="font-size:0.85rem;font-family:var(--mono);color:var(--ash);letter-spacing:0.08em;">Reading the full session&hellip;</div></div>`;
+  el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.15);background:rgba(201,169,110,0.03);"><div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ READING THE FULL SESSION ]</div><div style="font-size:0.85rem;font-family:var(--mono);color:var(--ash);letter-spacing:0.08em;">This takes a moment&hellip;</div></div>`;
+
+  numerologyData = computeNumerology(userName, birthDate);
 
   const summaries = SECTIONS.map((s, i) => {
     const answers = sessionData[i].filter(Boolean);
@@ -1365,19 +1461,102 @@ async function generateOverallPattern() {
       answers.map(a => `Q: ${a.question}\nA: ${a.answer}`).join('\n');
   }).filter(Boolean).join('\n\n');
 
-  const prompt = `You are reading the complete answers from a 10-section self-study. The student's name is ${userName || 'the student'}. Read everything and write as many paragraphs as the pattern requires — do not truncate. The depth of the read should match the depth of the data. Identify the single structural thread that ran consistently across the full session — the deepest pattern that connected their responses. Be direct and specific to what was actually in these answers. Do not be generic or affirming. Speak to the structure, not the content.`;
+  const prompt = `You are reading the complete answers from a 10-section self-study, along with the person's numerology data computed from their name and birth date.
+
+The student's name is ${userName}.
+
+Numerology data (computed, not interpreted by you yet):
+- Life Path Number: ${numerologyData.lifePath}
+- Expression Number: ${numerologyData.expression}
+- Soul Urge Number: ${numerologyData.soulUrge}
+
+Return ONLY valid JSON, no other text, no markdown fences, in exactly this shape:
+
+{
+  "numerologyReading": "A direct, structural reading of what these three numbers indicate about how this person is built to operate. Not fortune-telling language. Not affirming. Precise and grounded, same register as the rest of the Lab.",
+  "sectionSummaries": {
+    "01": "2-3 sentences naming the actual structural pattern this section revealed — not a restatement of the individual answers.",
+    "02": "...",
+    "03": "...",
+    "04": "...",
+    "05": "...",
+    "06": "...",
+    "07": "...",
+    "08": "...",
+    "09": "...",
+    "10": "..."
+  },
+  "overallSummary": "The single structural thread that ran consistently across the full session — the deepest pattern connecting their responses. Direct and specific to what was actually in the answers. Do not be generic or affirming.",
+  "mirrorAwareness": "2-3 sentences naming, directly and observationally, where the numerology data and the lived pattern from the session rhyme with each other — or explicitly note if they don't clearly rhyme. This is not causal language (never 'because you are a Life Path X, you do Y'). It is a resonance observation: two separate signals landing in the same place.",
+  "movingForward": "Not advice. Not a directive. First, name what has become visible to observe now that the mirror has been seen — one sentence. Then offer ONE brief, concrete, illustrative scene of what noticing this might look like in an ordinary moment — specific enough to paint a picture, not generic. Explicitly frame it as one example, not the path: use language like 'One version of this might look like —' and close by handing it back, e.g. 'Yours may look nothing like it.' Never conclude with a directive telling them what to do."
+}
+
+Write as many paragraphs/sentences as the depth of the data requires within each field — do not artificially truncate, but do not pad either.
+
+If a section's answers show the person genuinely did not see a pattern there (rather than avoided the question), say so plainly in that section's summary — "no clear pattern surfaced here yet" is a legitimate, honest summary line. Do not manufacture or strain to find a pattern that the person's own answers don't support.
+
+Here is the full session data:
+
+${summaries}`;
 
   try {
-    const text = await callClaudeText(prompt, summaries);
-    overallPatternText = text;
-    el.innerHTML = `<div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.3);background:rgba(201,169,110,0.04);">
-      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div>
-      <div style="font-size:1.1rem;font-family:var(--serif);font-weight:300;color:var(--light);line-height:1.9;font-style:italic;">${text}</div>
-    </div>`;
+    const text = await callClaudeText(prompt, summaries, 4096);
+    let cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+
+    sectionSummaries    = parsed.sectionSummaries    || {};
+    overallPatternText  = parsed.overallSummary       || '';
+    mirrorAwarenessText = parsed.mirrorAwareness       || '';
+    movingForwardText   = parsed.movingForward         || '';
+    numerologyReadingText = parsed.numerologyReading   || '';
+
+    renderPatternMapSynthesis(numerologyReadingText);
   } catch(e) {
-    console.error('[generateOverallPattern] error:', e);
+    console.error('[generatePatternMapSynthesis] error:', e);
     el.innerHTML = '';
   }
+}
+
+function renderPatternMapSynthesis(numerologyReadingText) {
+  const el = document.getElementById('overall-pattern');
+
+  const sectionSummaryHtml = SECTIONS.map(s => {
+    const summary = sectionSummaries[s.num];
+    if (!summary) return '';
+    return `
+      <div style="margin-bottom:1.25rem;padding:1rem 1.25rem;border-left:2px solid rgba(201,169,110,0.2);">
+        <div style="font-family:var(--mono);font-size:0.52rem;letter-spacing:0.12em;color:var(--gold);margin-bottom:0.5rem;">${s.num} — ${s.title.toUpperCase()}</div>
+        <div style="font-size:0.95rem;color:var(--smoke);line-height:1.7;">${summary}</div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.2);background:rgba(201,169,110,0.03);">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ NUMEROLOGY — YOUR OPERATING NUMBERS ]</div>
+      <div style="font-family:var(--mono);font-size:0.7rem;color:var(--ash);letter-spacing:0.08em;margin-bottom:1rem;">Life Path ${numerologyData.lifePath} &middot; Expression ${numerologyData.expression} &middot; Soul Urge ${numerologyData.soulUrge}</div>
+      <div style="font-size:1rem;color:var(--light);line-height:1.8;">${numerologyReadingText}</div>
+    </div>
+
+    <div style="margin-bottom:2rem;">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ SECTION READOUT ]</div>
+      ${sectionSummaryHtml}
+    </div>
+
+    <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border:1px solid rgba(201,169,110,0.3);background:rgba(201,169,110,0.04);">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ OVERALL PATTERN ]</div>
+      <div style="font-size:1.1rem;font-family:var(--serif);font-weight:300;color:var(--light);line-height:1.9;font-style:italic;">${overallPatternText}</div>
+    </div>
+
+    <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border-left:2px solid rgba(201,169,110,0.4);background:rgba(201,169,110,0.03);">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ THE MIRROR ]</div>
+      <div style="font-size:1rem;color:var(--light);line-height:1.8;">${mirrorAwarenessText}</div>
+    </div>
+
+    <div style="margin-bottom:2rem;padding:1.5rem 1.75rem;border-left:2px solid rgba(201,169,110,0.4);background:rgba(201,169,110,0.03);">
+      <div style="font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;color:var(--gold);margin-bottom:1rem;">[ MOVING FORWARD ]</div>
+      <div style="font-size:1rem;color:var(--light);line-height:1.8;">${movingForwardText}</div>
+    </div>
+  `;
 }
 
 // ── PROGRESS ─────────────────────────────────────────────────────────────────
@@ -1417,7 +1596,7 @@ async function showCompletion() {
 
   renderWeb();
   renderFlags();
-  generateOverallPattern();
+  generatePatternMapSynthesis();
   try { localStorage.removeItem('bhaveslab-study-progress'); } catch(e) {}
 }
 
@@ -1606,6 +1785,17 @@ async function downloadPatternMap() {
     rule(GOLD);
   }
 
+  // ── NUMEROLOGY ──
+  if (numerologyData) {
+    write('[ NUMEROLOGY — OPERATING NUMBERS ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write(`Life Path ${numerologyData.lifePath}  ·  Expression ${numerologyData.expression}  ·  Soul Urge ${numerologyData.soulUrge}`, 'courier', 'normal', 8, ASH);
+    gap(3);
+    write(numerologyReadingText, 'times', 'normal', 10, LIGHT);
+    gap(8);
+    rule(GOLD);
+  }
+
   // ── SESSION SUMMARY ──
   const totalAnswers = sessionData.flat().filter(Boolean).length;
   const flagCount    = sectionFlags.length;
@@ -1630,6 +1820,11 @@ async function downloadPatternMap() {
     write(s.layer, 'courier', 'normal', 6, ASH);
     gap(5);
 
+    if (sectionSummaries[s.num]) {
+      write(sectionSummaries[s.num], 'times', 'italic', 9, SMOKE);
+      gap(4);
+    }
+
     answers.forEach(d => {
       if (y + 14 > H - 16) newPage();
       write(`Q${d.questionNum}`, 'courier', 'normal', 6, ASH);
@@ -1641,7 +1836,7 @@ async function downloadPatternMap() {
         gap(2);
         write(d.reflection, 'times', 'italic', 9, SMOKE, 5);
       }
-      if (d.movedThrough) {
+      if (d.outcome === 'avoidant') {
         gap(1);
         write('[ SIGNAL — ADVANCED THROUGH ]', 'courier', 'normal', 6, GOLD);
       }
@@ -1664,6 +1859,22 @@ async function downloadPatternMap() {
     });
     gap(4);
     rule();
+  }
+
+  // ── THE MIRROR ──
+  if (mirrorAwarenessText) {
+    write('[ THE MIRROR ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write(mirrorAwarenessText, 'times', 'normal', 10, LIGHT);
+    gap(6);
+  }
+
+  // ── MOVING FORWARD ──
+  if (movingForwardText) {
+    write('[ MOVING FORWARD ]', 'courier', 'normal', 7, GOLD);
+    gap(2);
+    write(movingForwardText, 'times', 'normal', 10, LIGHT);
+    gap(6);
   }
 
   // ── FOOTER ──

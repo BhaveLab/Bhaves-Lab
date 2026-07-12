@@ -11,9 +11,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { input, systemPrompt } = req.body;
+  const { input, answer, systemPrompt, max_tokens } = req.body;
+  const userInput = input || answer;
 
-  if (!input) {
+  if (!userInput) {
     return res.status(400).json({ error: 'Missing required field: input' });
   }
 
@@ -21,6 +22,12 @@ export default async function handler(req, res) {
   if (!apiKey) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
   }
+
+  // Combined pattern-map synthesis (numerology + 10 section summaries + overall
+  // + mirror + moving-forward) needs far more room than a single-question
+  // reflection — callers pass max_tokens explicitly; this just enforces a ceiling.
+  const requestedTokens = Number(max_tokens) || 1000;
+  const cappedTokens = Math.min(Math.max(requestedTokens, 1), 4096);
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -31,9 +38,9 @@ export default async function handler(req, res) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1000,
+      max_tokens: cappedTokens,
       system: systemPrompt || undefined,
-      messages: [{ role: 'user', content: input }],
+      messages: [{ role: 'user', content: userInput }],
     }),
   });
 
