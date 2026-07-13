@@ -905,6 +905,7 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
   // wiring depends on this being ready regardless of how long token
   // validation below takes.
   devBypass = urlParams.get('dev') === 'true';
+  console.log('devBypass:', devBypass); // TEMP — remove after debugging dev-fill button visibility
 
   // ?success=true from Stripe redirect — persist access flag
   if (urlParams.get('success') === 'true') {
