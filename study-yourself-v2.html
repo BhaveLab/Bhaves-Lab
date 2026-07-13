@@ -888,6 +888,7 @@ let mirrorAwarenessText = '';
 let movingForwardText = '';
 let numerologyReadingText = '';
 let isReflecting      = false;  // true while an API call is in-flight; reset by renderQuestion
+let devBypass         = false; // ?dev=true — set synchronously by initToken() before any await
 
 const BACKEND = 'https://bhaveslab-backend.vercel.app';
 SECTIONS.forEach((s, i) => { sessionData[i] = []; });
@@ -898,6 +899,12 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 // is never bounced before the backend can confirm it.
 (async function initToken() {
   const urlParams = new URLSearchParams(window.location.search);
+
+  // Computed synchronously, before any await, so it is reliably set by the
+  // time DOMContentLoaded fires — the dev auto-fill button's visibility
+  // wiring depends on this being ready regardless of how long token
+  // validation below takes.
+  devBypass = urlParams.get('dev') === 'true';
 
   // ?success=true from Stripe redirect — persist access flag
   if (urlParams.get('success') === 'true') {
@@ -957,7 +964,6 @@ SECTIONS.forEach((s, i) => { sessionData[i] = []; });
 
   // Gate: only redirect if token is invalid AND no local access flag exists.
   // ?dev=true bypasses the gate entirely for local testing.
-  const devBypass = urlParams.get('dev') === 'true';
   if (!devBypass && !tokenValid && !sessionStorage.getItem('labAccess') && !localStorage.getItem('labAccess')) {
     window.location.href = '/study-yourself-landing.html';
     return;
@@ -2063,6 +2069,163 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// ── DEV AUTO-FILL TEST SESSION (?dev=true only) ──────────────────────────────
+// Drives the real question flow end to end — renderQuestion, handleReflectClick,
+// advance — so the complete/unseen/avoidant eval branches actually get
+// exercised, rather than injecting sessionData directly.
+const DEV_TEST_ANSWERS = [
+  // Section 01
+  "I notice I take charge in group situations almost automatically, before anyone asks me to — I've never really looked at why.",
+  "People close to me say I read situations fast and see what's coming before they do, but I brush it off as no big deal.",
+  "My first explanation is usually that I missed something or wasn't paying close enough attention.",
+  "I keep gathering information and building things even when nothing's asking me to — I don't fully know why I can't just stop.",
+  "I get defensive when someone says I need to slow down or simplify how I explain things.",
+  // Section 02
+  "Right now my body feels relaxed, steady, a little alert — not tense.",
+  "I spend most of my time in a curious, forward-leaning state — became the default a long time ago, hard to pin down when.",
+  "My body tightens up, chest gets a little tight, right before a decision I end up regretting.",
+  "Calm, unhurried states produce my clearest thinking — I'm only actually there a few hours a day.",
+  "I usually walk in already scanning the room, already reading it before anything's happened.",
+  "I'm in a rushed, pressured state when I'm most likely to avoid something important.",
+  // Section 03
+  "Thinking about it now, my body feels tight, like I'm bracing for something.",
+  "I notice how far this is from where I want to be — I'm probably filtering out the parts that are actually working.",
+  "The meaning I've landed on is that I'm behind and need to catch up before I can relax.",
+  "From here, the choices I can see are pushing harder or waiting it out.",
+  "Not really sure, hard to say.",
+  "If my state were calmer going in, I think I'd actually see more options than just those two.",
+  // Section 04
+  "I check my phone the second there's a lull, before I've decided to.",
+  "It started years ago when staying informed felt like staying safe — made sense back then.",
+  "It protects me from sitting in silence with nothing to do.",
+  "Boredom triggers it, and it runs almost instantly, before I notice.",
+  "I've told myself it's just curiosity, but it might actually be discomfort with stillness.",
+  "When it's running, life feels busy and full; when it's not, it feels quiet and a little exposed.",
+  // Section 05
+  "Earlier today I caught myself mid-scroll and realized I was doing it to avoid a hard conversation, right as it was happening.",
+  "It feels like standing slightly behind myself, watching, while still doing the thing.",
+  "Observing feels neutral, just naming what's there; judging adds a verdict on top of it.",
+  "Honestly I don't know, nothing's coming to mind right now.",
+  "In a strong emotional state I can still notice my breathing, but I completely lose track of time.",
+  "From outside the pattern I can see it's a loop; inside it, it just feels like the obvious next move.",
+  // Section 06
+  "The same \"I have to prove I've got it handled\" pattern shows up at work, in relationships, and with money.",
+  "The shape underneath is always: perceive a gap, feel exposed, immediately act to close it before anyone notices.",
+  "I consistently play the one who fixes it quietly before it becomes visible.",
+  "It costs me rest and connection, but it gives me a sense of control.",
+  "I have the most awareness right before it starts; the least once I'm already moving.",
+  "I'd have to face that I'm not actually as behind as the pattern insists I am.",
+  "My best guess is it starts at Perception — the moment I notice the gap.",
+  // Section 07
+  "With money, I keep circling the same worry about not having enough saved.",
+  "The evidence I'm spiraling: I catch the worry faster now and it doesn't consume the whole day like it used to.",
+  "The loop version would look like: same worry, same amount of panic, no faster recognition at all.",
+  "I keep deciding to check my accounts again instead of actually making a plan.",
+  "I've learned to notice the spike faster, but I still haven't changed what I do once I notice it.",
+  "The decision I keep avoiding is actually sitting down and building a real plan instead of just checking numbers.",
+  // Section 08
+  "Right now what's most active is a low hum of \"am I doing this course right.\"",
+  "My best guess is it's active more in what I'm noticing than in my body.",
+  "Honestly, I'm engaging seriously, but I can feel myself wanting to move faster through the harder ones.",
+  "Section 3 — I moved through it quickly, which probably means I didn't want to sit with it.",
+  "I didn't expect how much this \"checking to feel in control\" thread would show up everywhere.",
+  "Right now I'm resisting really sitting with the money question from Section 7.",
+  // Section 09
+  "With the phone-checking pattern, there's a tiny moment right after the lull hits, before my hand moves.",
+  "I'm not sure, I can't really find that moment when I try to picture it.",
+  "It's uncomfortable to just sit there, so it's easier to let the pattern finish.",
+  "The one time I did catch it, I just sat with the quiet for a minute and it actually passed.",
+  "It tells me if I don't act now, I'll fall behind or miss something important.",
+  "I'd need to trust that stillness isn't the same as falling behind.",
+  // Section 10
+  "The thing with the most real weight is realizing how much of my day is built around avoiding stillness.",
+  "The pattern that kept showing up was checking/acting fast to avoid feeling behind or exposed.",
+  "I moved past the money question fast — that one deserves more time.",
+  "I see now that the urgency I feel is often self-generated, not actually coming from outside.",
+  "Knowing the urgency is self-generated means I can test whether slowing down actually costs me anything.",
+  "I'll start noticing the exact moment right before I reach for my phone or start \"fixing\" something."
+];
+
+function devSleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+let devAutoFillRunning = false;
+
+async function runDevAutoFillSession() {
+  if (devAutoFillRunning || isReflecting) return;
+  devAutoFillRunning = true;
+
+  const btn = document.getElementById('dev-autofill-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.textContent = 'RUNNING TEST SESSION…'; }
+
+  try {
+    userEmail    = 'dev-test@bhaveslab.com';
+    userName     = 'Darin Palmer';
+    birthDate    = '20/09/1979';
+    birthTime    = '';
+    birthCity    = 'Minneapolis, USA';
+    openingState = 'curious';
+
+    // Skip straight past intro → birth-data → settling → state-check
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('birth-data').classList.remove('active');
+    document.getElementById('settling').classList.remove('active');
+    document.getElementById('state-check').classList.remove('active');
+    document.getElementById('course').style.display = 'block';
+    document.getElementById('save-progress-btn').style.display = 'block';
+
+    sessionData  = [];
+    sectionFlags = [];
+    SECTIONS.forEach((s, i) => { sessionData[i] = []; });
+    currentSection  = 0;
+    currentQuestion = 0;
+
+    let flatIndex = 0;
+
+    for (let sIndex = 0; sIndex < SECTIONS.length; sIndex++) {
+      const s = SECTIONS[sIndex];
+      for (let qIndex = 0; qIndex < s.questions.length; qIndex++) {
+        currentSection  = sIndex;
+        currentQuestion = qIndex;
+        renderQuestion(sIndex, qIndex);
+        await devSleep(400);
+
+        const answerInput = document.getElementById('answer-input');
+        if (answerInput) answerInput.value = DEV_TEST_ANSWERS[flatIndex];
+        flatIndex++;
+
+        await handleReflectClick();
+        await devSleep(400);
+
+        // Avoidant path requires the same explicit choice a real user makes —
+        // click through it rather than recording the answer directly.
+        if (pendingGap) {
+          const advanceAnywayEl = document.getElementById('advance-anyway-btn');
+          if (advanceAnywayEl) advanceAnywayEl.click();
+          await devSleep(300);
+        }
+
+        advance(currentSection, currentQuestion);
+        await devSleep(300);
+      }
+    }
+  } finally {
+    devAutoFillRunning = false;
+    const btnEl = document.getElementById('dev-autofill-btn');
+    if (btnEl) { btnEl.disabled = false; btnEl.style.opacity = ''; btnEl.textContent = 'AUTO-FILL TEST SESSION'; }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const devBtn = document.getElementById('dev-autofill-btn');
+  if (!devBtn) return;
+  if (devBypass) devBtn.style.display = 'block';
+
+  devBtn.addEventListener('click', function() {
+    if (devBtn.disabled) return;
+    runDevAutoFillSession();
+  });
+});
+
 </script>
 
 <!-- ── RESUME PROMPT ── -->
@@ -2087,6 +2250,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── SAVE PROGRESS BUTTON ── -->
 <button id="save-progress-btn" onclick="manualSaveProgress()" style="display:none;position:fixed;bottom:1.5rem;left:1.5rem;z-index:300;font-family:var(--mono);font-size:0.55rem;letter-spacing:0.14em;color:var(--ash);background:var(--deep);border:1px solid rgba(107,107,107,0.2);padding:0.5rem 0.9rem;cursor:pointer;transition:all 0.3s;">SAVE PROGRESS</button>
+
+<!-- ── DEV AUTO-FILL BUTTON (?dev=true only) ── -->
+<button id="dev-autofill-btn" style="display:none;position:fixed;bottom:5rem;left:1.5rem;z-index:300;font-family:var(--mono);font-size:0.55rem;letter-spacing:0.14em;color:var(--gold);background:var(--deep);border:1px solid rgba(201,169,110,0.3);padding:0.5rem 0.9rem;cursor:pointer;transition:all 0.3s;">AUTO-FILL TEST SESSION</button>
 
 <!-- ── ASSISTANCE BUTTON ── -->
 <a id="assistance-btn" href="mailto:info@bhaveslab.com?subject=Study%20Yourself%20%E2%80%94%20Assistance">ASSISTANCE</a>
