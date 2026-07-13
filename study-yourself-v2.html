@@ -308,8 +308,10 @@
   // Skipped entirely when a ?token= is present so the gate never blocks
   // a fresh access link arriving from email.
   (function() {
-    var hasToken = new URLSearchParams(window.location.search).has('token');
-    if (hasToken) return;
+    var params = new URLSearchParams(window.location.search);
+    var hasToken = params.has('token');
+    var isDevBypass = params.get('dev') === 'true';
+    if (hasToken || isDevBypass) return;
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if (!standalone && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
       document.documentElement.classList.add('show-pwa-gate');
