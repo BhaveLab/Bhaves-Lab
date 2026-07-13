@@ -7,7 +7,6 @@
     { "source": "/consciousness-mirror", "destination": "/consciousness-mirror.html" },
     { "source": "/chamber", "destination": "/chamber.html" },
     { "source": "/study-session", "destination": "/study-session.html" },
-    { "source": "/study-yourself", "destination": "/study-yourself.html" },
     { "source": "/study-yourself-v2", "destination": "/study-yourself-v2.html" },
     { "source": "/thank-you", "destination": "/thank-you.html" },
     { "source": "/pattern-immersion", "destination": "/pattern-immersion.html" },
