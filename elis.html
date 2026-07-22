@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Bhavé Labs — Terminal de Campo</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F1B18">
+<style>
+  :root {
+    --bg: #0F1B18;
+    --bg-soft: #16241F;
+    --paper: #EDE6D6;
+    --paper-soft: #E2D9C4;
+    --ink: #171310;
+    --gold: #D9A441;
+    --coral: #E85C33;
+    --line: #2B3A34;
+    --faint: #7C9088;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--paper);
+    height: 100%; overscroll-behavior: none;
+  }
+  #app { max-width: 420px; margin: 0 auto; height: 100vh; position: relative; overflow: hidden; }
+  .serif { font-family: Georgia, "Times New Roman", serif; }
+  .mono { font-family: "SF Mono", Menlo, monospace; }
+  .view { padding: 20px 16px 100px; height: 100%; overflow-y: auto; }
+  .hidden { display: none !important; }
+
+  .home-title { font-size: 24px; font-weight: 700; }
+  .home-sub { font-size: 12px; color: var(--faint); margin-top: 4px; margin-bottom: 20px; }
+
+  .pkg-card {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 16px; padding: 14px; margin-bottom: 10px;
+    cursor: pointer; text-align: left; width: 100%;
+  }
+  .pkg-card:active { transform: scale(0.98); }
+  .pkg-n { font-size: 12px; font-weight: 700; color: var(--faint); width: 22px; }
+  .pkg-icon { font-size: 20px; background: var(--bg); border-radius: 10px; padding: 8px; }
+  .pkg-name { font-weight: 700; font-size: 14px; }
+  .pkg-hook { font-size: 12px; color: var(--faint); margin-top: 2px; }
+  .pkg-gana { text-align: right; margin-left: auto; }
+  .pkg-gana-label { font-size: 9px; color: var(--faint); letter-spacing: 0.05em; }
+  .pkg-gana-amt { font-size: 14px; font-weight: 700; color: var(--gold); }
+
+  .backbtn { background: none; border: none; color: var(--paper); font-size: 16px; padding: 8px; margin-left: -8px; cursor: pointer; }
+  .detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .detail-eyebrow { font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
+  .detail-title-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .detail-icon { font-size: 22px; background: var(--bg-soft); border-radius: 12px; padding: 10px; }
+  .detail-name { font-size: 20px; font-weight: 700; }
+  .detail-sub { font-size: 12px; color: var(--faint); }
+
+  .section-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); margin: 16px 0 4px; }
+  .section-text { font-size: 14px; line-height: 1.5; }
+  .check-item { display: flex; gap: 8px; align-items: start; margin-bottom: 6px; }
+  .check-dot { background: var(--gold); border-radius: 50%; width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--ink); margin-top: 2px; }
+
+  .price-box { background: var(--paper); color: var(--ink); border-radius: 16px; padding: 20px; margin-top: 16px; }
+  .price-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+  .price-range { font-size: 20px; margin: 4px 0 16px; opacity: 0.7; }
+  .mision-text { font-size: 14px; line-height: 1.5; font-style: italic; opacity: 0.75; margin-bottom: 16px; }
+  .btn-reveal { width: 100%; padding: 13px; border-radius: 12px; border: none; background: var(--coral); color: var(--paper); font-weight: 600; font-size: 14px; letter-spacing: 0.02em; cursor: pointer; }
+  .villa-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); }
+  .villa-amt { font-size: 34px; font-weight: 700; font-family: Georgia, serif; margin: 4px 0 8px; }
+  .villa-note { font-size: 12px; color: var(--faint); line-height: 1.5; margin-bottom: 16px; }
+  .gana-box { display: flex; align-items: center; gap: 8px; background: var(--ink); border-radius: 12px; padding: 12px 16px; }
+  .gana-box b { color: var(--gold); }
+
+  .sticky-cta { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(to top, var(--bg) 60%, transparent); }
+  .btn-log { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--gold); color: var(--ink); font-weight: 700; font-size: 14px; cursor: pointer; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 30; display: flex; align-items: flex-end; }
+  .modal-sheet { width: 100%; max-width: 420px; margin: 0 auto; background: var(--paper); color: var(--ink); border-radius: 24px 24px 0 0; padding: 20px; padding-bottom: 32px; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-title { font-size: 18px; font-weight: 700; font-family: Georgia, serif; }
+  .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; }
+  .field-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .field-input { width: 100%; padding: 12px 14px; border-radius: 12px; border: none; background: var(--paper-soft); color: var(--ink); font-size: 14px; margin-bottom: 16px; }
+  .tipo-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tipo-btn { flex: 1; padding: 10px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--paper-soft); color: var(--ink); }
+  .tipo-btn.active { background: var(--coral); color: var(--paper); }
+  .btn-save { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--gold); color: var(--ink); font-weight: 700; font-size: 14px; cursor: pointer; }
+  .btn-save:disabled { opacity: 0.4; }
+
+  .ventas-total { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .ventas-total-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+  .ventas-total-amt { font-size: 30px; font-weight: 700; font-family: Georgia, serif; color: var(--gold); }
+  .ventas-pending { font-size: 12px; color: var(--coral); margin-top: 8px; }
+  .sync-banner { background: var(--coral); color: var(--paper); border-radius: 12px; padding: 12px 16px; font-size: 12px; margin-bottom: 16px; }
+  .venta-item { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
+  .venta-top { display: flex; justify-content: space-between; }
+  .venta-negocio { font-weight: 600; font-size: 14px; }
+  .venta-meta { font-size: 12px; color: var(--faint); margin-top: 2px; }
+  .venta-amt { font-weight: 700; color: var(--gold); font-size: 14px; }
+  .btn-entregado { width: 100%; margin-top: 10px; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; background: var(--coral); color: var(--paper); }
+  .btn-entregado.done { background: transparent; border: 1px solid var(--line); color: var(--faint); }
+
+  .guion-card { background: var(--paper); color: var(--ink); border-radius: 16px; padding: 24px; }
+  .guion-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); margin-bottom: 10px; }
+  .guion-linea { font-size: 17px; font-family: Georgia, serif; line-height: 1.5; margin-bottom: 14px; }
+  .guion-nota { font-size: 12px; color: var(--faint); padding-top: 10px; border-top: 1px solid var(--paper-soft); }
+  .guion-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; }
+  .guion-navbtn { background: var(--bg-soft); border: none; color: var(--paper); width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+  .guion-navbtn:disabled { opacity: 0.3; }
+  .guion-dots { display: flex; gap: 6px; }
+  .guion-dot { height: 6px; border-radius: 3px; background: var(--line); transition: all 0.2s; }
+  .guion-dot.active { width: 18px; background: var(--gold); }
+  .guion-dot:not(.active) { width: 6px; }
+
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; background: var(--bg-soft); border-top: 1px solid var(--line); max-width: 420px; margin: 0 auto; }
+  .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0; background: none; border: none; cursor: pointer; }
+  .tab-icon { font-size: 18px; }
+  .tab-label { font-size: 10px; font-weight: 600; color: var(--faint); }
+  .tab-btn.active .tab-label, .tab-btn.active .tab-icon { color: var(--gold); }
+
+  .empty-state { text-align: center; padding: 48px 0; color: var(--faint); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="view-paquetes" class="view"></div>
+  <div id="view-detail" class="view hidden"></div>
+  <div id="view-ventas" class="view hidden"></div>
+  <div id="view-guion" class="view hidden"></div>
+  <div id="modal-root"></div>
+  <div id="tabbar" class="tabbar"></div>
+</div>
+
+<script>
+// ---- CONFIG ----
+// bhaveslab-backend serves /api/* by absolute URL — same pattern as the rest of the site.
+const API_BASE = "https://bhaveslab-backend.vercel.app";
+
+// ---- DATA ----
+const PAQUETES = [
+  {
+    id: 1, n: "01", icon: "📍", nombre: "Pin y WhatsApp Rápido", sub: "Micro Starter",
+    hook: "Que lo encuentren en Google. Que le escriban por WhatsApp.",
+    problema: "El negocio es invisible en internet y pierde clientes que buscan servicios cerca en sus celulares.",
+    oferta: "Lo ponemos en el mapa mundial de Google y le creamos una vía rápida de ventas por WhatsApp.",
+    entregables: ["Registro en Google Maps y Apple Maps", "Enlace de WhatsApp con mensaje automático", "Código QR impreso para el mostrador"],
+    sinComp: true,
+    misionNota: "Muchos negocios aquí ni siquiera tienen un mapa o WhatsApp organizado. Esto no es sobre ahorrar dinero de agencia — es sobre existir en línea por primera vez.",
+    precio: 50, precioHNL: 1300, cashOpt: 20, cambioOpt: 750, comision: 25, comisionHNL: 625,
+  },
+  {
+    id: 2, n: "02", icon: "🌐", nombre: "Sitio Web Estándar", sub: "Identity Package",
+    hook: "Su propia página. No una de Facebook desactualizada.",
+    problema: "No tienen presencia profesional y no proyectan confianza a clientes nuevos o extranjeros.",
+    oferta: "Construimos su vitrina digital propia, moderna y rápida, activa las 24 horas.",
+    entregables: ["Dirección web propia por 1 año", "Página para celular con menú, fotos y precios", "Perfil completo en Google Maps", "Anuncio en el Directorio Oficial Bhavé Labs"],
+    valorRealMin: 500, valorRealMax: 800,
+    precio: 100, precioHNL: 2600, cashOpt: 40, cambioOpt: 5000, comision: 25, comisionHNL: 625,
+  },
+  {
+    id: 3, n: "03", icon: "🏨", nombre: "Suite de Turismo y Hoteles", sub: "Multi-Page & Booking",
+    hook: "Reservas directas. Sin comisión para Booking ni Airbnb.",
+    problema: "Hoteles y tours pierden 20–30% pagando comisión a plataformas, o pierden turistas por no tener inglés.",
+    oferta: "Portal de reservas directas en dos idiomas, sin comisión de intermediarios.",
+    entregables: ["Sitio de 4 páginas (Inicio, Servicios, Galería, Reservas)", "Cambio de idioma Español / Inglés", "Reservas directas a correo o WhatsApp", "Catálogo digital en código QR"],
+    valorRealMin: 1200, valorRealMax: 2000,
+    precio: 350, precioHNL: 8800, cashOpt: 100, cambioOpt: 12500, comision: 50, comisionHNL: 1250,
+  },
+  {
+    id: 4, n: "04", icon: "🏢", nombre: "Nodo Comercial y Desarrollo", sub: "Full Enterprise",
+    hook: "Para vender en línea a inversionistas fuera de La Ceiba.",
+    problema: "Negocios grandes necesitan mostrar propiedades o productos complejos a clientes de alto valor.",
+    oferta: "Plataforma comercial avanzada con catálogo o recorrido de propiedades.",
+    entregables: ["Tienda en línea con pasarela de pagos", "Muestrario en video HD", "Píxeles de seguimiento para anuncios", "Estado de Socio Preferencial Bhavé Labs"],
+    valorRealMin: 3000, valorRealMax: 5000,
+    precio: 700, precioHNL: 17500, cashOpt: 200, cambioOpt: 25000, comision: 100, comisionHNL: 2500,
+  },
+];
+
+const PAQUETE_EN = {
+  1: "Package 1 — Quick Pin & WhatsApp (Micro Starter)",
+  2: "Package 2 — Standard Website (Identity Package)",
+  3: "Package 3 — Tourism & Hotel Suite (Multi-Page & Booking)",
+  4: "Package 4 — Commercial Node & Development (Full Enterprise)",
+};
+
+const GUION = [
+  { t: "1. Apertura", linea: "Buenas, ¿cómo está? Trabajo con Bhavé Labs — ayudamos a negocios de la zona a tener presencia en línea. ¿Tiene un minuto?", nota: "Si dice que no: agradece y sigue. Sin insistir." },
+  { t: "2. La Necesidad", linea: "¿Ahora mismo cómo hace la gente para encontrarlo? ¿Ha perdido clientes por no estar en línea?", nota: "Escucha. Eso te dice qué paquete mostrar primero." },
+  { t: "3. Mostrar Paquete", linea: "Para lo que me cuenta, esto le serviría...", nota: "Muestra UN paquete en la pestaña Paquetes. No los cuatro." },
+  { t: "4. El Precio", linea: "Esto no es un descuento de agencia — es un precio pensado para la villa. Por eso también aceptamos intercambio.", nota: "Toca 'Ver Precio Villa' en la pantalla. Si pregunta por qué es tan bajo, esa es la respuesta — no inventes una comparación con agencias." },
+  { t: "5. Si no tiene dinero", linea: "No hay presión. Podemos hablar de intercambio — producto, comida, transporte, hospedaje.", nota: "Solo después de cubrir el costo base en efectivo." },
+  { t: "6. Cierre", linea: "Gracias por su tiempo — o, si acepta: vamos a registrar el trato ahora mismo.", nota: "Si acepta → botón Registrar Venta. Si no → te vas, sin insistir." },
+];
+
+// ---- STATE ----
+let state = { tab: "paquetes", selectedPkg: null, guionIdx: 0, ventas: [], syncError: false };
+
+function loadVentas() {
+  try {
+    const raw = localStorage.getItem("bhave-ventas-log");
+    state.ventas = raw ? JSON.parse(raw) : [];
+  } catch (e) { state.ventas = []; }
+}
+function saveVentas() {
+  try { localStorage.setItem("bhave-ventas-log", JSON.stringify(state.ventas)); } catch (e) {}
+}
+
+async function pushToSheet(entry) {
+  try {
+    const res = await fetch(API_BASE + "/api/registrar-venta", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        negocio: entry.negocio, paqueteId: entry.paqueteId, comision: entry.comision,
+        tipo: entry.tipo, detalle: entry.detalle, fecha: entry.fecha, operador: "Elis",
+      }),
+    });
+    if (!res.ok) throw new Error("sync failed");
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  if (state.tab === "ventas") renderVentas();
+}
+
+function money(n, hnl) { return "$" + n + " USD" + (hnl ? " (~L " + hnl.toLocaleString() + ")" : ""); }
+
+// ---- RENDER: PAQUETES ----
+function renderPaquetes() {
+  const el = document.getElementById("view-paquetes");
+  el.innerHTML = `
+    <div class="home-title serif">Bhavé Labs</div>
+    <div class="home-sub">Hola, Elis — toca un paquete para mostrarlo</div>
+    ${PAQUETES.map(p => `
+      <button class="pkg-card" onclick="openPackage(${p.id})">
+        <div class="pkg-n mono">${p.n}</div>
+        <div class="pkg-icon">${p.icon}</div>
+        <div style="flex:1; min-width:0; text-align:left;">
+          <div class="pkg-name serif">${p.nombre}</div>
+          <div class="pkg-hook">${p.hook}</div>
+        </div>
+        <div class="pkg-gana">
+          <div class="pkg-gana-label">TÚ GANAS</div>
+          <div class="pkg-gana-amt">$${p.comision}</div>
+        </div>
+      </button>
+    `).join("")}
+  `;
+}
+
+// ---- RENDER: DETAIL ----
+function openPackage(id) {
+  state.selectedPkg = PAQUETES.find(p => p.id === id);
+  priceRevealed = false;
+  switchView("detail");
+}
+function priceRevealHtml(pkg, revealed) {
+  if (!revealed) {
+    return `
+      ${pkg.sinComp
+        ? `<div class="mision-text">${pkg.misionNota}</div>`
+        : `<div class="price-eyebrow">Precio típico en Honduras</div><div class="price-range">$${pkg.valorRealMin}–$${pkg.valorRealMax} USD</div>`
+      }
+      <button class="btn-reveal" onclick="revealPrice()">Ver Precio Villa →</button>
+    `;
+  }
+  return `
+    ${pkg.sinComp ? `<div class="mision-text">${pkg.misionNota}</div>` : `<div class="price-eyebrow">Precio típico en Honduras</div><div class="price-range">$${pkg.valorRealMin}–$${pkg.valorRealMax} USD</div>`}
+    <div class="villa-eyebrow">Precio Villa — Bhavé Labs</div>
+    <div class="villa-amt serif">${money(pkg.precio, pkg.precioHNL)}</div>
+    <div class="villa-note">No es un descuento — es precio pensado para la villa. También aceptamos intercambio: $${pkg.cashOpt} cash + L ${pkg.cambioOpt.toLocaleString()} en producto, comida, transporte u hospedaje.</div>
+    <div class="gana-box">🪙 <div>Tú ganas <b>${money(pkg.comision, pkg.comisionHNL)}</b> al instante</div></div>
+  `;
+}
+let priceRevealed = false;
+function revealPrice() { priceRevealed = true; renderDetail(); }
+function renderDetail() {
+  const pkg = state.selectedPkg;
+  if (!pkg) return;
+  const el = document.getElementById("view-detail");
+  el.innerHTML = `
+    <button class="backbtn" onclick="switchView('paquetes')">‹</button>
+    <div class="detail-eyebrow mono">PAQUETE ${pkg.n}</div>
+    <div class="detail-title-row">
+      <div class="detail-icon">${pkg.icon}</div>
+      <div>
+        <div class="detail-name serif">${pkg.nombre}</div>
+        <div class="detail-sub">${pkg.sub}</div>
+      </div>
+    </div>
+    <div class="section-label">El Problema</div>
+    <div class="section-text">${pkg.problema}</div>
+    <div class="section-label">Nuestra Oferta</div>
+    <div class="section-text">${pkg.oferta}</div>
+    <div class="section-label">Entregables</div>
+    ${pkg.entregables.map(e => `<div class="check-item"><div class="check-dot">✓</div><div class="section-text">${e}</div></div>`).join("")}
+    <div class="price-box">${priceRevealHtml(pkg, priceRevealed)}</div>
+    <div style="height:70px;"></div>
+    <div class="sticky-cta">
+      <button class="btn-log" onclick="openLogForm()">Dijo que SÍ — Registrar Venta</button>
+    </div>
+  `;
+}
+
+// ---- LOG FORM MODAL ----
+let formTipo = "cash";
+function openLogForm() {
+  formTipo = "cash";
+  const pkg = state.selectedPkg;
+  const root = document.getElementById("modal-root");
+  root.innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this) closeLogForm()">
+      <div class="modal-sheet">
+        <div class="modal-head">
+          <div class="modal-title">Registrar Venta</div>
+          <button class="modal-close" onclick="closeLogForm()">✕</button>
+        </div>
+        <div class="field-label">Paquete</div>
+        <div style="font-weight:600; font-size:14px; margin-bottom:16px;">${pkg.n} — ${pkg.nombre}</div>
+        <div class="field-label">Nombre del negocio</div>
+        <input id="negocioInput" class="field-input" placeholder="Escribe el nombre...">
+        <div class="field-label">Cómo pagó</div>
+        <div class="tipo-row">
+          <button class="tipo-btn active" id="tipo-cash" onclick="setTipo('cash')">Efectivo</button>
+          <button class="tipo-btn" id="tipo-intercambio" onclick="setTipo('intercambio')">Intercambio</button>
+          <button class="tipo-btn" id="tipo-mixto" onclick="setTipo('mixto')">Mixto</button>
+        </div>
+        <div id="detalleWrap" class="hidden">
+          <div class="field-label">Qué se recibió exactamente</div>
+          <input id="detalleInput" class="field-input" placeholder="Ej: 2 noches hospedaje + L500">
+        </div>
+        <div class="gana-box" style="margin-bottom:20px;">🪙 <div>Tu comisión: <b>$${pkg.comision} USD</b></div></div>
+        <button class="btn-save" id="saveBtn" onclick="submitVenta()">Guardar Registro</button>
+      </div>
+    </div>
+  `;
+}
+function setTipo(t) {
+  formTipo = t;
+  ["cash","intercambio","mixto"].forEach(k => document.getElementById("tipo-"+k).classList.toggle("active", k===t));
+  document.getElementById("detalleWrap").classList.toggle("hidden", t === "cash");
+}
+function closeLogForm() { document.getElementById("modal-root").innerHTML = ""; }
+
+function submitVenta() {
+  const negocio = document.getElementById("negocioInput").value.trim();
+  if (!negocio) return;
+  const detalle = formTipo !== "cash" ? (document.getElementById("detalleInput")?.value.trim() || "") : "";
+  const pkg = state.selectedPkg;
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true; btn.textContent = "Guardando...";
+
+  const entry = {
+    id: Date.now(),
+    fecha: new Date().toLocaleDateString("es-HN"),
+    negocio, paqueteId: pkg.id, paqueteN: pkg.n, paqueteNombre: pkg.nombre,
+    comision: pkg.comision, tipo: formTipo, detalle, entregado: false,
+  };
+  state.ventas.push(entry);
+  saveVentas();
+  pushToSheet(entry);
+
+  closeLogForm();
+  priceRevealed = false;
+  switchView("ventas");
+}
+
+// ---- RENDER: VENTAS ----
+function toggleEntregado(id) {
+  const v = state.ventas.find(v => v.id === id);
+  if (v) v.entregado = !v.entregado;
+  saveVentas();
+  renderVentas();
+}
+function renderVentas() {
+  const el = document.getElementById("view-ventas");
+  const total = state.ventas.reduce((s, v) => s + v.comision, 0);
+  const pendientes = state.ventas.filter(v => !v.entregado).length;
+  el.innerHTML = `
+    <div class="home-title serif">Mis Ventas</div>
+    <div style="height:16px;"></div>
+    ${state.syncError ? `<div class="sync-banner">Tu último registro se guardó en tu teléfono pero no se pudo enviar todavía (sin señal, quizás). Se queda guardado aquí — díselo al ingeniero cuando tengas señal.</div>` : ""}
+    <div class="ventas-total">
+      <div class="ventas-total-label">Total ganado</div>
+      <div class="ventas-total-amt">$${total} USD</div>
+      ${pendientes > 0 ? `<div class="ventas-pending">${pendientes} venta${pendientes===1?"":"s"} sin entregar al ingeniero</div>` : ""}
+    </div>
+    ${state.ventas.length === 0 ? `<div class="empty-state">Todavía no hay ventas registradas.</div>` : ""}
+    ${state.ventas.slice().reverse().map(v => `
+      <div class="venta-item">
+        <div class="venta-top">
+          <div>
+            <div class="venta-negocio">${v.negocio}</div>
+            <div class="venta-meta">${v.paqueteN} · ${v.paqueteNombre} · ${v.fecha}</div>
+            ${v.tipo !== "cash" && v.detalle ? `<div class="venta-meta">Intercambio: ${v.detalle}</div>` : ""}
+          </div>
+          <div class="venta-amt">$${v.comision}</div>
+        </div>
+        <button class="btn-entregado ${v.entregado ? "done" : ""}" onclick="toggleEntregado(${v.id})">
+          ${v.entregado ? "✓ Entregado al ingeniero" : "Marcar como entregado"}
+        </button>
+      </div>
+    `).join("")}
+  `;
+}
+
+// ---- RENDER: GUION ----
+function guionNav(dir) {
+  state.guionIdx = Math.max(0, Math.min(GUION.length - 1, state.guionIdx + dir));
+  renderGuion();
+}
+function renderGuion() {
+  const el = document.getElementById("view-guion");
+  const card = GUION[state.guionIdx];
+  el.innerHTML = `
+    <div class="home-title serif">Guion Rápido</div>
+    <div class="home-sub">Repásalo antes de hablar con el negocio</div>
+    <div class="guion-card">
+      <div class="guion-eyebrow">${card.t}</div>
+      <div class="guion-linea">"${card.linea}"</div>
+      <div class="guion-nota">${card.nota}</div>
+    </div>
+    <div class="guion-nav">
+      <button class="guion-navbtn" onclick="guionNav(-1)" ${state.guionIdx===0?"disabled":""}>‹</button>
+      <div class="guion-dots">
+        ${GUION.map((_, i) => `<div class="guion-dot ${i===state.guionIdx?"active":""}"></div>`).join("")}
+      </div>
+      <button class="guion-navbtn" onclick="guionNav(1)" ${state.guionIdx===GUION.length-1?"disabled":""}>›</button>
+    </div>
+  `;
+}
+
+// ---- TAB BAR / NAV ----
+function switchView(view) {
+  state.tab = view === "detail" ? state.tab : view;
+  ["paquetes","detail","ventas","guion"].forEach(v => {
+    document.getElementById("view-"+v).classList.toggle("hidden", v !== view);
+  });
+  document.getElementById("tabbar").style.display = view === "detail" ? "none" : "flex";
+  if (view === "paquetes") renderPaquetes();
+  if (view === "detail") renderDetail();
+  if (view === "ventas") renderVentas();
+  if (view === "guion") renderGuion();
+  renderTabbar();
+}
+function renderTabbar() {
+  const tabs = [
+    { id: "paquetes", icon: "📦", label: "Paquetes" },
+    { id: "ventas", icon: "📋", label: "Mis Ventas" },
+    { id: "guion", icon: "📖", label: "Guion" },
+  ];
+  document.getElementById("tabbar").innerHTML = tabs.map(t => `
+    <button class="tab-btn ${state.tab===t.id?"active":""}" onclick="switchView('${t.id}')">
+      <div class="tab-icon">${t.icon}</div>
+      <div class="tab-label">${t.label}</div>
+    </button>
+  `).join("");
+}
+
+// ---- INIT ----
+loadVentas();
+switchView("paquetes");
+</script>
+</body>
+</html>

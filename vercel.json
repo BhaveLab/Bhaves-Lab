@@ -21,6 +21,7 @@
     { "source": "/home.html", "destination": "/index.html" },
     { "source": "/workshops-landing.html", "destination": "/events.html" },
     { "source": "/interview", "destination": "/interview.html" },
-    { "source": "/card", "destination": "/card.html" }
+    { "source": "/card", "destination": "/card.html" },
+    { "source": "/elis", "destination": "/elis.html" }
   ]
 }
