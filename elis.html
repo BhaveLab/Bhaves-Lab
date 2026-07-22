@@ -150,6 +150,7 @@ const PAQUETES = [
     sinComp: true,
     misionNota: "Muchos negocios aquí ni siquiera tienen un mapa o WhatsApp organizado. Esto no es sobre ahorrar dinero de agencia — es sobre existir en línea por primera vez.",
     precio: 50, precioHNL: 1300, cashOpt: 20, cambioOpt: 750, comision: 25, comisionHNL: 625,
+    stripeLink: "https://buy.stripe.com/00w8wI4kcdKa8Zg7F9bQY0n",
   },
   {
     id: 2, n: "02", icon: "🌐", nombre: "Sitio Web Estándar", sub: "Identity Package",
@@ -159,6 +160,7 @@ const PAQUETES = [
     entregables: ["Dirección web propia por 1 año", "Página para celular con menú, fotos y precios", "Perfil completo en Google Maps", "Anuncio en el Directorio Oficial Bhavé Labs"],
     valorRealMin: 500, valorRealMax: 800,
     precio: 100, precioHNL: 2600, cashOpt: 40, cambioOpt: 5000, comision: 25, comisionHNL: 625,
+    stripeLink: "https://buy.stripe.com/00w9AMbMEcG61wOe3xbQY0m",
   },
   {
     id: 3, n: "03", icon: "🏨", nombre: "Suite de Turismo y Hoteles", sub: "Multi-Page & Booking",
@@ -168,6 +170,7 @@ const PAQUETES = [
     entregables: ["Sitio de 4 páginas (Inicio, Servicios, Galería, Reservas)", "Cambio de idioma Español / Inglés", "Reservas directas a correo o WhatsApp", "Catálogo digital en código QR"],
     valorRealMin: 1200, valorRealMax: 2000,
     precio: 350, precioHNL: 8800, cashOpt: 100, cambioOpt: 12500, comision: 50, comisionHNL: 1250,
+    stripeLink: "https://buy.stripe.com/cNi5kwg2U49A3EWe3xbQY0l",
   },
   {
     id: 4, n: "04", icon: "🏢", nombre: "Nodo Comercial y Desarrollo", sub: "Full Enterprise",
@@ -177,6 +180,7 @@ const PAQUETES = [
     entregables: ["Tienda en línea con pasarela de pagos", "Muestrario en video HD", "Píxeles de seguimiento para anuncios", "Estado de Socio Preferencial Bhavé Labs"],
     valorRealMin: 3000, valorRealMax: 5000,
     precio: 700, precioHNL: 17500, cashOpt: 200, cambioOpt: 25000, comision: 100, comisionHNL: 2500,
+    stripeLink: "https://buy.stripe.com/4gM8wI2c48pQ8Zg9NhbQY0k",
   },
 ];
 
@@ -274,6 +278,9 @@ function priceRevealHtml(pkg, revealed) {
     <div class="villa-amt serif">${money(pkg.precio, pkg.precioHNL)}</div>
     <div class="villa-note">No es un descuento — es precio pensado para la villa. También aceptamos intercambio: $${pkg.cashOpt} cash + L ${pkg.cambioOpt.toLocaleString()} en producto, comida, transporte u hospedaje.</div>
     <div class="gana-box">🪙 <div>Tú ganas <b>${money(pkg.comision, pkg.comisionHNL)}</b> al instante</div></div>
+    <button class="btn-reveal" style="margin-top:12px; background:transparent; border:1px solid var(--gold); color:var(--gold);" onclick="window.open('${pkg.stripeLink}', '_blank')">
+      💳 Pagar con Tarjeta
+    </button>
   `;
 }
 let priceRevealed = false;
