@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Taxi Directo — Carlos</title>
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Taxi Directo">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Taxi Directo","short_name":"Taxi Directo","start_url":".","display":"standalone","background_color":"%230A0A0A","theme_color":"%230A0A0A","icons":[]}'>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  body { background:#0A0A0A; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  .yellow { color:#FFC72C; }
+  .bg-yellow-taxi { background:#FFC72C; }
+  .bg-green-duty { background:#22C55E; }
+  .tap { transition: transform .08s ease; }
+  .tap:active { transform: scale(0.96); }
+  input:focus, select:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,199,44,0.35); }
+  @keyframes pulse-once { 0%{opacity:.4} 100%{opacity:1} }
+  .fade-in { animation: pulse-once .25s ease; }
+  #qr-holder svg { width:100%; height:auto; display:block; }
+</style>
+</head>
+<body class="text-white min-h-screen">
+
+<div id="app" class="max-w-md mx-auto min-h-screen flex flex-col px-5 pb-8"></div>
+
+<!-- ============ Embedded QR code generator (Kazuhiko Arase, MIT license) ============
+     Bundled inline so this stays a single deployable file with no CDN dependency
+     for the driver panel's QR code. -->
+<script>
+var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,h=null,i=[],v={},_=function(a,f){r=n*4+17,t=(function(e){for(var u=new Array(e),o=0;o<e;o+=1){u[o]=new Array(e);for(var d=0;d<e;d+=1)u[o][d]=null}return u})(r),B(0,0),B(r-7,0),B(0,r-7),E(),T(),m(a,f),n>=7&&N(a),h==null&&(h=nr(n,s,i)),U(h,f)},B=function(a,f){for(var e=-1;e<=7;e+=1)if(!(a+e<=-1||r<=a+e))for(var u=-1;u<=7;u+=1)f+u<=-1||r<=f+u||(0<=e&&e<=6&&(u==0||u==6)||0<=u&&u<=6&&(e==0||e==6)||2<=e&&e<=4&&2<=u&&u<=4?t[a+e][f+u]=!0:t[a+e][f+u]=!1)},k=function(){for(var a=0,f=0,e=0;e<r;e+=1)for(var u=0;u<r;u+=1){for(var o=0,d=t[u][e],c=-1;c<=1;c+=1)if(!(u+c<0||r<=u+c))for(var b=-1;b<=1;b+=1)e+b<0||r<=e+b||c==0&&b==0||d==t[u+c][e+b]&&(o+=1);o>5&&(a+=3+o-5)}for(var e=0;e<r-1;e+=1)for(var u=0;u<r-1;u+=1){var q=0;t[e][u]&&(q+=1),t[e+1][u]&&(q+=1),t[e][u+1]&&(q+=1),t[e+1][u+1]&&(q+=1),(q==0||q==4)&&(a+=3)}for(var e=0;e<r;e+=1)for(var u=0;u<r-6;u+=1)t[e][u]&&!t[e][u+1]&&t[e][u+2]&&t[e][u+3]&&t[e][u+4]&&!t[e][u+5]&&t[e][u+6]&&(a+=40);for(var u=0;u<r;u+=1)for(var e=0;e<r-6;e+=1)t[e][u]&&!t[e+1][u]&&t[e+2][u]&&t[e+3][u]&&t[e+4][u]&&!t[e+5][u]&&t[e+6][u]&&(a+=40);var y=0;for(var u=0;u<r;u+=1)for(var e=0;e<r;e+=1)t[e][u]&&(y+=1);var C=Math.abs(100*y/r/r-50)/5;return a+=C*10,a},m=function(a,f){for(var e=g-1;e>=0;e-=1)(e==6||e==7)&&f==2||F(e,a,f)},N=function(a){for(var f=zr.getPatternPosition(n),e=0;e<f.length;e+=1)for(var u=0;u<f.length;u+=1){var o=f[e],d=f[u];if(t[o][d]==null)for(var c=-2;c<=2;c+=1)for(var b=-2;b<=2;b+=1)c==-2||c==2||b==-2||b==2||c==0&&b==0?t[o+c][d+b]=!0:t[o+c][d+b]=!1}},E=function(){for(var a=8;a<r-8;a+=1)t[a][6]==null&&(t[a][6]=a%2==0);for(var a=8;a<r-8;a+=1)t[6][a]==null&&(t[6][a]=a%2==0)},T=function(){for(var a=zr.getBCHTypeInfo(s<<3|0),f=0;f<15;f+=1){var e=!x&&(a>>f&1)==1;f<6?t[f][8]=e:f<8?t[f+1][8]=e:t[r-15+f][8]=e}for(var f=0;f<15;f+=1){var e=!x&&(a>>f&1)==1;f<8?t[8][r-f-1]=e:f<9?t[8][15-f-1+1]=e:t[8][15-f-1]=e}t[r-8][8]=!x},F=function(a,f,e){for(var u=-1;u<=7;u+=1)if(!(a+u<=-1||r<=a+u))for(var o=-1;o<=7;o+=1)f+o<=-1||r<=f+o||u==-1&&(o==-1||o==7)||u==7&&(o==-1||o==7)||(0<=u&&u<=6&&(o==0||o==6)||0<=o&&o<=6&&(u==0||u==6)||2<=u&&u<=4&&2<=o&&o<=4?t[a+u][f+o]=!0:t[a+u][f+o]=null)},U=function(a,f){for(var e=-1,u=r-1,o=7,d=0,c=lr.getMaskFunction(f),b=r-1;b>0;b-=2)for(b==6&&(b-=1);;){for(var q=0;q<2;q+=1)if(t[u][b-q]==null){var y=!1;d<a.length&&(y=(a[d]>>>o&1)==1);var C=c(u,b-q);C&&(y=!y),t[u][b-q]=y,o-=1,o==-1&&(d+=1,o=7)}if(u+=e,u<0||r<=u){u-=e,e=-e;break}}},nr=function(a,f,e){for(var u=X.getRSBlocks(a,f),o=Y(),d=0;d<e.length;d+=1){var c=e[d];o.put(c.getMode(),4),o.put(c.getLength(),zr.getLengthInBits(c.getMode(),a)),c.write(o)}var b=0;for(var d=0;d<u.length;d+=1)b+=u[d].dataCount;if(o.getLengthInBits()>b*8)throw"code length overflow. ("+o.getLengthInBits()+">"+b*8+")";for(o.getLengthInBits()+4<=b*8&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=b*8||(o.put(236,8),o.getLengthInBits()>=b*8));)o.put(17,8);return rr(o,u)},rr=function(a,f){for(var e=0,u=0,o=0,d=new Array(f.length),c=new Array(f.length),b=0;b<f.length;b+=1){var q=f[b].dataCount,y=f[b].totalCount-q;u=Math.max(u,q),o=Math.max(o,y),d[b]=new Array(q);for(var C=0;C<d[b].length;C+=1)d[b][C]=255&a.getBuffer()[C+e];e+=q;var M=zr.getErrorCorrectPolynomial(y),D=Y2(d[b],M.getLength()-1).mod(M);c[b]=new Array(M.getLength()-1);for(var C=0;C<c[b].length;C+=1){var L=C+D.getLength()-c[b].length;c[b][C]=L>=0?D.getAt(L):0}}var A=0;for(var C=0;C<f.length;C+=1)A+=f[C].totalCount;var W=new Array(A),z=0;for(var C=0;C<u;C+=1)for(var b=0;b<f.length;b+=1)C<d[b].length&&(W[z]=d[b][C],z+=1);for(var C=0;C<o;C+=1)for(var b=0;b<f.length;b+=1)C<c[b].length&&(W[z]=c[b][C],z+=1);return W};v.addData=function(a,f){f=f||"Byte";var e=null;switch(f){case"Numeric":e=I(a);break;case"Alphanumeric":e=R(a);break;case"Byte":e=j(a);break;case"Kanji":e=K(a);break;default:throw"mode:"+f}i.push(e),h=null},v.isDark=function(a,f){if(a<0||r<=a||f<0||r<=f)throw a+","+f;return t[a][f]},v.getModuleCount=function(){return r},v.make=function(){if(n<1){for(var a=1;a<40;a+=1){for(var f=X.getRSBlocks(a,s),e=Y(),u=0;u<i.length;u+=1){var o=i[u];e.put(o.getMode(),4),e.put(o.getLength(),zr.getLengthInBits(o.getMode(),a)),o.write(e)}var d=0;for(var u=0;u<f.length;u+=1)d+=f[u].dataCount;if(e.getLengthInBits()<=d*8)break}n=a}_(!1,pr())},v.createTableTag=function(a,f){a=a||2,f=typeof f=="undefined"?a*4:f;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+f+"px;",e+='">',e+="<tbody>";for(var u=0;u<v.getModuleCount();u+=1){e+="<tr>";for(var o=0;o<v.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+a+"px;",e+=" height: "+a+"px;",e+=" background-color: ",e+=v.isDark(u,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>",e},v.createSvgTag=function(a,f,e,u){var o=v.getModuleCount()*(a=a||2)+(f=typeof f=="undefined"?a*4:f)*2;e="";var d;for(d=0;d<v.getModuleCount();d+=1)for(var c=d*a+f,b=0;b<v.getModuleCount();b+=1)if(v.isDark(d,b)){var q=b*a+f;e+="<rect x=\""+q+"\" y=\""+c+"\" width=\""+a+"\" height=\""+a+"\" fill=\"#000000\"/>"}return'<svg xmlns="http://www.w3.org/2000/svg" width="'+o+'px" height="'+o+'px" viewBox="0 0 '+o+" "+o+'" preserveAspectRatio="xMinYMin meet"><rect width="100%" height="100%" fill="#ffffff" cx="0" cy="0"/>'+e+"</svg>"},v.createDataURL=function(a,f){a=a||2,f=typeof f=="undefined"?a*4:f;var e=v.getModuleCount()*a+f*2,u=f,o=e-f;return H(e,e,function(d,c){if(u<=d&&d<o&&u<=c&&c<o){var b=Math.floor((d-u)/a),q=Math.floor((c-u)/a);return v.isDark(q,b)}else return!1})},v.createImgTag=function(a,f,e){a=a||2,f=typeof f=="undefined"?a*4:f;var u="";return u+="<img",u+='\tsrc="',u+=v.createDataURL(a,f),u+='"',u+=' width="',u+=v.getModuleCount()*a+f*2,u+='"',u+=' height="',u+=v.getModuleCount()*a+f*2,u+='"',e&&(u+=' alt="',u+=nn(e),u+='"'),u+="/>",u};var H=function(a,f,e){for(var u="data:image/gif;base64,",o=[],d=0;d<f;d+=1){for(var c=0;c<a;c+=1)o.push(e(c,d)?1:0)}return u+=or(a,f,o),u},or=function(a,f,e){var u=0,o=0,d=0,c="",b="",q=1<<0;c=e[0]?"1":"0";for(var y=1;y<e.length;y+=1){var C=e[y]?"1":"0";C==c?d+=1:(c=C,b+=String.fromCharCode((d>>0&31)+63),b+=String.fromCharCode((d>>5&31)+63),d=0)}return b+=String.fromCharCode((d>>0&31)+63),b+=String.fromCharCode((d>>5&31)+63),"GIF87a"+ur(a)+ur(f)+"\x80\x00\x00\xff\xff\xff\x00\x00\x00,\x00\x00\x00\x00"+ur(a)+ur(f)+"\x00"+b+"\x00;"};return v};P.stringToBytes=function(x){return x.split("").map(function(w){return w.charCodeAt(0)&255})};var O={L:1,M:0,Q:3,H:2},zr=(function(){var x=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,108],[6,30,58,86,110],[6,34,62,90,114],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],w={};return w.getBCHTypeInfo=function(g){for(var l=g<<10;lr.getBCHDigit(l)-lr.getBCHDigit(1335)>=0;)l^=1335<<lr.getBCHDigit(l)-lr.getBCHDigit(1335);return(g<<10|l)^21522},w.getBCHTypeNumber=function(g){for(var l=g<<12;lr.getBCHDigit(l)-lr.getBCHDigit(7973)>=0;)l^=7973<<lr.getBCHDigit(l)-lr.getBCHDigit(7973);return g<<12|l},w.getPatternPosition=function(g){return x[g-1]},w.getMask=function(g,l,n){switch(g){case 0:return(l+n)%2==0;case 1:return l%2==0;case 2:return n%3==0;case 3:return(l+n)%3==0;case 4:return(Math.floor(l/2)+Math.floor(n/3))%2==0;case 5:return l*n%2+l*n%3==0;case 6:return(l*n%2+l*n%3)%2==0;case 7:return(l*n%3+(l+n)%2)%2==0;default:throw"bad maskPattern:"+g}},w.getErrorCorrectPolynomial=function(g){for(var l=Y2([1],0),n=0;n<g;n+=1)l=l.multiply(Y2([1,dr.gexp(n)],0));return l},w.getLengthInBits=function(g,l){if(1<=l&&l<10)switch(g){case 1:return 10;case 2:return 9;case 4:return 8;case 8:return 8;default:throw"mode:"+g}else if(l<27)switch(g){case 1:return 12;case 2:return 11;case 4:return 16;case 8:return 10;default:throw"mode:"+g}else if(l<41)switch(g){case 1:return 14;case 2:return 13;case 4:return 16;case 8:return 12;default:throw"mode:"+g}else throw"type:"+l},w.getLostPoint=function(g){for(var l=g.getModuleCount(),n=0,s=0;s<l;s+=1)for(var t=0;t<l;t+=1){for(var r=0,h=g.isDark(s,t),i=-1;i<=1;i+=1)if(!(s+i<0||l<=s+i))for(var v=-1;v<=1;v+=1)t+v<0||l<=t+v||i==0&&v==0||h==g.isDark(s+i,t+v)&&(r+=1);r>5&&(n+=3+r-5)}for(var s=0;s<l-1;s+=1)for(var t=0;t<l-1;t+=1){var _=0;g.isDark(s,t)&&(_+=1),g.isDark(s+1,t)&&(_+=1),g.isDark(s,t+1)&&(_+=1),g.isDark(s+1,t+1)&&(_+=1),(_==0||_==4)&&(n+=3)}for(var s=0;s<l;s+=1)for(var t=0;t<l-6;t+=1)g.isDark(s,t)&&!g.isDark(s,t+1)&&g.isDark(s,t+2)&&g.isDark(s,t+3)&&g.isDark(s,t+4)&&!g.isDark(s,t+5)&&g.isDark(s,t+6)&&(n+=40);for(var t=0;t<l;t+=1)for(var s=0;s<l-6;s+=1)g.isDark(s,t)&&!g.isDark(s+1,t)&&g.isDark(s+2,t)&&g.isDark(s+3,t)&&g.isDark(s+4,t)&&!g.isDark(s+5,t)&&g.isDark(s+6,t)&&(n+=40);var C=0;for(var t=0;t<l;t+=1)for(var s=0;s<l;s+=1)g.isDark(s,t)&&(C+=1);var M=Math.abs(100*C/l/l-50)/5;return n+=M*10,n},w})(),dr=(function(){for(var x=new Array(256),w=new Array(256),g=0;g<8;g+=1)x[g]=1<<g;for(var g=8;g<256;g+=1)x[g]=x[g-4]^x[g-5]^x[g-6]^x[g-8];for(var g=0;g<255;g+=1)w[x[g]]=g;var l={};return l.glog=function(n){if(n<1)throw"glog("+n+")";return w[n]},l.gexp=function(n){for(;n<0;)n+=255;for(;n>=256;)n-=255;return x[n]},l})();function Y2(x,w){if(typeof x.length=="undefined")throw x.length+"/"+w;var g=0;for(g=0;g<x.length&&x[g]==0;)g+=1;var l=new Array(x.length-g+w),n;for(n=0;n<x.length-g;n+=1)l[n]=x[n+g];var s={};return s.getAt=function(t){return l[t]},s.getLength=function(){return l.length},s.multiply=function(t){for(var r=new Array(s.getLength()+t.getLength()-1),h=0;h<s.getLength();h+=1)for(var i=0;i<t.getLength();i+=1)r[h+i]^=dr.gexp(dr.glog(s.getAt(h))+dr.glog(t.getAt(i)));return Y2(r,0)},s.mod=function(t){if(s.getLength()-t.getLength()<0)return s;for(var r=dr.glog(s.getAt(0))-dr.glog(t.getAt(0)),h=new Array(s.getLength()),i=0;i<s.getLength();i+=1)h[i]=s.getAt(i);for(var i=0;i<t.getLength();i+=1)h[i]^=dr.gexp(dr.glog(t.getAt(i))+r);return Y2(h,0).mod(t)},s}var X=(function(){var x=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],w={};return w.getRSBlocks=function(g,l){var n=(function(u,o){switch(o){case 1:return x[(u-1)*4+0];case 0:return x[(u-1)*4+1];case 3:return x[(u-1)*4+2];case 2:return x[(u-1)*4+3];default:throw"error"}})(g,l);if(typeof n=="undefined")throw"bad rs block @ typeNumber:"+g+"/errorCorrectionLevel:"+l;for(var s=n.length/3,t=[],r=0;r<s;r+=1)for(var h=n[r*3+0],i=n[r*3+1],v=n[r*3+2],_=0;_<h;_+=1)t.push(w.createRSBlock(i,v));return t},w.createRSBlock=function(g,l){var n={};return n.totalCount=g,n.dataCount=l,n},w})(),Y=function(){var x=[],w=0,g={};return g.getBuffer=function(){return x},g.getAt=function(l){var n=Math.floor(l/8);return(x[n]>>>7-l%8&1)==1},g.put=function(l,n){for(var s=0;s<n;s+=1)g.putBit((l>>>n-s-1&1)==1)},g.getLengthInBits=function(){return w},g.putBit=function(l){var n=Math.floor(w/8);x.length<=n&&x.push(0),l&&(x[n]|=128>>>w%8),w+=1},g};function I(x){var w={};w._mode=1,w._data=x;var g=function(n){var s=n.charCodeAt(0)-48;return 48<=n.charCodeAt(0)&&n.charCodeAt(0)<=57?s:0};return w.getMode=function(){return w._mode},w.getLength=function(n){return w._data.length},w.write=function(n){for(var s=w._data,t=0;t+2<s.length;t+=3)n.put(g(s.charAt(t))*100+g(s.charAt(t+1))*10+g(s.charAt(t+2)),10);s.length-t==2?n.put(g(s.charAt(t))*10+g(s.charAt(t+1)),7):s.length-t==1&&n.put(g(s.charAt(t)),4)},w}function R(x){var w={};w._mode=2,w._data=x;var g=function(n){if(48<=n&&n<=57)return n-48;if(65<=n&&n<=90)return n-65+10;switch(n){case 32:return 36;case 36:return 37;case 37:return 38;case 42:return 39;case 43:return 40;case 45:return 41;case 46:return 42;case 47:return 43;case 58:return 44;default:throw"illegal char :"+n}};return w.getMode=function(){return w._mode},w.getLength=function(n){return w._data.length},w.write=function(n){for(var s=w._data,t=0;t+1<s.length;t+=2)n.put(g(s.charCodeAt(t))*45+g(s.charCodeAt(t+1)),11);s.length%2==1&&n.put(g(s.charCodeAt(t)),6)},w}function j(x){var w={};w._mode=4,w._data=x;var g=P.stringToBytes(x);return w.getMode=function(){return w._mode},w.getLength=function(n){return g.length},w.write=function(n){for(var s=0;s<g.length;s+=1)n.put(g[s],8)},w}function K(x){var w={};w._mode=8,w._data=x;return w.getMode=function(){return w._mode},w.getLength=function(n){return 0},w.write=function(n){};return w}var lr=(function(){var x={};var w=[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];return x.getBCHDigit=function(g){for(var l=0;g!=0;)l+=1,g>>>=1;return l},x.getMaskFunction=function(g){switch(g){case 0:return function(l,n){return(l+n)%2==0};case 1:return function(l,n){return l%2==0};case 2:return function(l,n){return n%3==0};case 3:return function(l,n){return(l+n)%3==0};case 4:return function(l,n){return(Math.floor(l/2)+Math.floor(n/3))%2==0};case 5:return function(l,n){return l*n%2+l*n%3==0};case 6:return function(l,n){return(l*n%2+l*n%3)%2==0};case 7:return function(l,n){return(l*n%3+(l+n)%2)%2==0};default:throw"bad maskPattern:"+g}},x})(),pr=function(){return 0};return function(x,w){var g=0;typeof x=="object"&&(g=x.typeNumber||0,w=x.errorCorrectionLevel||"L");var l=P(g,O[w||"L"]!==undefined?w:"L");return l.addData(typeof x=="object"?x.text||"":x),l.make(),l}})();
+</script>
+
+<script>
+// ============ DRIVER CONFIG — edit these for each driver's copy ============
+const DRIVER_NAME = "Carlos";
+const DRIVER_PHONE = "50499999999"; // Honduras country code + number, digits only
+const VEHICLE_MODEL = "White Nissan Sentra";
+const DRIVER_PIN = "1234"; // change before deploying to a real driver
+const DRIVER_ID = "carlos"; // unique slug — scopes this driver's data to their own tab in the shared backend Sheet
+// ==============================================================================
+
+// bhaveslab-backend serves /api/* by absolute URL — same pattern as elis.html
+const API_BASE = "https://bhaveslab-backend.vercel.app";
+
+const DEFAULT_ZONES = {
+  A: { name: { es: "Centro / Mall", en: "Downtown / Mall" }, hnlMin: 100, hnlMax: 150, usdMin: 4, usdMax: 6 },
+  B: { name: { es: "Corredor Monte Real", en: "Monte Real Corridor" }, hnlMin: 150, hnlMax: 200, usdMin: 6, usdMax: 8 },
+  C: { name: { es: "Río Cangrejal", en: "Cangrejal River" }, hnlMin: 350, hnlMax: 500, usdMin: 14, usdMax: 20 },
+  D: { name: { es: "Terminal / Aeropuerto", en: "Ferry Terminal / Airport" }, hnlMin: 250, hnlMax: 350, usdMin: 10, usdMax: 14 },
+};
+const ZONE_RANK = { A: 1, B: 2, D: 3, C: 4 };
+const ZONE_ORDER = ["A", "B", "C", "D"];
+
+const I18N = {
+  es: {
+    onDuty: "🟢 En Servicio — Disponible Ahora",
+    offDuty: "🔴 Fuera de Servicio — Puede Tardar en Responder",
+    pickup: "Recogida", dropoff: "Destino", time: "Hora",
+    asap: "Ahora", later: "Programar", passengers: "Pasajeros",
+    fareLabel: "Tarifa estimada", fareConfirm: "Tarifa confirmada al responder el motorista.",
+    fareNote: "Precio final lo confirma el motorista por WhatsApp.",
+    cta: "Pedir Viaje por WhatsApp",
+    ctaNote: "Se abre WhatsApp con el mensaje ya escrito — solo confirma y envía.",
+    otroPlaceholder: "Escribe la dirección...",
+    pwaBanner: `Agrega el Taxi de ${DRIVER_NAME} a tu pantalla de inicio`,
+    pwaBannerHow: "Toca compartir → Agregar a pantalla de inicio",
+    offDutyAsapWarning: "El motorista está fuera de servicio ahora — puede tardar en responder.",
+    dismiss: "Ahora no",
+    driverLogin: "Acceso Motorista",
+    pinTitle: "PIN del Motorista",
+    pinPlaceholder: "····",
+    pinWrong: "PIN incorrecto",
+    enter: "Entrar",
+    cancel: "Cancelar",
+    panelTitle: "Panel del Motorista",
+    statusSectionTitle: "Estado",
+    setOnDuty: "Poner En Servicio",
+    setOffDuty: "Poner Fuera de Servicio",
+    fareSectionTitle: "Ajustar Tarifas Base",
+    qrSectionTitle: "Código QR — Muéstralo a Pasajeros",
+    shareSectionTitle: "Compartir Link",
+    shareBtn: "Compartir por WhatsApp/SMS",
+    copyBtn: "Copiar Link",
+    copied: "¡Copiado!",
+    closePanel: "Cerrar Panel / Salir",
+    minLabel: "Mín",
+    maxLabel: "Máx",
+    confirmLogTitle: "Nueva Reserva",
+    confirmLogSubtitle: "Un pasajero pidió este viaje por WhatsApp. ¿Guardarlo en tu panel?",
+    saveToBookings: "Guardar en Mis Reservas",
+    discard: "Descartar",
+    bookingsSectionTitle: "Reservas",
+    addManually: "Agregar a Mano",
+    noBookings: "Todavía no hay reservas registradas.",
+    markDone: "Marcar Completado",
+    markPending: "Marcar Pendiente",
+    delete: "Eliminar",
+    save: "Guardar",
+    syncError: "No se pudo sincronizar con el servidor — usando datos guardados en este teléfono.",
+    refresh: "Actualizar",
+    justUpdated: "Actualizado hace un momento",
+    lastChecked: "Última verificación",
+    neverChecked: "Sin verificar todavía",
+  },
+  en: {
+    onDuty: "🟢 On Duty — Available Now",
+    offDuty: "🔴 Off Duty — May Be Slow To Respond",
+    pickup: "Pickup", dropoff: "Dropoff", time: "Time",
+    asap: "ASAP", later: "Schedule", passengers: "Passengers",
+    fareLabel: "Estimated fare", fareConfirm: "Rate confirmed once the driver replies.",
+    fareNote: "Final price is confirmed by the driver over WhatsApp.",
+    cta: "Request Ride via WhatsApp",
+    ctaNote: "Opens WhatsApp with the message pre-written — just confirm and send.",
+    otroPlaceholder: "Type the address...",
+    pwaBanner: `Add ${DRIVER_NAME}'s Taxi to your home screen`,
+    pwaBannerHow: "Tap Share → Add to Home Screen",
+    offDutyAsapWarning: "The driver is currently off duty — may take a while to respond.",
+    dismiss: "Not now",
+    driverLogin: "Driver Login",
+    pinTitle: "Driver PIN",
+    pinPlaceholder: "····",
+    pinWrong: "Incorrect PIN",
+    enter: "Enter",
+    cancel: "Cancel",
+    panelTitle: "Driver Control Panel",
+    statusSectionTitle: "Status",
+    setOnDuty: "Set On Duty",
+    setOffDuty: "Set Off Duty",
+    fareSectionTitle: "Adjust Base Fares",
+    qrSectionTitle: "QR Code — Show To Passengers",
+    shareSectionTitle: "Share Link",
+    shareBtn: "Share via WhatsApp/SMS",
+    copyBtn: "Copy Link",
+    copied: "Copied!",
+    closePanel: "Close Panel / Log Out",
+    minLabel: "Min",
+    maxLabel: "Max",
+    confirmLogTitle: "New Booking",
+    confirmLogSubtitle: "A passenger requested this ride via WhatsApp. Save it to your panel?",
+    saveToBookings: "Save to My Bookings",
+    discard: "Discard",
+    bookingsSectionTitle: "Bookings",
+    addManually: "Add Manually",
+    noBookings: "No bookings logged yet.",
+    markDone: "Mark Complete",
+    markPending: "Mark Pending",
+    delete: "Delete",
+    save: "Save",
+    syncError: "Couldn't sync with the server — using data saved on this phone.",
+    refresh: "Refresh",
+    justUpdated: "Just updated",
+    lastChecked: "Last checked",
+    neverChecked: "Not checked yet",
+  },
+};
+
+// ---- Local persistence (localStorage) — fallback copy so the app still
+// works, in a degraded single-device way, if the backend is unreachable ----
+const LS_STATUS = "taxi_status";
+const LS_ZONES = "taxi_zone_rates";
+const LS_PWA_DISMISSED = "taxi_pwa_dismissed";
+const LS_BOOKINGS = "taxi_bookings";
+
+function loadStatusLocal() { return localStorage.getItem(LS_STATUS) || "on"; }
+function saveStatusLocal(v) { localStorage.setItem(LS_STATUS, v); }
+
+function mergeZones(stored) {
+  const merged = JSON.parse(JSON.stringify(DEFAULT_ZONES));
+  if (stored) for (const k of ZONE_ORDER) if (stored[k]) Object.assign(merged[k], stored[k]);
+  return merged;
+}
+function loadZonesLocal() {
+  try {
+    const raw = localStorage.getItem(LS_ZONES);
+    return raw ? mergeZones(JSON.parse(raw)) : JSON.parse(JSON.stringify(DEFAULT_ZONES));
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_ZONES));
+  }
+}
+function saveZonesLocal(zones) { localStorage.setItem(LS_ZONES, JSON.stringify(zones)); }
+
+function loadBookingsLocal() {
+  try { return JSON.parse(localStorage.getItem(LS_BOOKINGS) || "[]"); } catch (e) { return []; }
+}
+function saveBookingsLocal(bookings) { localStorage.setItem(LS_BOOKINGS, JSON.stringify(bookings)); }
+
+// ---- Backend sync (bhaveslab-backend /api/taxi-backend, driverId-scoped) ----
+async function apiCall(action, body) {
+  const res = await fetch(`${API_BASE}/api/taxi-backend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, driverId: DRIVER_ID, ...(body || {}) }),
+  });
+  if (!res.ok) throw new Error("request failed: " + res.status);
+  return res.json();
+}
+
+async function fetchConfigFromBackend(showToast) {
+  try {
+    const data = await apiCall("getConfig");
+    if (data.status) { state.status = data.status; saveStatusLocal(data.status); }
+    state.zones = mergeZones(data.zones);
+    saveZonesLocal(state.zones);
+    state.syncError = false;
+    state.lastChecked = new Date();
+    if (showToast) {
+      state.justRefreshed = true;
+      setTimeout(() => { state.justRefreshed = false; render(); }, 2000);
+    }
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+
+async function syncConfigToBackend() {
+  try {
+    await apiCall("setConfig", { status: state.status, zones: state.zones });
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+
+async function fetchBookingsFromBackend() {
+  try {
+    const data = await apiCall("getBookings");
+    if (Array.isArray(data.bookings)) {
+      state.bookings = data.bookings;
+      saveBookingsLocal(state.bookings);
+    }
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+
+function manualRefresh() { fetchConfigFromBackend(true); }
+
+function formatRelativeTime(date) {
+  const diffMin = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (diffMin < 1) return state.lang === "es" ? "justo ahora" : "just now";
+  if (diffMin < 60) return state.lang === "es" ? `hace ${diffMin} min` : `${diffMin} min ago`;
+  const diffH = Math.floor(diffMin / 60);
+  return state.lang === "es" ? `hace ${diffH} h` : `${diffH}h ago`;
+}
+
+let state = {
+  lang: "es",
+  view: "passenger", // 'passenger' | 'pin' | 'driver' | 'confirmLog'
+  pinError: false,
+  status: loadStatusLocal(),
+  zones: loadZonesLocal(),
+  bookings: loadBookingsLocal(),
+  pendingLog: null, // booking parsed from a tap-to-log URL, awaiting confirmation
+  pwaDismissed: localStorage.getItem(LS_PWA_DISMISSED) === "1",
+  pickup: { presetId: null, zone: null, text: "" },
+  dropoff: { presetId: null, zone: null, text: "" },
+  timeMode: "asap",
+  pax: 1,
+  showManualAdd: false,
+  syncError: false,
+  lastChecked: null,
+  justRefreshed: false,
+};
+
+function t(key) { return I18N[state.lang][key]; }
+
+function syncBannerHtml() {
+  if (!state.syncError) return "";
+  return `<div class="rounded-xl bg-[#2A0D0D] border border-red-800 text-red-300 text-xs px-4 py-2.5 mb-4">⚠️ ${t("syncError")}</div>`;
+}
+
+// ---------------------------------------------------------------------------
+// PASSENGER VIEW
+// ---------------------------------------------------------------------------
+function passengerHtml() {
+  const presets = ZONE_ORDER.map((z) => ({ id: z, zone: z, name: state.zones[z].name }));
+  const otro = { id: "otro", zone: null, name: { es: "Otro (escribir)", en: "Other (type below)" } };
+  const allPresets = [...presets, otro];
+
+  const renderPresetGroup = (field) => allPresets.map((p) => {
+    const selected = state[field].presetId === p.id;
+    return `<button class="tap text-left px-3 py-2.5 rounded-xl border text-sm font-semibold ${selected ? "border-yellow-taxi bg-[#1C1600] yellow" : "border-neutral-700 text-neutral-300"}"
+      onclick="selectPreset('${field}','${p.id}')">${p.name[state.lang]}</button>`;
+  }).join("");
+
+  const statusPill = state.status === "on"
+    ? `<div class="rounded-xl bg-[#0D2410] border border-green-700 text-green-400 text-sm font-bold px-4 py-2.5 mb-3">${t("onDuty")}</div>`
+    : `<div class="rounded-xl bg-[#2A0D0D] border border-red-800 text-red-400 text-sm font-bold px-4 py-2.5 mb-3">${t("offDuty")}</div>`;
+
+  const refreshRow = `
+    <div class="flex items-center justify-between mb-1">
+      <div class="text-[11px] text-neutral-500">${t("lastChecked")}: ${state.lastChecked ? formatRelativeTime(state.lastChecked) : t("neverChecked")}</div>
+      <button class="tap text-xs font-bold yellow" onclick="manualRefresh()">🔄 ${t("refresh")}</button>
+    </div>
+    ${state.justRefreshed ? `<div class="text-center text-xs text-green-400 mb-3">${t("justUpdated")}</div>` : `<div class="mb-3"></div>`}
+  `;
+
+  const pwaBanner = state.pwaDismissed ? "" : `
+    <div class="rounded-xl bg-neutral-900 border border-neutral-700 px-4 py-3 mb-4 flex items-start gap-3">
+      <div class="text-xl">📲</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-semibold">${t("pwaBanner")}</div>
+        <div class="text-xs text-neutral-500 mt-0.5">${t("pwaBannerHow")}</div>
+      </div>
+      <button class="text-xs text-neutral-500 font-bold shrink-0" onclick="dismissPwaBanner()">${t("dismiss")}</button>
+    </div>`;
+
+  const bothZoned = state.pickup.zone && state.dropoff.zone;
+  const zoneKey = bothZoned ? (ZONE_RANK[state.pickup.zone] >= ZONE_RANK[state.dropoff.zone] ? state.pickup.zone : state.dropoff.zone) : null;
+  const fareBody = bothZoned
+    ? `<div class="text-3xl font-black yellow">L ${state.zones[zoneKey].hnlMin}–${state.zones[zoneKey].hnlMax}  ·  $${state.zones[zoneKey].usdMin}–$${state.zones[zoneKey].usdMax}</div>
+       <div class="text-xs text-neutral-500 mt-1">${t("fareNote")}</div>`
+    : `<div class="text-lg font-bold yellow">${t("fareConfirm")}</div>`;
+
+  return `
+    <div class="flex items-center justify-between pt-6 pb-4">
+      <div>
+        <div class="text-2xl font-black tracking-tight">🚕 <span class="yellow">TAXI</span> DIRECTO</div>
+        <div class="text-xs text-neutral-400 mt-0.5">La Ceiba, Honduras</div>
+      </div>
+      <div class="flex rounded-full bg-neutral-900 border border-neutral-700 overflow-hidden text-xs font-bold">
+        <button class="px-3 py-1.5 tap ${state.lang === "es" ? "bg-yellow-taxi text-black rounded-full" : "text-neutral-500"}" onclick="setLang('es')">ES</button>
+        <button class="px-3 py-1.5 tap ${state.lang === "en" ? "bg-yellow-taxi text-black rounded-full" : "text-neutral-500"}" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+
+    ${statusPill}
+    ${refreshRow}
+    ${syncBannerHtml()}
+    ${state.status === "off" && state.timeMode === "asap" ? `<div class="text-xs text-amber-400 -mt-2 mb-4">⚠️ ${t("offDutyAsapWarning")}</div>` : ""}
+    ${pwaBanner}
+
+    <div class="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 mb-5 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-full bg-yellow-taxi flex items-center justify-center text-xl">🚗</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-bold text-sm truncate">${DRIVER_NAME}</div>
+        <div class="text-xs text-neutral-400 truncate">${VEHICLE_MODEL}</div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("pickup")}</label>
+      <div class="grid grid-cols-2 gap-2 mb-2">${renderPresetGroup("pickup")}</div>
+      <input id="pickup-input" type="text" value="${state.pickup.presetId ? state.pickup.text : ""}"
+        class="${state.pickup.presetId && state.pickup.presetId !== "otro" ? "hidden " : ""}w-full rounded-xl bg-neutral-900 border border-neutral-700 px-4 py-3.5 text-base"
+        placeholder="${t("otroPlaceholder")}" oninput="onCustomInput('pickup', this.value)">
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("dropoff")}</label>
+      <div class="grid grid-cols-2 gap-2 mb-2">${renderPresetGroup("dropoff")}</div>
+      <input id="dropoff-input" type="text" value="${state.dropoff.presetId ? state.dropoff.text : ""}"
+        class="${state.dropoff.presetId && state.dropoff.presetId !== "otro" ? "hidden " : ""}w-full rounded-xl bg-neutral-900 border border-neutral-700 px-4 py-3.5 text-base"
+        placeholder="${t("otroPlaceholder")}" oninput="onCustomInput('dropoff', this.value)">
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("time")}</label>
+        <div class="flex gap-2">
+          <button class="tap flex-1 rounded-xl border py-3 text-sm font-bold ${state.timeMode === "asap" ? "border-yellow-taxi bg-[#1C1600] yellow" : "border-neutral-700"}"
+            onclick="setTimeMode('asap')">${t("asap")}</button>
+          <button class="tap flex-1 rounded-xl border py-3 text-sm font-bold ${state.timeMode === "later" ? "border-yellow-taxi bg-[#1C1600] yellow" : "border-neutral-700"}"
+            onclick="setTimeMode('later')">${t("later")}</button>
+        </div>
+        <input id="time-input" type="time" class="${state.timeMode === "later" ? "" : "hidden "}w-full mt-2 rounded-xl bg-neutral-900 border border-neutral-700 px-3 py-2.5 text-base">
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("passengers")}</label>
+        <div class="flex rounded-xl border border-neutral-700 overflow-hidden">
+          <button class="tap flex-1 py-3 text-lg font-bold" onclick="changePax(-1)">−</button>
+          <div class="flex-1 py-3 text-center text-lg font-black yellow">${state.pax}</div>
+          <button class="tap flex-1 py-3 text-lg font-bold" onclick="changePax(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 mb-5 fade-in">
+      <div class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-1">${t("fareLabel")}</div>
+      ${fareBody}
+    </div>
+
+    <div class="flex-1"></div>
+
+    <button id="cta-button" onclick="sendRequest()"
+      class="tap w-full bg-yellow-taxi text-black font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
+      style="opacity:${state.pickup.text.trim() && state.dropoff.text.trim() ? "1" : "0.5"}">
+      📲 ${t("cta")}
+    </button>
+    <div class="text-center text-xs text-neutral-500 mt-3">${t("ctaNote")}</div>
+
+    <button class="tap mt-6 text-xs text-neutral-600 font-semibold underline underline-offset-2" onclick="openPin()">${t("driverLogin")}</button>
+  `;
+}
+
+function selectPreset(field, presetId) {
+  const isOtro = presetId === "otro";
+  state[field].presetId = presetId;
+  state[field].zone = isOtro ? null : presetId;
+  state[field].text = isOtro ? "" : state.zones[presetId].name[state.lang];
+  render();
+  if (isOtro) document.getElementById(field + "-input").focus();
+}
+function onCustomInput(field, value) {
+  state[field].text = value;
+  const ctaBtn = document.getElementById("cta-button");
+  if (ctaBtn) ctaBtn.style.opacity = state.pickup.text.trim() && state.dropoff.text.trim() ? "1" : "0.5";
+}
+function setTimeMode(mode) {
+  state.timeMode = mode;
+  render();
+}
+function changePax(delta) {
+  state.pax = Math.min(4, Math.max(1, state.pax + delta));
+  render();
+}
+function dismissPwaBanner() {
+  state.pwaDismissed = true;
+  localStorage.setItem(LS_PWA_DISMISSED, "1");
+  render();
+}
+
+function buildLogUrl(p, d, timeStr, fareStr) {
+  const base = window.location.href.split("#")[0].split("?")[0];
+  const params = new URLSearchParams({
+    log: "1", pu: p, do: d, tm: timeStr, px: String(state.pax), fr: fareStr, lg: state.lang,
+  });
+  return `${base}?${params.toString()}`;
+}
+
+function buildMessage() {
+  const p = state.pickup.text || "—";
+  const d = state.dropoff.text || "—";
+  const timeStr = state.timeMode === "asap" ? t("asap") : ((document.getElementById("time-input") && document.getElementById("time-input").value) || t("later"));
+  const bothZoned = state.pickup.zone && state.dropoff.zone;
+  let fareStr;
+  if (bothZoned) {
+    const zoneKey = ZONE_RANK[state.pickup.zone] >= ZONE_RANK[state.dropoff.zone] ? state.pickup.zone : state.dropoff.zone;
+    const z = state.zones[zoneKey];
+    fareStr = `L ${z.hnlMin}-${z.hnlMax} (~$${z.usdMin}-$${z.usdMax})`;
+  } else {
+    fareStr = state.lang === "es" ? "Por confirmar" : "To be confirmed";
+  }
+  const logUrl = buildLogUrl(p, d, timeStr, fareStr);
+  if (state.lang === "es") {
+    return `Hola ${DRIVER_NAME}! Necesito un viaje.\n🚗 ${VEHICLE_MODEL}\n📍 Origen: ${p}\n🏁 Destino: ${d}\n⏰ Hora: ${timeStr}\n👥 Pasajeros: ${state.pax}\n💰 Tarifa Estimada: ${fareStr}\nPor favor confirme si está disponible.\n\n📋 Carlos: toca aquí para guardar esta reserva en tu panel:\n${logUrl}`;
+  }
+  return `Hi ${DRIVER_NAME}! I need a ride.\n🚗 ${VEHICLE_MODEL}\n📍 Pickup: ${p}\n🏁 Destination: ${d}\n⏰ Time: ${timeStr}\n👥 Passengers: ${state.pax}\n💰 Estimated Fare: ${fareStr}\nPlease confirm if you're available.\n\n📋 Carlos: tap here to save this booking to your panel:\n${logUrl}`;
+}
+function sendRequest() {
+  if (!state.pickup.text.trim() || !state.dropoff.text.trim()) return;
+  const url = `https://wa.me/${DRIVER_PHONE}?text=${encodeURIComponent(buildMessage())}`;
+  window.open(url, "_blank");
+}
+
+
+// ---------------------------------------------------------------------------
+// PIN MODAL
+// ---------------------------------------------------------------------------
+function openPin() { state.view = "pin"; state.pinError = false; render(); }
+function closePin() { state.view = "passenger"; render(); }
+function submitPin(value) {
+  if (value === DRIVER_PIN) {
+    state.view = "driver";
+    state.pinError = false;
+    render();
+    fetchConfigFromBackend(false);
+    fetchBookingsFromBackend();
+    return;
+  }
+  state.pinError = true;
+  render();
+}
+function pinHtml() {
+  return `
+    <div class="fixed inset-0 z-30 flex items-center justify-center bg-black/70 px-6" onclick="if(event.target===this) closePin()">
+      <div class="w-full max-w-xs bg-neutral-900 border border-neutral-700 rounded-2xl p-6">
+        <div class="text-lg font-black mb-4">${t("pinTitle")}</div>
+        <input id="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="${t("pinPlaceholder")}"
+          class="w-full text-center text-3xl tracking-[0.5em] rounded-xl bg-neutral-800 border border-neutral-700 px-4 py-3 mb-2"
+          onkeydown="if(event.key==='Enter') submitPin(this.value)">
+        ${state.pinError ? `<div class="text-red-400 text-xs font-bold mb-2">${t("pinWrong")}</div>` : ""}
+        <div class="flex gap-2 mt-3">
+          <button class="tap flex-1 rounded-xl border border-neutral-700 py-3 text-sm font-bold" onclick="closePin()">${t("cancel")}</button>
+          <button class="tap flex-1 rounded-xl bg-yellow-taxi text-black py-3 text-sm font-black" onclick="submitPin(document.getElementById('pin-input').value)">${t("enter")}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------------------
+// TAP-TO-LOG CONFIRMATION (reached only via the link inside the WhatsApp message)
+// ---------------------------------------------------------------------------
+function confirmLogHtml() {
+  const b = state.pendingLog;
+  if (!b) return passengerHtml();
+  return `
+    <div class="pt-10">
+      <div class="text-center text-4xl mb-3">📋</div>
+      <div class="text-xl font-black text-center mb-1">${t("confirmLogTitle")}</div>
+      <div class="text-sm text-neutral-400 text-center mb-6">${t("confirmLogSubtitle")}</div>
+      <div class="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 mb-6 space-y-2 text-sm">
+        <div><span class="text-neutral-500">${t("pickup")}:</span> <b>${b.pickup}</b></div>
+        <div><span class="text-neutral-500">${t("dropoff")}:</span> <b>${b.dropoff}</b></div>
+        <div><span class="text-neutral-500">${t("time")}:</span> <b>${b.time}</b></div>
+        <div><span class="text-neutral-500">${t("passengers")}:</span> <b>${b.pax}</b></div>
+        <div><span class="text-neutral-500">${t("fareLabel")}:</span> <b class="yellow">${b.fare}</b></div>
+      </div>
+      <button class="tap w-full bg-yellow-taxi text-black font-black text-lg py-4 rounded-2xl mb-3" onclick="confirmSaveLog()">${t("saveToBookings")}</button>
+      <button class="tap w-full rounded-xl border border-neutral-700 py-3 font-bold text-neutral-400" onclick="discardLog()">${t("discard")}</button>
+    </div>
+  `;
+}
+async function confirmSaveLog() {
+  const b = state.pendingLog;
+  if (!b) return;
+  const booking = {
+    id: Date.now(),
+    pickup: b.pickup, dropoff: b.dropoff, time: b.time, pax: b.pax, fare: b.fare,
+    createdAt: new Date().toISOString(),
+    status: "pending",
+  };
+  const bookings = loadBookingsLocal();
+  bookings.unshift(booking);
+  saveBookingsLocal(bookings);
+  state.bookings = bookings;
+  state.pendingLog = null;
+  state.view = "passenger";
+  render();
+  try {
+    await apiCall("addBooking", { booking });
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+function discardLog() {
+  state.pendingLog = null;
+  state.view = "passenger";
+  render();
+}
+
+// ---------------------------------------------------------------------------
+// DRIVER PANEL
+// ---------------------------------------------------------------------------
+function toggleStatus() {
+  state.status = state.status === "on" ? "off" : "on";
+  saveStatusLocal(state.status);
+  render();
+  syncConfigToBackend();
+}
+function adjustZoneRate(zoneKey, field, delta) {
+  state.zones[zoneKey][field] = Math.max(0, state.zones[zoneKey][field] + delta);
+  saveZonesLocal(state.zones);
+  render();
+  syncConfigToBackend();
+}
+function bookingUrl() {
+  return window.location.href.split("#")[0].split("?")[0];
+}
+function closeDriverPanel() {
+  state.view = "passenger";
+  render();
+}
+async function shareLink() {
+  const url = bookingUrl();
+  const text = state.lang === "es" ? `Reserva tu taxi con ${DRIVER_NAME}:` : `Book your ride with ${DRIVER_NAME}:`;
+  if (navigator.share) {
+    try { await navigator.share({ title: "Taxi Directo", text, url }); } catch (e) {}
+  } else if (navigator.clipboard) {
+    await navigator.clipboard.writeText(url);
+    flashCopied();
+  }
+}
+async function copyLink() {
+  const url = bookingUrl();
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(url);
+    flashCopied();
+  }
+}
+function flashCopied() {
+  const el = document.getElementById("copy-feedback");
+  if (!el) return;
+  el.textContent = t("copied");
+  setTimeout(() => { const e2 = document.getElementById("copy-feedback"); if (e2) e2.textContent = ""; }, 1500);
+}
+
+function bookingRowHtml(b) {
+  const done = b.status === "done";
+  return `
+    <div class="rounded-xl bg-neutral-800 border ${done ? "border-neutral-800 opacity-50" : "border-neutral-700"} p-3 mb-2">
+      <div class="flex justify-between items-start gap-2">
+        <div class="min-w-0">
+          <div class="text-sm font-bold truncate">${b.pickup} → ${b.dropoff}</div>
+          <div class="text-xs text-neutral-400 mt-0.5">⏰ ${b.time} · 👥 ${b.pax} · 💰 ${b.fare}</div>
+        </div>
+        <div class="text-[10px] text-neutral-500 shrink-0">${new Date(b.createdAt).toLocaleDateString(state.lang === "es" ? "es-HN" : "en-US")}</div>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button class="tap flex-1 rounded-lg py-2 text-xs font-bold ${done ? "border border-neutral-700 text-neutral-400" : "bg-green-duty text-black"}" onclick="toggleBookingDone('${b.id}')">
+          ${done ? t("markPending") : t("markDone")}
+        </button>
+        <button class="tap px-3 rounded-lg border border-neutral-700 text-xs font-bold text-red-400" onclick="deleteBooking('${b.id}')">${t("delete")}</button>
+      </div>
+    </div>`;
+}
+
+async function toggleBookingDone(id) {
+  const current = state.bookings.find((b) => String(b.id) === String(id));
+  const newStatus = current && current.status === "done" ? "pending" : "done";
+  const bookings = state.bookings.map((b) => String(b.id) === String(id) ? { ...b, status: newStatus } : b);
+  saveBookingsLocal(bookings);
+  state.bookings = bookings;
+  render();
+  try {
+    await apiCall("updateBooking", { id, patch: { status: newStatus } });
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+async function deleteBooking(id) {
+  const bookings = state.bookings.filter((b) => String(b.id) !== String(id));
+  saveBookingsLocal(bookings);
+  state.bookings = bookings;
+  render();
+  try {
+    await apiCall("deleteBooking", { id });
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+async function addManualBooking() {
+  const pickup = document.getElementById("manual-pickup").value.trim();
+  const dropoff = document.getElementById("manual-dropoff").value.trim();
+  const time = document.getElementById("manual-time").value.trim() || t("asap");
+  const pax = document.getElementById("manual-pax").value || "1";
+  const fare = document.getElementById("manual-fare").value.trim() || (state.lang === "es" ? "Por confirmar" : "To be confirmed");
+  if (!pickup || !dropoff) return;
+  const booking = { id: Date.now(), pickup, dropoff, time, pax, fare, createdAt: new Date().toISOString(), status: "pending" };
+  const bookings = [booking, ...state.bookings];
+  saveBookingsLocal(bookings);
+  state.bookings = bookings;
+  state.showManualAdd = false;
+  render();
+  try {
+    await apiCall("addBooking", { booking });
+    state.syncError = false;
+  } catch (e) {
+    state.syncError = true;
+  }
+  render();
+}
+function toggleManualAdd() {
+  state.showManualAdd = !state.showManualAdd;
+  render();
+}
+
+function driverPanelHtml() {
+  const zoneRows = ZONE_ORDER.map((z) => {
+    const zone = state.zones[z];
+    return `
+      <div class="rounded-xl bg-neutral-800 border border-neutral-700 p-3 mb-2">
+        <div class="text-sm font-bold mb-2">${zone.name[state.lang]}</div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <div class="text-neutral-500 mb-1">${t("minLabel")} (HNL)</div>
+            <div class="flex items-center rounded-lg border border-neutral-700 overflow-hidden">
+              <button class="tap px-3 py-1.5 font-bold" onclick="adjustZoneRate('${z}','hnlMin',-10)">−</button>
+              <div class="flex-1 text-center font-bold yellow">${zone.hnlMin}</div>
+              <button class="tap px-3 py-1.5 font-bold" onclick="adjustZoneRate('${z}','hnlMin',10)">+</button>
+            </div>
+          </div>
+          <div>
+            <div class="text-neutral-500 mb-1">${t("maxLabel")} (HNL)</div>
+            <div class="flex items-center rounded-lg border border-neutral-700 overflow-hidden">
+              <button class="tap px-3 py-1.5 font-bold" onclick="adjustZoneRate('${z}','hnlMax',-10)">−</button>
+              <div class="flex-1 text-center font-bold yellow">${zone.hnlMax}</div>
+              <button class="tap px-3 py-1.5 font-bold" onclick="adjustZoneRate('${z}','hnlMax',10)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="flex items-center justify-between pt-6 pb-5">
+      <div class="text-xl font-black">🔧 ${t("panelTitle")}</div>
+      <div class="flex rounded-full bg-neutral-900 border border-neutral-700 overflow-hidden text-xs font-bold">
+        <button class="px-3 py-1.5 tap ${state.lang === "es" ? "bg-yellow-taxi text-black rounded-full" : "text-neutral-500"}" onclick="setLang('es')">ES</button>
+        <button class="px-3 py-1.5 tap ${state.lang === "en" ? "bg-yellow-taxi text-black rounded-full" : "text-neutral-500"}" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+
+    ${syncBannerHtml()}
+
+    <div class="mb-6">
+      <div class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("statusSectionTitle")}</div>
+      <div class="rounded-xl border ${state.status === "on" ? "border-green-700 bg-[#0D2410]" : "border-red-800 bg-[#2A0D0D]"} p-4 mb-2 text-sm font-bold">
+        ${state.status === "on" ? t("onDuty") : t("offDuty")}
+      </div>
+      <button class="tap w-full rounded-xl py-3.5 font-black ${state.status === "on" ? "bg-red-600" : "bg-green-duty text-black"}" onclick="toggleStatus()">
+        ${state.status === "on" ? t("setOffDuty") : t("setOnDuty")}
+      </button>
+    </div>
+
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-xs font-bold uppercase tracking-wide text-neutral-400">${t("bookingsSectionTitle")}</div>
+        <button class="tap text-xs font-bold yellow" onclick="toggleManualAdd()">${state.showManualAdd ? t("cancel") : "+ " + t("addManually")}</button>
+      </div>
+      ${state.showManualAdd ? `
+        <div class="rounded-xl bg-neutral-800 border border-neutral-700 p-3 mb-3 space-y-2">
+          <input id="manual-pickup" type="text" placeholder="${t("pickup")}" class="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm">
+          <input id="manual-dropoff" type="text" placeholder="${t("dropoff")}" class="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="manual-time" type="text" placeholder="${t("time")}" class="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm">
+            <input id="manual-pax" type="number" min="1" max="4" value="1" placeholder="${t("passengers")}" class="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm">
+          </div>
+          <input id="manual-fare" type="text" placeholder="${t("fareLabel")}" class="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm">
+          <button class="tap w-full rounded-lg bg-yellow-taxi text-black font-bold py-2 text-sm" onclick="addManualBooking()">${t("save")}</button>
+        </div>
+      ` : ""}
+      ${state.bookings.length === 0 && !state.showManualAdd ? `<div class="text-xs text-neutral-500 italic">${t("noBookings")}</div>` : ""}
+      ${state.bookings.map(bookingRowHtml).join("")}
+    </div>
+
+    <div class="mb-6">
+      <div class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("fareSectionTitle")}</div>
+      ${zoneRows}
+    </div>
+
+    <div class="mb-6">
+      <div class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("qrSectionTitle")}</div>
+      <div id="qr-holder" class="bg-white rounded-2xl p-4"></div>
+    </div>
+
+    <div class="mb-8">
+      <div class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">${t("shareSectionTitle")}</div>
+      <button class="tap w-full rounded-xl bg-yellow-taxi text-black font-black py-3.5 mb-2" onclick="shareLink()">${t("shareBtn")}</button>
+      <button class="tap w-full rounded-xl border border-neutral-700 font-bold py-3" onclick="copyLink()">${t("copyBtn")}</button>
+      <div id="copy-feedback" class="text-center text-xs yellow mt-2 h-4"></div>
+    </div>
+
+    <button class="tap w-full rounded-xl border border-neutral-700 py-3.5 font-bold text-neutral-400" onclick="closeDriverPanel()">${t("closePanel")}</button>
+  `;
+}
+
+function renderQr() {
+  const holder = document.getElementById("qr-holder");
+  if (!holder) return;
+  try {
+    // This qrcode() wrapper takes the TEXT to encode directly as its first
+    // argument (auto-picks QR type/size) — it is not a (typeNumber, level)
+    // constructor. Passing a type number here would silently encode that
+    // number instead of the URL.
+    const qr = qrcode(bookingUrl(), "M");
+    holder.innerHTML = qr.createSvgTag(6, 8);
+  } catch (e) {
+    holder.innerHTML = `<div class="text-black text-xs p-4">QR unavailable: ${e.message}</div>`;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ROOT RENDER
+// ---------------------------------------------------------------------------
+function setLang(lang) { state.lang = lang; render(); }
+
+function render() {
+  const app = document.getElementById("app");
+  if (state.view === "driver") {
+    app.innerHTML = driverPanelHtml();
+    renderQr();
+  } else if (state.view === "confirmLog") {
+    app.innerHTML = confirmLogHtml();
+  } else {
+    app.innerHTML = passengerHtml();
+    if (state.view === "pin") {
+      document.getElementById("app").insertAdjacentHTML("beforeend", pinHtml());
+      const pinInput = document.getElementById("pin-input");
+      if (pinInput) pinInput.focus();
+    }
+  }
+}
+
+// If this page was opened from the tap-to-log link inside a WhatsApp booking
+// message, pull the booking details out of the URL and show a one-tap
+// confirm screen instead of the normal passenger view. This only matters on
+// whichever device opens that specific link — in practice, only Carlos's,
+// since only he receives that message.
+function checkForPendingLog() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("log") !== "1") return;
+  state.pendingLog = {
+    pickup: params.get("pu") || "",
+    dropoff: params.get("do") || "",
+    time: params.get("tm") || "",
+    pax: params.get("px") || "1",
+    fare: params.get("fr") || "",
+    lang: params.get("lg") || "es",
+  };
+  state.lang = state.pendingLog.lang === "en" ? "en" : "es";
+  state.view = "confirmLog";
+  // Clear the params from the address bar so refreshing doesn't re-trigger this
+  const cleanUrl = window.location.href.split("?")[0];
+  window.history.replaceState({}, "", cleanUrl);
+}
+
+checkForPendingLog();
+render();
+// Silent background refresh from the shared backend on load — status/fares
+// can go stale if another device (or Carlos's own panel) changed them since
+// this page was last opened; falls back to the localStorage copy on failure.
+fetchConfigFromBackend(false);
+</script>
+</body>
+</html>
