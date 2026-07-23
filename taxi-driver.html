@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Taxi Directo — Carlos</title>
+<title>Taxi Directo — Driver</title>
 <meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,11 +37,11 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
 
 <script>
 // ============ DRIVER CONFIG — edit these for each driver's copy ============
-const DRIVER_NAME = "Carlos";
+const DRIVER_NAME = "Driver";
 const DRIVER_PHONE = "50499999999"; // Honduras country code + number, digits only
 const VEHICLE_MODEL = "White Nissan Sentra";
 const DRIVER_PIN = "1234"; // change before deploying to a real driver
-const DRIVER_ID = "carlos"; // unique slug — scopes this driver's data to their own tab in the shared backend Sheet
+const DRIVER_ID = "driver"; // unique slug — scopes this driver's data to their own tab in the shared backend Sheet
 // ==============================================================================
 
 // bhaveslab-backend serves /api/* by absolute URL — same pattern as elis.html
@@ -452,9 +452,9 @@ function buildMessage() {
   }
   const logUrl = buildLogUrl(p, d, timeStr, fareStr);
   if (state.lang === "es") {
-    return `Hola ${DRIVER_NAME}! Necesito un viaje.\n🚗 ${VEHICLE_MODEL}\n📍 Origen: ${p}\n🏁 Destino: ${d}\n⏰ Hora: ${timeStr}\n👥 Pasajeros: ${state.pax}\n💰 Tarifa Estimada: ${fareStr}\nPor favor confirme si está disponible.\n\n📋 Carlos: toca aquí para guardar esta reserva en tu panel:\n${logUrl}`;
+    return `Hola ${DRIVER_NAME}! Necesito un viaje.\n🚗 ${VEHICLE_MODEL}\n📍 Origen: ${p}\n🏁 Destino: ${d}\n⏰ Hora: ${timeStr}\n👥 Pasajeros: ${state.pax}\n💰 Tarifa Estimada: ${fareStr}\nPor favor confirme si está disponible.\n\n📋 ${DRIVER_NAME}: toca aquí para guardar esta reserva en tu panel:\n${logUrl}`;
   }
-  return `Hi ${DRIVER_NAME}! I need a ride.\n🚗 ${VEHICLE_MODEL}\n📍 Pickup: ${p}\n🏁 Destination: ${d}\n⏰ Time: ${timeStr}\n👥 Passengers: ${state.pax}\n💰 Estimated Fare: ${fareStr}\nPlease confirm if you're available.\n\n📋 Carlos: tap here to save this booking to your panel:\n${logUrl}`;
+  return `Hi ${DRIVER_NAME}! I need a ride.\n🚗 ${VEHICLE_MODEL}\n📍 Pickup: ${p}\n🏁 Destination: ${d}\n⏰ Time: ${timeStr}\n👥 Passengers: ${state.pax}\n💰 Estimated Fare: ${fareStr}\nPlease confirm if you're available.\n\n📋 ${DRIVER_NAME}: tap here to save this booking to your panel:\n${logUrl}`;
 }
 function sendRequest() {
   if (!state.pickup.text.trim() || !state.dropoff.text.trim()) return;
@@ -801,8 +801,8 @@ function render() {
 // If this page was opened from the tap-to-log link inside a WhatsApp booking
 // message, pull the booking details out of the URL and show a one-tap
 // confirm screen instead of the normal passenger view. This only matters on
-// whichever device opens that specific link — in practice, only Carlos's,
-// since only he receives that message.
+// whichever device opens that specific link — in practice, only the
+// driver's, since only they receive that message.
 function checkForPendingLog() {
   const params = new URLSearchParams(window.location.search);
   if (params.get("log") !== "1") return;
@@ -824,7 +824,7 @@ function checkForPendingLog() {
 checkForPendingLog();
 render();
 // Silent background refresh from the shared backend on load — status/fares
-// can go stale if another device (or Carlos's own panel) changed them since
+// can go stale if another device (or the driver's own panel) changed them since
 // this page was last opened; falls back to the localStorage copy on failure.
 fetchConfigFromBackend(false);
 </script>
